@@ -1,14 +1,11 @@
- terraform {
-  backend "remote" {
+terraform {
+  backend "cloud" {
     organization = "hogwarts"
 
     workspaces {
       name = "prod-eu-central"
     }
   }
- /*  backend "local" {
-    path = ".terraform/terraform.tfstate"
-  } */
 
   required_providers {
     linode = {
@@ -34,7 +31,7 @@ provider "cloudflare" {
 
 resource "linode_instance" "server1" {
   label = var.server1_label
-  tags = [ "prod", "server" ]
+  tags = [ "prod" ]
   image = var.server1_image
   region = var.server1_region
   type = var.server1_type
@@ -65,10 +62,10 @@ resource "linode_instance" "server1" {
       "sed -i 's/PermitRootLogin.*/PermitRootLogin without-password/' /etc/ssh/sshd_config",
 
       # Add Tailscale login
-      #"tailscale up --authkey=${var.server1_tskey}",
+      "tailscale up --authkey=${var.server1_tskey}",
 
       # .bashrc
-      #"echo -e '## Aliases\nalias ls='ls -ahlG'\ncdls() { cd '$@' && ls; }\nalias cd='cdls'\n\n# Restart linode1, simply running reboot from the OS doesn't bring up the Linode\nexport LINODE_TOKEN=${var.linode_selfrestart_token}\nalias reboot='linode-cli linodes reboot ${linode_instance.server1.id}'\n' >> .bashrc",
+      "echo -e '## Aliases\nalias ls='ls -ahlG'\ncdls() { cd '$@' && ls; }\nalias cd='cdls'\n\n# Restart linode1, simply running reboot from the OS doesn't bring up the Linode\nexport LINODE_TOKEN=${var.linode_selfrestart_token}\nalias reboot='linode-cli linodes reboot ${linode_instance.server1.id}'\n' >> .bashrc",
 
       # firewall config
       "firewall-cmd --permanent --service=http --add-port=80/udp",
