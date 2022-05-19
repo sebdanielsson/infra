@@ -1,5 +1,5 @@
 terraform {
-  backend "cloud" {
+  cloud {
     organization = "hogwarts"
 
     workspaces {
@@ -24,9 +24,8 @@ provider "linode" {
   token = var.linode_token
 }
 
-provider "cloudflare" { 
-  email   = var.cloudflare_email
-  api_key = var.cloudflare_api_key
+provider "cloudflare" {
+  api_key = var.cloudflare_api_token
 }
 
 resource "linode_instance" "server1" {
@@ -132,7 +131,7 @@ resource "cloudflare_record" "dns_ipv6_server1" {
 
 # Linode tokens
 variable "linode_token" {
-  description = "Linode API token"
+  description = "Linode API Token"
   type = string
   sensitive = true
 }
@@ -143,15 +142,9 @@ variable "linode_selfrestart_token" {
   sensitive = true
 }
 
-# Cloudflare tokens
-variable "cloudflare_email" {
-  description = "Cloudflare account email"
-  type = string
-  sensitive = true
-}
-
-variable "cloudflare_api_key" {
-  description = "Cloudflare API Key"
+# Cloudflare
+variable "cloudflare_api_token" {
+  description = "Cloudflare API Token"
   type = string
   sensitive = true
 }
