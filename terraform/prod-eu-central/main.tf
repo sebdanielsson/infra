@@ -25,7 +25,7 @@ provider "linode" {
 }
 
 provider "cloudflare" {
-  api_key = var.cloudflare_api_token
+  api_token = var.cloudflare_api_token
 }
 
 resource "linode_instance" "server1" {
