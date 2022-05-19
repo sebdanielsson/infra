@@ -18,10 +18,10 @@ terraform {
       version = "3.15.0"
     }
 
-    tailscale = {
+    /* tailscale = {
       source = "davidsbond/tailscale"
       version = "0.10.1"
-    }
+    } */
   }
 }
 
