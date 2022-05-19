@@ -64,7 +64,7 @@ resource "linode_instance" "server1" {
       "tailscale up --authkey=${var.server1_tskey}",
 
       # .bashrc
-      "echo -e '## Aliases\nalias ls='ls -ahlG'\ncdls() { cd '$@' && ls; }\nalias cd='cdls'\n\n# Restart linode1, simply running reboot from the OS doesn't bring up the Linode\nexport LINODE_TOKEN=${var.linode_selfrestart_token}\nalias reboot='linode-cli linodes reboot ${linode_instance.server1.id}'\n' >> .bashrc",
+      #"echo -e '## Aliases\nalias ls='ls -ahlG'\ncdls() { cd '$@' && ls; }\nalias cd='cdls'\n\n# Restart linode1, simply running reboot from the OS doesn't bring up the Linode\nexport LINODE_TOKEN=${var.linode_selfrestart_token}\nalias reboot='linode-cli linodes reboot ${linode_instance.server1.id}'\n' >> .bashrc",
 
       # firewall config
       "firewall-cmd --permanent --service=http --add-port=80/udp",
@@ -83,8 +83,8 @@ resource "linode_instance" "server1" {
 
       "firewall-cmd --reload",
 
-      //"sed -i 's/TARGET_DOMAIN=.*/TARGET_DOMAIN=${var.server1_hostname}/' /compose/traefik-cloudflare-companion/compose.yaml",
-      //"for d in /compose/*/ ; do (cd $d && docker compose up -d); done",
+      "sed -i 's/TARGET_DOMAIN=.*/TARGET_DOMAIN=${var.server1_hostname}/' /compose/traefik-cloudflare-companion/compose.yaml",
+      #"for d in /compose/*/ ; do (cd $d && docker compose up -d); done",
 
       # complete
       "echo 'Please restart the server from the dashboard for all changes to take effect.'",
