@@ -17,6 +17,11 @@ terraform {
       source = "cloudflare/cloudflare"
       version = "3.15.0"
     }
+
+    tailscale = {
+      source = "davidsbond/tailscale"
+      version = "0.10.1"
+    }
   }
 }
 
@@ -26,6 +31,11 @@ provider "linode" {
 
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
+}
+
+provider "tailscale" {
+  api_key = var.tailscale_api_key
+  tailnet = var.tailscale_tailnet
 }
 
 resource "linode_instance" "server1" {
@@ -83,7 +93,8 @@ resource "linode_instance" "server1" {
 
       "firewall-cmd --reload",
 
-      "sed -i 's/TARGET_DOMAIN=.*/TARGET_DOMAIN=${var.server1_hostname}/' /compose/traefik-cloudflare-companion/compose.yaml",
+      # Following two rows requires the restoration of docker-compose fieles first
+      #"sed -i 's/TARGET_DOMAIN=.*/TARGET_DOMAIN=${var.server1_hostname}/' /compose/traefik-cloudflare-companion/compose.yaml",
       #"for d in /compose/*/ ; do (cd $d && docker compose up -d); done",
 
       # complete
@@ -144,6 +155,15 @@ variable "cloudflare_api_token" {
 }
 
 variable "cloudflare_zone_id" {
+  
+}
+
+# Tailscale
+variable "tailscale_api_key" {
+  
+}
+
+variable "tailscale_tailnet" {
   
 }
 
