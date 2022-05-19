@@ -59,7 +59,7 @@ resource "linode_instance" "server1" {
       "dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo",
       "dnf config-manager --add-repo https://pkgs.tailscale.com/stable/fedora/tailscale.repo",
       "dnf -q -y install dnf-automatic cockpit-pcp docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-scan-plugin wireguard-tools bind restic tailscale git tmux",
-      #"pip3 install linode-cli",
+      "pip3 install linode-cli",
       "systemctl daemon-reload",
       "systemctl enable --now docker",
       "systemctl enable --now tailscaled",
