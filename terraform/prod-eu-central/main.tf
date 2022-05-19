@@ -126,7 +126,7 @@ resource "cloudflare_record" "dns_ipv6_server1" {
     update = "2m"
   }
 }
-
+/* 
 ### Variables ###
 
 # Linode tokens
@@ -255,3 +255,4 @@ variable "server1_snapshot_target" {
   type = string
   default = "/"
 }
+ */
