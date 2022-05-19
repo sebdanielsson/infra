@@ -33,10 +33,10 @@ provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
 
-provider "tailscale" {
+/* provider "tailscale" {
   api_key = var.tailscale_api_key
   tailnet = var.tailscale_tailnet
-}
+} */
 
 resource "linode_instance" "server1" {
   label = var.server1_label
@@ -159,13 +159,13 @@ variable "cloudflare_zone_id" {
 }
 
 # Tailscale
-variable "tailscale_api_key" {
+/* variable "tailscale_api_key" {
   
 }
 
 variable "tailscale_tailnet" {
   
-}
+} */
 
 # Linode instance
 variable "server1_label" {
