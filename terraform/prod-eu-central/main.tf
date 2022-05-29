@@ -17,11 +17,6 @@ terraform {
       source = "cloudflare/cloudflare"
       version = "3.15.0"
     }
-
-    /* tailscale = {
-      source = "davidsbond/tailscale"
-      version = "0.10.1"
-    } */
   }
 }
 
@@ -32,11 +27,6 @@ provider "linode" {
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
-
-/* provider "tailscale" {
-  api_key = var.tailscale_api_key
-  tailnet = var.tailscale_tailnet
-} */
 
 resource "linode_instance" "server1" {
   label = var.server1_label
@@ -71,11 +61,15 @@ resource "linode_instance" "server1" {
       "sed -i 's/PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config",
       "sed -i 's/PermitRootLogin.*/PermitRootLogin without-password/' /etc/ssh/sshd_config",
 
+      # Datadog config
+      "printf '\n# Added by Sebastian through Terraform on creation\nlogs_enabled: true\n' >> /etc/datadog-agent/datadog.yaml",
+      "printf \"instances:\n  - file_system_exclude:\n    - tmpfs\n    - none\n    - shm\n    - nsfs\n    - netns\n    - overlay\n    - tracefs\n\" >> /etc/datadog-agent/conf.d/disk.d/disk.yml",
+
       # Add Tailscale login
       "tailscale up --authkey=${var.server1_tskey}",
 
       # .bashrc
-      #"echo -e '## Aliases\nalias ls='ls -ahlG'\ncdls() { cd '$@' && ls; }\nalias cd='cdls'\n\n# Restart linode1, simply running reboot from the OS doesn't bring up the Linode\nexport LINODE_TOKEN=${var.linode_selfrestart_token}\nalias reboot='linode-cli linodes reboot ${linode_instance.server1.id}'\n' >> .bashrc",
+      "printf \"## Aliases\nalias ls='ls -ahlG'\ncdls() { cd '$@' && ls; }\nalias cd='cdls'\n\n# Restart linode1, simply running reboot from the OS doesn't bring up the Linode\nexport LINODE_TOKEN=${var.linode_selfrestart_token}\nalias reboot='linode-cli linodes reboot ${linode_instance.server1.id}'\n\" >> .bashrc",
 
       # firewall config
       "firewall-cmd --permanent --service=http --add-port=80/udp",
@@ -95,8 +89,8 @@ resource "linode_instance" "server1" {
       "firewall-cmd --reload",
 
       # Following two rows requires the restoration of docker-compose fieles first
-      #"sed -i 's/TARGET_DOMAIN=.*/TARGET_DOMAIN=${var.server1_hostname}/' /compose/traefik-cloudflare-companion/compose.yaml",
-      #"for d in /compose/*/ ; do (cd $d && docker compose up -d); done",
+      #"sed -i 's/TARGET_DOMAIN=.*/TARGET_DOMAIN=${var.server1_hostname}/' /docker/compose/enabled/traefik-cloudflare-companion/compose.yaml",
+      #"for d in /docker/compose/enabled/*/ ; do (cd $d && docker compose up -d); done",
 
       # complete
       "echo 'Please restart the server from the dashboard for all changes to take effect.'",
@@ -158,15 +152,6 @@ variable "cloudflare_api_token" {
 variable "cloudflare_zone_id" {
   
 }
-
-# Tailscale
-/* variable "tailscale_api_key" {
-  
-}
-
-variable "tailscale_tailnet" {
-  
-} */
 
 # Linode instance
 variable "server1_label" {
