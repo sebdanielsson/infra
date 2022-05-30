@@ -48,8 +48,9 @@ resource "linode_instance" "server1" {
       # install software
       "dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo",
       "dnf config-manager --add-repo https://pkgs.tailscale.com/stable/fedora/tailscale.repo",
-      "dnf -q -y install dnf-automatic cockpit-pcp docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-scan-plugin wireguard-tools bind restic tailscale git tmux",
+      "dnf -q -y install dnf-automatic cockpit-pcp docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-scan-plugin wireguard-tools bind restic tailscale git tmux python3-pip",
       "DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=${var.datadog_api_key} DD_SITE='datadoghq.com' bash -c '$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script.sh)'",
+      "wget -qO - https://raw.githubusercontent.com/CupCakeArmy/autorestic/master/install.sh | bash",
       "pip3 install linode-cli",
       "systemctl daemon-reload",
       "systemctl enable --now docker",
@@ -70,14 +71,21 @@ resource "linode_instance" "server1" {
       "tailscale up --authkey=${var.server1_tskey}",
 
       # .bashrc
-      "printf \"\n## Aliases\nalias ls='ls -ahlG'\ncdls() { cd '$@' && ls; }\nalias cd='cdls'\n\n# Restart linode1, simply running reboot from the OS doesn't bring up the Linode\nexport LINODE_TOKEN=${var.linode_selfrestart_token}\nalias reboot='linode-cli linodes reboot ${linode_instance.server1.id}'\n\" >> .bashrc",
+      "printf \"\n## Aliases\nalias ls='ls -ahl --color=auto'\n\n# Restart linode1, simply running reboot from the OS doesn't bring up the Linode\nexport LINODE_CLI_TOKEN=${var.linode_selfrestart_token}\nalias reboot='linode-cli linodes reboot ${linode_instance.server1.id}'\n\" >> .bashrc",
 
       # firewall config
-      "firewall-cmd --permanent --service=http --add-port=80/udp",
+      "firewall-cmd --permanent --add-interface=tailscale0 --zone=internal",
+      "firewall-cmd --zone=internal --permanent --add-service=cockpit",
+
       "firewall-cmd --zone=FedoraServer --permanent --add-service=http",
 
+      # Remove when Fedora 37 OR firewalld v1.1 is released
       "firewall-cmd --permanent --service=https --add-port=443/udp",
+
       "firewall-cmd --zone=FedoraServer --permanent --add-service=https",
+
+      # Add when Fedora 37 OR firewalld v1.1 is released - Predefined HTTP/3 service
+      #"firewall-cmd --zone=FedoraServer --permanent --add-service=http3",
 
       "firewall-cmd --permanent --new-service=etlegacy",
       "firewall-cmd --permanent --service=etlegacy --add-port=27960/udp",
