@@ -20,6 +20,62 @@ terraform {
   }
 }
 
+resource "linode_firewall" "web" {
+  label = "web"
+  tags  = ["web"]
+
+  inbound {
+    label    = "http"
+    action   = "ACCEPT"
+    protocol = "TCP"
+    ports    = "80"
+    ipv4     = ["0.0.0.0/0"]
+    ipv6     = ["::/0"]
+  }
+
+  inbound {
+    label    = "https"
+    action   = "ACCEPT"
+    protocol = "TCP"
+    ports    = "443"
+    ipv4     = ["0.0.0.0/0"]
+    ipv6     = ["::/0"]
+  }
+
+  inbound {
+    label    = "http3"
+    action   = "ACCEPT"
+    protocol = "UDP"
+    ports    = "443"
+    ipv4     = ["0.0.0.0/0"]
+    ipv6     = ["::/0"]
+  }
+
+  inbound {
+    label    = "minecraft"
+    action   = "ACCEPT"
+    protocol = "UDP"
+    ports    = "19132-19133"
+    ipv4     = ["0.0.0.0/0"]
+    ipv6     = ["::/0"]
+  }
+
+  inbound {
+    label    = "etlegacy"
+    action   = "ACCEPT"
+    protocol = "UDP"
+    ports    = "27960"
+    ipv4     = ["0.0.0.0/0"]
+    ipv6     = ["::/0"]
+  }
+
+  inbound_policy = "DROP"
+
+  outbound_policy = "ACCEPT"
+
+  linodes = [linode_instance.server1.id]
+}
+
 provider "linode" {
   token = var.linode_token
 }
@@ -44,7 +100,7 @@ resource "linode_instance" "server1" {
     inline = [
       # upgrade system
       "dnf -q -y upgrade",
-
+      
       # install software
       "dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo",
       "dnf config-manager --add-repo https://pkgs.tailscale.com/stable/fedora/tailscale.repo",
@@ -54,53 +110,42 @@ resource "linode_instance" "server1" {
       "pip3 install linode-cli",
       "systemctl daemon-reload",
       "systemctl enable --now docker",
-
+      
       # misc config
       "hostnamectl set-hostname ${var.server1_hostname}",
       "timedatectl set-timezone Europe/Berlin",
       "sed -i 's/PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config",
       "sed -i 's/PermitRootLogin.*/PermitRootLogin without-password/' /etc/ssh/sshd_config",
-
+      
       # Configure Datadog and start service
       "printf '\n# Added by Sebastian through Terraform on creation\nlogs_enabled: true\n' >> /etc/datadog-agent/datadog.yaml",
       "printf \"instances:\n  - file_system_exclude:\n    - tmpfs\n    - none\n    - shm\n    - nsfs\n    - netns\n    - overlay\n    - tracefs\n\" >> /etc/datadog-agent/conf.d/disk.d/disk.yml",
       "systemctl enable --now datadog-agent",
-
+      
       # Start Tailscale and login
       "systemctl enable --now tailscaled",
       "tailscale up --authkey=${var.server1_tskey}",
-
+      
       # .bashrc
       "printf \"\n## Aliases\nalias ls='ls -ahl --color=auto'\n\n# Restart linode1, simply running reboot from the OS doesn't bring up the Linode\nexport LINODE_CLI_TOKEN=${var.linode_selfrestart_token}\nalias reboot='linode-cli linodes reboot ${linode_instance.server1.id}'\n\" >> .bashrc",
-
+      
       # firewall config
       "firewall-cmd --permanent --add-interface=tailscale0 --zone=internal",
       "firewall-cmd --zone=internal --permanent --add-service=cockpit",
-
+      
       "firewall-cmd --zone=FedoraServer --permanent --add-service=http",
-
+      "firewall-cmd --zone=FedoraServer --permanent --add-service=https",
+      # Add when Fedora 37 OR firewalld v1.1 is released - Predefined HTTP/3 service
+      #"firewall-cmd --zone=FedoraServer --permanent --add-service=http3",
       # Remove when Fedora 37 OR firewalld v1.1 is released
       "firewall-cmd --permanent --service=https --add-port=443/udp",
 
-      "firewall-cmd --zone=FedoraServer --permanent --add-service=https",
-
-      # Add when Fedora 37 OR firewalld v1.1 is released - Predefined HTTP/3 service
-      #"firewall-cmd --zone=FedoraServer --permanent --add-service=http3",
-
-      "firewall-cmd --permanent --new-service=etlegacy",
-      "firewall-cmd --permanent --service=etlegacy --add-port=27960/udp",
-      "firewall-cmd --zone=FedoraServer --permanent --add-service=etlegacy",
-
-      "firewall-cmd --permanent --new-service=minecraft",
-      "firewall-cmd --permanent --service=minecraft --add-port=19132-19133/udp",
-      "firewall-cmd --zone=FedoraServer --permanent --add-service=minecraft",
-
       "firewall-cmd --reload",
-
+      
       # Following two rows requires the restoration of docker-compose fieles first
       #"sed -i 's/TARGET_DOMAIN=.*/TARGET_DOMAIN=${var.server1_hostname}/' /docker/compose/enabled/traefik-cloudflare-companion/compose.yaml",
       #"for d in /docker/compose/enabled/*/ ; do (cd $d && docker compose up -d); done",
-
+      
       # complete
       "echo 'Please restart the server from the dashboard for all changes to take effect.'",
     ]
