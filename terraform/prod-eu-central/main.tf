@@ -219,6 +219,12 @@ variable "server1_tskey" {
   type = string
 }
 
+# Datadog API key
+variable "datadog_api_key" {
+  description = "Datadog API Key"
+  type = string
+}
+
 # Restic restore
 variable "server1_restic_repository" {
   description = "Restore snapshot with Docker volumes for server1"
