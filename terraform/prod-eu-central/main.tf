@@ -10,7 +10,7 @@ terraform {
   required_providers {
     linode = {
       source = "linode/linode"
-      version = "1.27.2"
+      version = "1.28.0"
     }
 
     cloudflare = {
