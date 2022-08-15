@@ -124,7 +124,7 @@ resource "linode_instance" "server1" {
       
       # Start Tailscale and login
       "systemctl enable --now tailscaled",
-      "tailscale up --authkey=${var.server1_tskey}",
+      "tailscale up --authkey=${var.server1_tskey} --ssh",
       
       # .bashrc
       "printf \"\n## Aliases\nalias ls='ls -ahl --color=auto'\n\n# Restart linode1, simply running reboot from the OS doesn't bring up the Linode\nexport LINODE_CLI_TOKEN=${var.linode_selfrestart_token}\nalias reboot='linode-cli linodes reboot ${linode_instance.server1.id}'\n\" >> .bashrc",
