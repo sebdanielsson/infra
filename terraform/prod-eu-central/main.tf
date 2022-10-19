@@ -104,7 +104,8 @@ resource "linode_instance" "server1" {
       # install software
       "dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo",
       "dnf config-manager --add-repo https://pkgs.tailscale.com/stable/fedora/tailscale.repo",
-      "dnf -q -y install dnf-automatic cockpit-pcp docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-scan-plugin wireguard-tools bind restic tailscale git tmux python3-pip",
+      "dnf config-manager --add-repo https://pkg.cloudflare.com/cloudflared-ascii.repo",
+      "dnf -q -y install dnf-automatic cockpit-pcp docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-scan-plugin wireguard-tools bind restic tailscale git tmux python3-pip cloudflared",
       "DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=${var.datadog_api_key} DD_SITE='datadoghq.com' bash -c '$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script.sh)'",
       "wget -qO - https://raw.githubusercontent.com/CupCakeArmy/autorestic/master/install.sh | bash",
       "pip3 install linode-cli",
