@@ -105,7 +105,7 @@ resource "linode_instance" "server1" {
       "dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo",
       "dnf config-manager --add-repo https://pkgs.tailscale.com/stable/fedora/tailscale.repo",
       "dnf config-manager --add-repo https://pkg.cloudflare.com/cloudflared-ascii.repo",
-      "dnf -q -y install dnf-automatic cockpit-pcp docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-scan-plugin wireguard-tools bind restic tailscale git tmux python3-pip cloudflared",
+      "dnf -q -y install dnf-automatic cockpit-pcp docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-scan-plugin wireguard-tools bind git restic tailscale tmux python3-pip cloudflared",
       "DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=${var.datadog_api_key} DD_SITE='datadoghq.com' bash -c '$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script.sh)'",
       "wget -qO - https://raw.githubusercontent.com/CupCakeArmy/autorestic/master/install.sh | bash",
       "pip3 install linode-cli",
@@ -136,10 +136,7 @@ resource "linode_instance" "server1" {
       
       "firewall-cmd --zone=FedoraServer --permanent --add-service=http",
       "firewall-cmd --zone=FedoraServer --permanent --add-service=https",
-      # Add when Fedora 37 OR firewalld v1.1 is released - Predefined HTTP/3 service
-      #"firewall-cmd --zone=FedoraServer --permanent --add-service=http3",
-      # Remove when Fedora 37 OR firewalld v1.1 is released
-      "firewall-cmd --permanent --service=https --add-port=443/udp",
+      "firewall-cmd --zone=FedoraServer --permanent --add-service=http3",
 
       "firewall-cmd --reload",
       
