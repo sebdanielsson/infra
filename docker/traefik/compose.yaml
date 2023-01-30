@@ -52,7 +52,7 @@ services:
       - traefik.http.middlewares.secHeaders.headers.customFrameOptionsValue=SAMEORIGIN
       - traefik.http.middlewares.secHeaders.headers.referrerPolicy=same-origin
       - traefik.http.middlewares.secHeaders.headers.PermissionsPolicy="geolocation=(self), microphone=(), camera=(), fullscreen=*"
-      - traefik.http.middlewares.secHeaders.headers.customresponseheaders=X-Powered-By=""
+      - traefik.http.middlewares.secHeaders.headers.customresponseheaders="X-Powered-By="""
 volumes:
   traefik_acme:
     name: traefik_acme
