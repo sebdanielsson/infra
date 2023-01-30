@@ -1,0 +1,13 @@
+collections:
+  - name: community.docker
+    version: 3.4.0
+
+roles:
+  - name: artis3n.tailscale
+    version: 3.5.0
+
+  - name: simoncaron.pve_addons
+    version: 1.3.0
+
+  - name: geerlingguy.docker
+    version: 6.0.4

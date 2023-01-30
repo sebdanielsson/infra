@@ -1,4 +1,3 @@
 {
-  "extends": ["config:base"],
-  "files": ["(.*\\/|^)requirements\\.ya?ml$"]
+  "extends": ["config:base"]
 }
