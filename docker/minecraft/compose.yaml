@@ -1,0 +1,38 @@
+services:
+  minecraft:
+    image: itzg/minecraft-bedrock-server:2022.1.0
+    environment:
+      EULA: "TRUE"
+      PACKAGE_BACKUP_KEEP: "2"
+      SERVER_NAME: "P.MADSEN"
+      SERVER_PORT: "19132"
+      SERVER_PORT_V6: "19133"
+      GAMEMODE: "survival"
+      DIFFICULTY: "easy"
+      LEVEL_TYPE: "DEFAULT"
+      ALLOW_CHEATS: "true"
+      MAX_PLAYERS: "16"
+      ONLINE_MODE: "true"
+      #WHITE_LIST: "true"
+      VIEW_DISTANCE: "12"
+      TICK_DISTANCE: "12"
+      PLAYER_IDLE_TIMEOUT: "0"
+      MAX_THREADS: "8"
+      LEVEL_NAME: "level"
+      #LEVEL_SEED: ""
+      DEFAULT_PLAYER_PERMISSION_LEVEL: "member"
+      TEXTUREPACK_REQUIRED: "false"
+      SERVER_AUTHORITATIVE_MOVEMENT: "true"
+      PLAYER_MOVEMENT_SCORE_THRESHOLD: "20"
+      PLAYER_MOVEMENT_DISTANCE_THRESHOLD: "0.3"
+      PLAYER_MOVEMENT_DURATION_THRESHOLD_IN_MS: "500"
+      CORRECT_PLAYER_MOVEMENT: "false"
+    volumes:
+      - minecraft:/data
+    ports:
+      - "19132:19132/udp"
+      - "19133:19133/udp"
+    restart: always
+volumes:
+  minecraft:
+    name: minecraft

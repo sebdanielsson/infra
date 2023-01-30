@@ -1,0 +1,48 @@
+services:
+  traefik:
+    image: traefik:v2.9.5
+    command:
+      - --api
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --pilot.dashboard=false
+      - --log.level=WARN
+      - --global.checknewversion=false
+      - --global.sendanonymoususage=false
+      - --metrics.prometheus=false
+      - --metrics.prometheus.addrouterslabels=true
+      - --metrics.prometheus.entryPoint=metrics
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.file.directory=/etc/traefik
+      - --providers.file.watch=true
+      - --entryPoints.metrics.address=:8082
+      - --entrypoints.web.Address=:80
+      - --entrypoints.websecure.Address=:443
+      - --entrypoints.websecure.http3
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      - --experimental.http3=true
+      - --certificatesresolvers.letsencrypt.acme.email=sebastian.danielsson@protonmail.com
+      - --certificatesresolvers.letsencrypt.acme.storage=/etc/traefik/acme.json
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge=true
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53
+      - --certificatesresolvers.letsencrypt.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
+    network_mode: "host"
+    env_file:
+      - /docker/secrets/traefik/traefik.env
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /docker/data/traefik/traefik:/etc/traefik
+    restart: always
+    labels:
+          - traefik.enable=true
+          - traefik.http.routers.dashboard.rule=Host(`traefik.hogwarts.zone`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+          - traefik.http.routers.dashboard.service=api@internal
+          - traefik.http.services.dashboard.loadbalancer.server.port=8080
+          - traefik.http.routers.dashboard.tls.certresolver=letsencrypt
+          - traefik.http.routers.dashboard.middlewares=secHeaders@file, private-ipwhitelist
+          - traefik.http.middlewares.private-ipwhitelist.ipwhitelist.sourcerange=127.0.0.1/32, 100.0.0.0/8

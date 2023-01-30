@@ -1,0 +1,33 @@
+services:
+  etlegacy:
+    container_name: etlegacy
+    image: sebdanielsson/etlegacy:2.80.2-6
+    command: +set fs_game nitmod +set fs_homepath /etlegacy +set g_protect 1 +exec nitmod.cfg
+    networks:
+      - etlegacy
+    ports:
+      - "27960:27960/udp"
+    volumes:
+      - /docker/data/etlegacy/etlegacy/legacy/omni-bot/et/user/omni-bot.cfg:/etlegacy/legacy/omni-bot/et/user/omni-bot.cfg
+      - /docker/data/etlegacy/etlegacy/legacy/omni-bot/et/nav:/etlegacy/legacy/omni-bot/et/nav
+      - /docker/data/etlegacy/etlegacy/nitmod:/etlegacy/nitmod
+      - /docker/data/etlegacy/etlegacy/etmain:/etlegacy/etmain
+    restart: always
+  etlegacy-mirror:
+    container_name: etlegacy-mirror
+    image: nginx:1.23.3-alpine
+    networks:
+      - etlegacy
+    volumes:
+     - /docker/data/etlegacy/etlegacy/etmain:/usr/share/nginx/html/etmain:ro
+     - /docker/data/etlegacy/etlegacy/nitmod/nitmod_2.3.4_b4.pk3:/usr/share/nginx/html/nitmod/nitmod_2.3.4_b4.pk3:ro
+    restart: always
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.etlegacy-mirror.rule=Host(`etlegacy-mirror.hogwarts.zone`)
+      - traefik.http.routers.etlegacy-mirror.tls.certresolver=letsencrypt
+      - traefik.http.routers.etlegacy-mirror.middlewares=secHeaders@file
+      - traefik.http.services.etlegacy-mirror.loadbalancer.server.port=80
+networks:
+  etlegacy:
+    name: etlegacy
