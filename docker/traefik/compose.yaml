@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:v2.9.5
+    image: traefik:v2.9.6
     command:
       - --api
       - --api.dashboard=true
