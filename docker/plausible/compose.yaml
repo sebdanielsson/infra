@@ -1,5 +1,6 @@
 services:
   db:
+    container_name: plausible_db
     image: postgres:14-alpine
     volumes:
       - db:/var/lib/postgresql/data
@@ -7,6 +8,7 @@ services:
       - POSTGRES_PASSWORD=postgres
     restart: always
   event_db:
+    container_name: plausible_event_db
     image: clickhouse/clickhouse-server:22.6-alpine
     volumes:
       - event_db:/var/lib/clickhouse
@@ -18,6 +20,7 @@ services:
         soft: 262144
         hard: 262144
   app:
+    container_name: plausible_app
     image: plausible/analytics:v1.5.1
     command: sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run"
     depends_on:
