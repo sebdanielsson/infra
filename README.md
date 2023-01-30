@@ -1,2 +1,3 @@
-# hogwarts-infra
- Infrastructure for Hogwarts
+# infra
+
+GitOps all the things!
