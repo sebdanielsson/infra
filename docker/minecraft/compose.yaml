@@ -1,5 +1,6 @@
 services:
   minecraft:
+    container_name: minecraft
     image: itzg/minecraft-bedrock-server:2022.1.0
     environment:
       EULA: "TRUE"

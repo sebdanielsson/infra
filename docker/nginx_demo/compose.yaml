@@ -1,8 +1,9 @@
 services:
   nginx:
+    container_name: nginx_demo
     image: nginx:1.23.3-alpine
     volumes:
-     - /docker/data/demo/nginx:/usr/share/nginx/html:ro
+      - /docker/data/nginx_demo/nginx:/usr/share/nginx/html:ro
     ports:
       - "8088:80"
     restart: always

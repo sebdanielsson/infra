@@ -1,7 +1,7 @@
 services:
   etlegacy:
     container_name: etlegacy
-    image: sebdanielsson/etlegacy:2.80.2-6
+    image: sebdanielsson/etlegacy:2.81.0
     command: +set fs_game nitmod +set fs_homepath /etlegacy +set g_protect 1 +exec nitmod.cfg
     networks:
       - etlegacy
@@ -19,8 +19,8 @@ services:
     networks:
       - etlegacy
     volumes:
-     - /docker/data/etlegacy/etlegacy/etmain:/usr/share/nginx/html/etmain:ro
-     - /docker/data/etlegacy/etlegacy/nitmod/nitmod_2.3.4_b4.pk3:/usr/share/nginx/html/nitmod/nitmod_2.3.4_b4.pk3:ro
+      - /docker/data/etlegacy/etlegacy/etmain:/usr/share/nginx/html/etmain:ro
+      - /docker/data/etlegacy/etlegacy/nitmod/nitmod_2.3.4_b4.pk3:/usr/share/nginx/html/nitmod/nitmod_2.3.4_b4.pk3:ro
     restart: always
     labels:
       - traefik.enable=true
