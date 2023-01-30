@@ -7,7 +7,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=postgres
   events_db:
-    image: clickhouse/clickhouse-server:22.12-alpine
+    image: clickhouse/clickhouse-server:23.1-alpine
     restart: always
     volumes:
       - event-data:/var/lib/clickhouse
