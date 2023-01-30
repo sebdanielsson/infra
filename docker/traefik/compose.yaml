@@ -19,7 +19,6 @@ services:
       - --entrypoints.websecure.http3
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
-      - --experimental.http3=true
       - --certificatesresolvers.tailscale.tailscale=true
       - --certificatesresolvers.letsencrypt.acme.email=sebastian.danielsson@protonmail.com
       - --certificatesresolvers.letsencrypt.acme.storage=/etc/traefik/acme.json
