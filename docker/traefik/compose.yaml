@@ -41,8 +41,8 @@ services:
       - traefik.http.routers.dashboard.service=api@internal
       - traefik.http.services.dashboard.loadbalancer.server.port=8080
       - traefik.http.routers.dashboard.tls.certresolver=tailscale
-      - traefik.http.routers.dashboard.middlewares=secHeaders, private-ipwhitelist
-      - traefik.http.middlewares.private-ipwhitelist.ipwhitelist.sourcerange=127.0.0.1/32, 100.0.0.0/8
+      - traefik.http.routers.dashboard.middlewares=secHeaders #, private-ipwhitelist Not working on v3.0.0 beta 2, inspect when this version is stable
+      #- traefik.http.middlewares.private-ipwhitelist.ipwhitelist.sourcerange=127.0.0.1/32, 100.0.0.0/8
       - traefik.http.middlewares.secHeaders.headers.browserXssFilter=true
       - traefik.http.middlewares.secHeaders.headers.contentTypeNosniff=true
       - traefik.http.middlewares.secHeaders.headers.frameDeny=true
