@@ -10,40 +10,50 @@ services:
       - --log.level=WARN
       - --global.checknewversion=false
       - --global.sendanonymoususage=false
-      - --metrics.prometheus=false
-      - --metrics.prometheus.addrouterslabels=true
-      - --metrics.prometheus.entryPoint=metrics
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --providers.file.directory=/etc/traefik
       - --providers.file.watch=true
-      - --entryPoints.metrics.address=:8082
-      - --entrypoints.web.Address=:80
-      - --entrypoints.websecure.Address=:443
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.http3
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --experimental.http3=true
+      - --certificatesresolvers.tailscale.tailscale=true
       - --certificatesresolvers.letsencrypt.acme.email=sebastian.danielsson@protonmail.com
       - --certificatesresolvers.letsencrypt.acme.storage=/etc/traefik/acme.json
       - --certificatesresolvers.letsencrypt.acme.dnschallenge=true
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
       - --certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53
       - --certificatesresolvers.letsencrypt.acme.caserver=https://acme-v02.api.letsencrypt.org/directory
-    network_mode: "host"
-    env_file:
-      - /docker/secrets/traefik/traefik.env
     volumes:
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /docker/data/traefik/traefik:/etc/traefik
+      - traefik_acme:/etc/traefik/acme.json
+    ports:
+      - "8080:8080"
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
     restart: always
     labels:
       - traefik.enable=true
-      - traefik.http.routers.dashboard.rule=Host(`traefik.hogwarts.zone`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      - traefik.http.routers.dashboard.rule=Host(`traefik.mediaserver.risk-bee.ts.net`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       - traefik.http.routers.dashboard.service=api@internal
       - traefik.http.services.dashboard.loadbalancer.server.port=8080
       - traefik.http.routers.dashboard.tls.certresolver=letsencrypt
-      - traefik.http.routers.dashboard.middlewares=secHeaders@file, private-ipwhitelist
+      - traefik.http.routers.dashboard.middlewares=secHeaders, private-ipwhitelist
       - traefik.http.middlewares.private-ipwhitelist.ipwhitelist.sourcerange=127.0.0.1/32, 100.0.0.0/8
+      - traefik.http.middlewares.secHeaders.headers.browserXssFilter=true
+      - traefik.http.middlewares.secHeaders.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.secHeaders.headers.frameDeny=true
+      - traefik.http.middlewares.secHeaders.headers.stsIncludeSubdomains=true
+      - traefik.http.middlewares.secHeaders.headers.stsPreload=true
+      - traefik.http.middlewares.secHeaders.headers.stsSeconds=63072000
+      - traefik.http.middlewares.secHeaders.headers.customFrameOptionsValue=SAMEORIGIN
+      - traefik.http.middlewares.secHeaders.headers.referrerPolicy=same-origin
+      - traefik.http.middlewares.secHeaders.headers.PermissionsPolicy="geolocation=(self), microphone=(), camera=(), fullscreen=*"
+      - traefik.http.middlewares.secHeaders.headers.customresponseheaders=X-Powered-By=""
+volumes:
+  traefik_acme:
+    name: traefik_acme
