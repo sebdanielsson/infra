@@ -6,7 +6,7 @@ services:
       - --api
       - --api.dashboard=true
       - --api.insecure=true
-      - --pilot.dashboard=false
+      #- --pilot.dashboard=false # Not found in v3.0.0 beta 2?
       - --log.level=WARN
       - --global.checknewversion=false
       - --global.sendanonymoususage=false
