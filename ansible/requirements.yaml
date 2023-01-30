@@ -1,0 +1,7 @@
+collections:
+  - name: community.docker
+
+roles:
+  - src: artis3n.tailscale
+  - src: simoncaron.pve_addons
+  - src: geerlingguy.docker

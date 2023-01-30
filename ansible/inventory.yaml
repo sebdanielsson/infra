@@ -1,0 +1,8 @@
+all:
+  children:
+    proxmox_nodes:
+      hosts:
+        hogsmeade:
+    virtual_machines:
+      hosts:
+        mediaserver:
