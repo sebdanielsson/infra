@@ -7,9 +7,3 @@ services:
     ports:
       - "8088:80"
     restart: always
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.demo.rule=Host(`demo.hogwarts.zone`)
-      - traefik.http.routers.demo.tls.certresolver=letsencrypt
-      - traefik.http.routers.demo.middlewares=secHeaders@file
-      - traefik.http.services.demo.loadbalancer.server.port=80
