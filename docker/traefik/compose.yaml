@@ -1,7 +1,7 @@
 services:
   traefik:
     container_name: traefik
-    image: traefik:v2.9.6
+    image: traefik:v3.0.0-beta2
     command:
       - --api
       - --api.dashboard=true
@@ -20,7 +20,7 @@ services:
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --experimental.http3=true
-      - --certificatesresolvers.tailscalee.tailscale=true
+      - --certificatesresolvers.tailscale.tailscale=true
       - --certificatesresolvers.letsencrypt.acme.email=sebastian.danielsson@protonmail.com
       - --certificatesresolvers.letsencrypt.acme.storage=/etc/traefik/acme.json
       - --certificatesresolvers.letsencrypt.acme.dnschallenge=true
@@ -41,7 +41,7 @@ services:
       - traefik.http.routers.dashboard.rule=Host(`mediaserver.risk-bee.ts.net`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       - traefik.http.routers.dashboard.service=api@internal
       - traefik.http.services.dashboard.loadbalancer.server.port=8080
-      - traefik.http.routers.dashboard.tls.certresolver=tailscalee
+      - traefik.http.routers.dashboard.tls.certresolver=tailscale
       - traefik.http.routers.dashboard.middlewares=secHeaders, private-ipwhitelist
       - traefik.http.middlewares.private-ipwhitelist.ipwhitelist.sourcerange=127.0.0.1/32, 100.0.0.0/8
       - traefik.http.middlewares.secHeaders.headers.browserXssFilter=true
