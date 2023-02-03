@@ -4,7 +4,7 @@ collections:
 
 roles:
   - name: artis3n.tailscale
-    version: 3.5.0
+    version: v4.0.0
 
   - name: simoncaron.pve_addons
     version: 1.3.0
