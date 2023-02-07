@@ -39,3 +39,7 @@ terraform.rc
 
 # Ignore macOS metadata files
 .DS_Store
+
+# Ignore certs and sensitive config files
+*.pfx
+docker/transmission-wireguard/wg0.conf
