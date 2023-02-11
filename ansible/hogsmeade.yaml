@@ -118,8 +118,8 @@
         name: fedora-template
         machine: q35
         cpu: host
-        cores: 2
-        memory: 2048
+        cores: 4
+        memory: 4096
         bios: ovmf
         ostype: l26
         agent: 1
@@ -159,6 +159,7 @@
         vmid: 1000
         newid: 100
         name: mediaserver
+        onboot: true
         timeout: 300
         state: present
       register: mediaserver

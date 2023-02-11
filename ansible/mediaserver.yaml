@@ -18,6 +18,8 @@
       role: geerlingguy.docker
       vars:
         docker_edition: ce
+        docker_yum_repo_enable_test: 0
+        docker_yum_repo_enable_nightly: 0
         docker_packages_state: present
         docker_install_compose_plugin: true
         docker_compose_package: docker-compose-plugin
@@ -89,12 +91,111 @@
     - name: Mount media share
       ansible.posix.mount:
         src: 192.168.1.116:/chungus/media
-        path: /mnt/media
+        path: /mnt/chungus/media
         fstype: nfs
         opts: defaults
         dump: 0
         passno: 0
         state: mounted
+
+    - name: Synchronize docker files
+      ansible.posix.synchronize:
+        src: ../docker/
+        dest: /docker/
+        archive: true
+        delete: true
+        owner: false
+        group: false
+        mode: push
+        rsync_opts:
+          - "--exclude=.DS_Store"
+
+    - name: Init a new swarm with default parameters
+      community.docker.docker_swarm:
+        state: present
+
+    - name: Create secret cf_dns_api_token
+      community.docker.docker_secret:
+        name: cf_dns_api_token
+        data: "{{ lookup('community.general.onepassword', 'Cloudflare API Key', field='cf_dns_api_token', vault='prod') }}"
+        state: present
+
+    - name: Create secret plausible_postgres_password
+      community.docker.docker_secret:
+        name: plausible_postgres_password
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_postgres_password', vault='prod') }}"
+        state: present
+
+    - name: Create secret plausible_secret_key_base
+      community.docker.docker_secret:
+        name: plausible_secret_key_base
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_secret_key_base', vault='prod') }}"
+        state: present
+
+    - name: Create secret plausible_google_client_id
+      community.docker.docker_secret:
+        name: plausible_google_client_id
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_google_client_id', vault='prod') }}"
+        state: present
+
+    - name: Create secret plausible_google_client_secret
+      community.docker.docker_secret:
+        name: plausible_google_client_secret
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_google_client_secret', vault='prod') }}"
+        state: present
+
+    - name: Create secret plausible_mailer_email
+      community.docker.docker_secret:
+        name: plausible_mailer_email
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_mailer_email', vault='prod') }}"
+        state: present
+
+    - name: Create secret plausible_smtp_host_addr
+      community.docker.docker_secret:
+        name: plausible_smtp_host_addr
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_smtp_host_addr', vault='prod') }}"
+        state: present
+
+    - name: Create secret plausible_smtp_user_name
+      community.docker.docker_secret:
+        name: plausible_smtp_user_name
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_smtp_user_name', vault='prod') }}"
+        state: present
+
+    - name: Create secret plausible_smtp_user_pwd
+      community.docker.docker_secret:
+        name: plausible_smtp_user_pwd
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_smtp_user_pwd', vault='prod') }}"
+        state: present
+
+    - name: Create secret transmission_user
+      community.docker.docker_secret:
+        name: transmission_user
+        data: "{{ lookup('community.general.onepassword', 'Transmission Container Secrets', field='transmission_user', vault='prod') }}"
+        state: present
+
+    - name: Create secret transmission_pass
+      community.docker.docker_secret:
+        name: transmission_pass
+        data: "{{ lookup('community.general.onepassword', 'Transmission Container Secrets', field='transmission_pass', vault='prod') }}"
+        state: present
+
+    - name: Create network medianet
+      community.docker.docker_network:
+        name: medianet
+        driver: overlay
+        attachable: true
+        state: present
+
+    - name: Create network wgnet
+      community.docker.docker_network:
+        name: wgnet
+        driver: bridge
+        ipam_config:
+          - subnet: 172.100.0.0/24
+            gateway: 172.100.0.1
+        attachable: true
+        state: present
 
     - name: Install pip
       ansible.builtin.dnf:
@@ -105,26 +206,55 @@
       ansible.builtin.pip:
         name:
           - pyyaml
+          - jsondiff
           - docker
           - docker-compose
         state: present
 
-    - name: Add Portainer compose file
+    - name: Deploy Portainer
+      community.docker.docker_stack:
+        name: portainer
+        compose:
+          - /docker/portainer/compose.yaml
+        state: present
+
+    - name: Deploy Radarr
+      community.docker.docker_stack:
+        name: radarr
+        compose:
+          - /docker/radarr/compose.yaml
+        state: present
+
+    - name: Deploy Sonarr
+      community.docker.docker_stack:
+        name: sonarr
+        compose:
+          - /docker/sonarr/compose.yaml
+        state: present
+
+    - name: Deploy Jellyfin
+      community.docker.docker_stack:
+        name: jellyfin
+        compose:
+          - /docker/jellyfin/compose.yaml
+        state: present
+
+    - name: Deploy transmission-wireguard
       community.docker.docker_compose:
-        project_name: portainer
-        definition:
-          services:
-            portainer:
-              container_name: portainer
-              image: portainer/portainer-ee:2.16.2-alpine
-              volumes:
-                - "/var/run/docker.sock:/var/run/docker.sock"
-                - "portainer:/data"
-              ports:
-                - "8000:8000"
-                - "9443:9443"
-              restart: always
-          volumes:
-            portainer:
-              name: portainer
-      register: output
+        project_src: /docker/transmission-wireguard
+        pull: true
+        state: present
+
+    - name: Deploy Plausible
+      community.docker.docker_stack:
+        name: plausible
+        compose:
+          - /docker/plausible/compose.yaml
+        state: absent
+
+    - name: Deploy Traefik
+      community.docker.docker_stack:
+        name: traefik
+        compose:
+          - /docker/traefik/compose.yaml
+        state: absent
