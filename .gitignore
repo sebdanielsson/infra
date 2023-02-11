@@ -41,5 +41,6 @@ terraform.rc
 .DS_Store
 
 # Ignore certs and sensitive config files
-*.pfx
-docker/transmission-wireguard/wg0.conf
+.pfx
+wg0.conf
+secrets.env
