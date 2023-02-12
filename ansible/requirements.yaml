@@ -7,7 +7,7 @@ roles:
     version: v4.0.0
 
   - name: simoncaron.pve_addons
-    version: 1.4.0
+    version: 1.5.0
 
   - name: geerlingguy.docker
     version: 6.1.0
