@@ -1,0 +1,3 @@
+---
+- name: Configure virtual_machines
+  hosts: proxmox_nodes

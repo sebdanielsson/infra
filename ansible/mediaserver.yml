@@ -1,3 +1,4 @@
+---
 - name: Mediaserver setup
   hosts: mediaserver
 
@@ -13,6 +14,7 @@
       tailscale_args: "--ssh"
       vars:
         tailscale_authkey: "{{ lookup('community.general.onepassword', 'ts-authkey-server', field='credential', vault='Private') }}"
+      state: present
 
     - name: Install Docker
       role: geerlingguy.docker
@@ -53,17 +55,6 @@
         key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Key', field='public key', vault='Private') }}"
         state: present
 
-    - name: Upgrade all packages # noqa package-latest
-      ansible.builtin.dnf:
-        name: "*"
-        state: latest
-
-    - name: Install misc packages
-      ansible.builtin.dnf:
-        name:
-          - wget
-        state: present
-
     - name: Add cloudflared repository
       ansible.builtin.yum_repository:
         name: cloudflared-stable
@@ -73,20 +64,51 @@
         gpgkey: https://pkg.cloudflare.com/cloudflare-ascii-pubkey.gpg
         state: present
 
-    - name: Install cloudflared
+    - name: Upgrade all packages # noqa package-latest
       ansible.builtin.dnf:
-        name: cloudflared
-        state: present
+        name: "*"
+        state: latest
 
-    - name: Install nfs-utils
+    - name: Install misc packages
       ansible.builtin.dnf:
-        name: nfs-utils
+        name:
+          - wget
+          - curl
+          - certbot
+          - certbot-dns-cloudflare
+          - cloudflared
+          - nfs-utils
+          - python3-pip
         state: present
 
     - name: Enable 'cloudflared' service
       ansible.builtin.command:
         cmd: cloudflared service install {{ lookup('community.general.onepassword', 'cf-tunnel-hogsmeade-mediaserver', field='credential', vault='Private') }}
         creates: /etc/systemd/system/cloudflared.service
+
+    - name: Add cloudflare_api_key for certbot plugin
+      ansible.builtin.lineinfile:
+        path: /etc/letsencrypt/cloudflare.ini
+        regexp: '^dns_cloudflare_api_token'
+        line: "dns_cloudflare_api_token = {{ lookup('community.general.onepassword', 'Cloudflare API Key', field='cf_dns_api_token', vault='prod') }}" # noqa yaml
+        create: true
+        mode: 0640
+        state: present
+
+    - name: Add renew hook for Jellyfin cert
+      ansible.builtin.blockinfile:
+        path: /etc/letsencrypt/renewal-hooks/deploy/jellyfin-pkcs12.sh
+        block: |
+          #!/bin/sh
+          openssl pkcs12 -export -password pass:{{ lookup('community.general.onepassword', 'jellyfin_pkcs12_cert_password', field='password', vault='prod') }} -out /docker/jellyfin/certs/hogsmeade.pfx -inkey /etc/letsencrypt/live/hogsmeade.hogwarts.zone/privkey.pem -in /etc/letsencrypt/live/hogsmeade.hogwarts.zone/cert.pem
+        create: true
+        mode: 0750
+        state: present
+
+    - name: Obtain cert for Jellyfin
+      ansible.builtin.command:
+        cmd: certbot certonly --agree-tos -m sebastian.danielsson@proton.me --dns-cloudflare --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini --key-type ecdsa --elliptic-curve secp384r1 --rsa-key-size 4096 --staple-ocsp true --hsts true --uir true --must-staple true -d hogsmeade.hogwarts.zone --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/jellyfin-pkcs12.sh
+        creates: /etc/letsencrypt/live/hogsmeade.hogwarts.zone/fullchain.pem
 
     - name: Mount media share
       ansible.posix.mount:
@@ -114,7 +136,7 @@
       community.docker.docker_swarm:
         state: present
 
-    - name: Create secret cf_dns_api_token
+    - name: Create secret cf_dns_api_token for Traefik
       community.docker.docker_secret:
         name: cf_dns_api_token
         data: "{{ lookup('community.general.onepassword', 'Cloudflare API Key', field='cf_dns_api_token', vault='prod') }}"
@@ -195,11 +217,6 @@
           - subnet: 172.100.0.0/24
             gateway: 172.100.0.1
         attachable: true
-        state: present
-
-    - name: Install pip
-      ansible.builtin.dnf:
-        name: python3-pip
         state: present
 
     - name: Add community.docker.docker_compose dependencies

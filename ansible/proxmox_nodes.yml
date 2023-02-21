@@ -1,0 +1,131 @@
+---
+- name: Configure proxmox_nodes
+  hosts: proxmox_nodes
+
+  roles:
+    - name: Remove PVE subscription nag, enable Dark Theme and manage repos
+      role: simoncaron.pve_addons
+      vars:
+        pve_addons_enable_dark_theme: true
+        pve_addons_remove_subscription_nag: true
+        pve_addons_disable_enterprise_repo: true
+        pve_addons_add_no_subscription_repo: true
+
+    - name: Install and configure Tailscale
+      role: artis3n.tailscale
+      tailscale_args: "--ssh"
+      vars:
+        tailscale_authkey: "{{ lookup('community.general.onepassword', 'ts-authkey-server', field='credential', vault='Private') }}"
+      state: present
+
+    - name: Install Docker
+      role: geerlingguy.docker
+      vars:
+        docker_edition: ce
+        docker_yum_repo_enable_test: 0
+        docker_yum_repo_enable_nightly: 0
+        docker_packages_state: present
+        docker_install_compose_plugin: true
+        docker_compose_package: docker-compose-plugin
+        docker_compose_package_state: present
+        docker_install_compose: false
+        docker_users:
+          - sebastian
+        docker_service_manage: true
+        docker_service_state: started
+        docker_service_enabled: true
+        docker_restart_handler_state: restarted
+
+    - name: Install and configure cloudflared
+      role: sebdanielsson.cloudflared
+      vars:
+        cloudflare_tunnel_credential: "{{ lookup('community.general.onepassword', 'cf-tunnel-hogsmeade', field='credential', vault='Private') }}"
+      state: present
+
+  tasks:
+    - name: Enable nomodeset in GRUB
+      ansible.builtin.lineinfile:
+        path: /etc/default/grub
+        regexp: '^GRUB_CMDLINE_LINUX_DEFAULT="((:?(?!nomodeset).)*?)"$'
+        line: 'GRUB_CMDLINE_LINUX_DEFAULT="\1 nomodeset"'
+        backup: true
+        backrefs: true
+      notify: update-grub
+
+    - name: Enable IOMMU in GRUB
+      ansible.builtin.lineinfile:
+        path: /etc/default/grub
+        regexp: '^GRUB_CMDLINE_LINUX_DEFAULT="((:?(?!intel_iommu=on).)*?)"$'
+        line: 'GRUB_CMDLINE_LINUX_DEFAULT="\1 intel_iommu=on"'
+        backup: true
+        backrefs: true
+      notify: update-grub
+
+    - name: Enable vfio kernel modules
+      ansible.builtin.lineinfile:
+        path: /etc/modules
+        line: "{{ item }}"
+        state: present
+      with_items:
+        - vfio
+        - vfio_iommu_type1
+        - vfio_pci
+        - vfio_virqfd
+
+    - name: SSH authorized key for 'root'
+      ansible.posix.authorized_key:
+        user: root
+        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Key', field='public key', vault='Private') }}"
+        state: present
+
+    - name: Disable root login over SSH
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^PermitRootLogin"
+        line: "PermitRootLogin prohibit-password"
+        state: present
+
+    - name: Disable password login
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^PasswordAuthentication"
+        line: "PasswordAuthentication no"
+        state: present
+
+    - name: Ensure 'sebastian' user exists
+      ansible.builtin.user:
+        name: sebastian
+        shell: /bin/bash
+        group: sebastian
+        groups: root,docker
+        append: true
+        state: present
+
+    - name: SSH authorized key for 'sebastian'
+      ansible.posix.authorized_key:
+        user: sebastian
+        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Key', field='public key', vault='Private') }}"
+        state: present
+
+    - name: Install proxmox_kvm
+      ansible.builtin.pip:
+        name:
+          - proxmoxer
+          - requests
+        state: present
+
+    - name: Install packages
+      ansible.builtin.apt:
+        name:
+          - nfs-kernel-server
+          - python3-pip
+          - python3-setuptools
+          - python3-wheel
+        state: present
+
+    - name: Install certbot
+      ansible.builtin.pip:
+        name:
+          - certbot
+          - certbot-dns-cloudflare
+        state: present

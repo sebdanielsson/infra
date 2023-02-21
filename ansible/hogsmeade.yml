@@ -1,0 +1,290 @@
+---
+- name: Hogsmeade Proxmox
+  hosts: proxmox_nodes
+
+  tasks:
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: hogsmeade
+        use: systemd
+
+    - name: Add cloudflare_api_key for certbot plugin
+      ansible.builtin.lineinfile:
+        path: /etc/letsencrypt/cloudflare.ini
+        regexp: '^dns_cloudflare_api_token'
+        line: "dns_cloudflare_api_token = {{ lookup('community.general.onepassword', 'Cloudflare API Key', field='cf_dns_api_token', vault='prod') }}" # noqa yaml
+        create: true
+        mode: 0640
+        state: present
+
+    - name: Add renew hook for Jellyfin cert
+      ansible.builtin.blockinfile:
+        path: /etc/letsencrypt/renewal-hooks/deploy/jellyfin-pkcs12.sh
+        block: |
+          #!/bin/sh
+          mkdir -p /certs/hogsmeade.hogwarts.zone
+          openssl pkcs12 -export -password pass:{{ lookup('community.general.onepassword', 'jellyfin_pkcs12_cert_password', field='password', vault='prod') }} -out /certs/hogsmeade.hogwarts.zone/hogsmeade.pfx -inkey /etc/letsencrypt/live/hogsmeade.hogwarts.zone/privkey.pem -in /etc/letsencrypt/live/hogsmeade.hogwarts.zone/cert.pem
+          chmod 644 /certs/hogsmeade.hogwarts.zone/hogsmeade.pfx
+          chown root:docker /certs/hogsmeade.hogwarts.zone/hogsmeade.pfx
+        create: true
+        mode: 0750
+        state: present
+
+    - name: Obtain cert for Jellyfin
+      ansible.builtin.shell: |
+        certbot certonly \
+        --dns-cloudflare \
+        --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini \
+        --email sebastian.danielsson@proton.me \
+        --agree-tos \
+        --key-type ecdsa \
+        --elliptic-curve secp384r1 \
+        --rsa-key-size 4096 \
+        --staple-ocsp \
+        --hsts \
+        --uir \
+        --must-staple \
+        --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/jellyfin-pkcs12.sh \
+        --domain hogsmeade.hogwarts.zone
+      args:
+        creates: /etc/letsencrypt/live/hogsmeade.hogwarts.zone/fullchain.pem
+
+    - name: Create ZFS filesystem and set sharenfs property
+      community.general.zfs:
+        name: chungus/media
+        extra_zfs_properties:
+          sharenfs: crossmnt,no_root_squash,rw=192.168.1.0/24
+        state: present
+
+    - name: Add community.docker.docker_compose dependencies
+      ansible.builtin.pip:
+        name:
+          - pyyaml
+          - jsondiff
+          - docker
+          - docker-compose
+        state: present
+
+    - name: Synchronize docker files
+      ansible.posix.synchronize:
+        src: ../docker/
+        dest: /docker/
+        archive: true
+        delete: true
+        owner: false
+        group: false
+        mode: push
+        rsync_opts:
+          - "--exclude=.DS_Store"
+
+    - name: Init a new swarm with default parameters
+      community.docker.docker_swarm:
+        listen_addr: 0.0.0.0:2377
+        advertise_addr: 192.168.1.116:2377
+        state: present
+
+    - name: Create secret transmission_user
+      community.docker.docker_secret:
+        name: transmission_user
+        data: "{{ lookup('community.general.onepassword', 'Transmission Container Secrets', field='transmission_user', vault='prod') }}"
+        state: present
+
+    - name: Create secret transmission_pass
+      community.docker.docker_secret:
+        name: transmission_pass
+        data: "{{ lookup('community.general.onepassword', 'Transmission Container Secrets', field='transmission_pass', vault='prod') }}"
+        state: present
+
+    - name: Create network medianet
+      community.docker.docker_network:
+        name: medianet
+        driver: overlay
+        attachable: true
+        state: present
+
+    - name: Create network wgnet
+      community.docker.docker_network:
+        name: wgnet
+        driver: bridge
+        ipam_config:
+          - subnet: 172.100.0.0/24
+            gateway: 172.100.0.1
+        attachable: true
+        state: present
+
+    - name: Create network plausible_network
+      community.docker.docker_network:
+        name: plausible_network
+        driver: overlay
+        attachable: true
+        state: present
+
+    - name: Deploy Portainer
+      community.docker.docker_stack:
+        name: portainer
+        compose:
+          - /docker/portainer/compose.yaml
+        state: present
+
+    - name: Deploy Radarr
+      community.docker.docker_stack:
+        name: radarr
+        compose:
+          - /docker/radarr/compose.yaml
+        state: present
+
+    - name: Deploy Sonarr
+      community.docker.docker_stack:
+        name: sonarr
+        compose:
+          - /docker/sonarr/compose.yaml
+        state: present
+
+    - name: Deploy Jellyfin
+      community.docker.docker_stack:
+        name: jellyfin
+        compose:
+          - /docker/jellyfin/compose.yaml
+        state: present
+
+    - name: Deploy transmission-wireguard
+      community.docker.docker_compose:
+        project_src: /docker/transmission-wireguard
+        pull: true
+        state: present
+
+    - name: Create secret plausible_postgres_password
+      community.docker.docker_secret:
+        name: plausible_postgres_password
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_postgres_password', vault='prod') }}"
+        state: present
+
+    - name: Create secret plausible_secret_key_base
+      community.docker.docker_secret:
+        name: plausible_secret_key_base
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_secret_key_base', vault='prod') }}"
+        state: present
+
+    - name: Create secret plausible_google_client_id
+      community.docker.docker_secret:
+        name: plausible_google_client_id
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_google_client_id', vault='prod') }}"
+        state: present
+
+    - name: Create secret plausible_google_client_secret
+      community.docker.docker_secret:
+        name: plausible_google_client_secret
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_google_client_secret', vault='prod') }}"
+        state: present
+
+    - name: Create secret plausible_mailer_email
+      community.docker.docker_secret:
+        name: plausible_mailer_email
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_mailer_email', vault='prod') }}"
+        state: present
+
+    - name: Create secret plausible_smtp_host_addr
+      community.docker.docker_secret:
+        name: plausible_smtp_host_addr
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_smtp_host_addr', vault='prod') }}"
+        state: present
+
+    - name: Create secret plausible_smtp_user_name
+      community.docker.docker_secret:
+        name: plausible_smtp_user_name
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_smtp_user_name', vault='prod') }}"
+        state: present
+
+    - name: Create secret plausible_smtp_user_pwd
+      community.docker.docker_secret:
+        name: plausible_smtp_user_pwd
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_smtp_user_pwd', vault='prod') }}"
+        state: present
+
+    - name: Deploy Plausible
+      community.docker.docker_stack:
+        name: plausible
+        compose:
+          - /docker/plausible/compose.yaml
+        state: present
+
+    - name: Download Fedora-Cloud-Base-37-1.7.x86_64.qcow2
+      ansible.builtin.get_url:
+        url: https://download.fedoraproject.org/pub/fedora/linux/releases/37/Cloud/x86_64/images/Fedora-Cloud-Base-37-1.7.x86_64.qcow2
+        dest: /var/lib/vz/template/cloudimg/Fedora-Cloud-Base-37-1.7.x86_64.qcow2
+        mode: 0640
+
+    - name: Create Fedora Template
+      community.general.proxmox_kvm:
+        api_user: "{{ lookup('community.general.onepassword', 'hogsmeade', field='username', vault='Private') }}@pam"
+        api_password: "{{ lookup('community.general.onepassword', 'hogsmeade', field='password', vault='Private') }}"
+        api_host: hogsmeade
+        node: hogsmeade
+
+        vmid: 1000
+        name: fedora-template
+        machine: q35
+        cpu: host
+        cores: 4
+        memory: 4096
+        bios: ovmf
+        ostype: l26
+        agent: 1
+        scsihw: virtio-scsi-pci
+        net:
+          net0: virtio,bridge=vmbr0
+        efidisk0:
+          storage: local-lvm
+          format: raw
+          efitype: 4m
+          pre_enrolled_keys: 1
+        ide:
+          ide2: local-lvm:cloudinit,format=raw
+        serial:
+          serial0: socket
+        vga: serial0
+        bootdisk: scsi0
+        ciuser: "{{ lookup('community.general.onepassword', 'mediaserver', field='username', vault='Private') }}"
+        cipassword: "{{ lookup('community.general.onepassword', 'mediaserver', field='password', vault='Private') }}"
+        sshkeys: "{{ lookup('community.general.onepassword', 'Sebastian SSH Key', field='public key', vault='Private') }}"
+        timeout: 180
+        state: present
+      register: fedora_template
+
+    - name: Import Fedora Cloud Base image # noqa no-handler
+      ansible.builtin.shell: /usr/sbin/qm disk import 1000 /var/lib/vz/template/cloudimg/Fedora-Cloud-Base-37-1.7.x86_64.qcow2 local-lvm --format qcow2; /usr/sbin/qm set 1000 --scsi0 local-lvm:vm-1000-disk-1;/usr/sbin/qm set 1000 --boot order=scsi0; /usr/sbin/qm template 1000 # noqa yaml
+      when: fedora_template.changed
+
+    - name: Clone fedora_template to mediaserver
+      community.general.proxmox_kvm:
+        api_user: "{{ lookup('community.general.onepassword', 'hogsmeade', field='username', vault='Private') }}@pam"
+        api_password: "{{ lookup('community.general.onepassword', 'hogsmeade', field='password', vault='Private') }}"
+        api_host: hogsmeade
+        node: hogsmeade
+        clone: fedora-template
+        full: true
+        vmid: 1000
+        newid: 100
+        name: mediaserver
+        onboot: true
+        timeout: 300
+        state: present
+      register: mediaserver
+      notify:
+        - resize_vm
+
+  handlers:
+    - name: Restart pveproxy
+      ansible.builtin.service:
+        name: pveproxy
+        state: restarted
+
+    - name: Update grub
+      ansible.builtin.command:
+        cmd: update-grub
+      listen: update-grub
+
+    - name: Resize VM
+      ansible.builtin.command:
+        cmd: /usr/sbin/qm resize {{ mediaserver.newid }} scsi0 +20G
+      listen: resize_vm
