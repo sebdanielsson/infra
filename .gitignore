@@ -41,6 +41,5 @@ terraform.rc
 .DS_Store
 
 # Ignore certs and sensitive config files
-*.pfx
 wg0.conf
 secrets.env
