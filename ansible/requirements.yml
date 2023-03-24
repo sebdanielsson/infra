@@ -1,7 +1,7 @@
 ---
 collections:
   - name: community.docker
-    version: 3.4.2
+    version: 3.4.3
 
 roles:
   - name: artis3n.tailscale
