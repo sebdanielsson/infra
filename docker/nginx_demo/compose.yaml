@@ -1,7 +1,7 @@
 services:
   nginx:
     container_name: nginx_demo
-    image: nginx:1.23.3-alpine
+    image: nginx:1.23.4-alpine
     volumes:
       - /docker/data/nginx_demo/nginx:/usr/share/nginx/html:ro
     ports:
