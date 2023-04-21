@@ -1,14 +1,38 @@
 services:
-  portainer:
-    container_name: portainer
-    image: portainer/portainer-ee:2.18.1-alpine
+  agent:
+    image: portainer/agent:2.18.1-alpine
+    networks:
+      - agent_network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - portainer:/data
-    ports:
-      - "8000:8000"
-      - "9443:9443"
-    restart: always
-volumes:
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+    deploy:
+      mode: global
+      placement:
+        constraints: [node.platform.os == linux]
+
   portainer:
-    name: portainer
+    image: portainer/portainer-ee:2.18.1-alpine
+    command: -H tcp://tasks.agent:9001 --tlsskipverify
+    ports:
+      - "9443:9443"
+      - "9000:9000"
+    networks:
+      - agent_network
+    volumes:
+      - portainer_data:/data
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+
+networks:
+  agent_network:
+    name: portainer_agent_network
+    driver: overlay
+    attachable: true
+
+volumes:
+  portainer_data:
+    name: portainer_data
