@@ -1,0 +1,22 @@
+services:
+  ombi:
+    image: linuxserver/ombi:4.35.10
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    networks:
+      - medianet
+    volumes:
+      - ombi_data:/config
+    ports:
+      - 3579:3579
+    restart: unless-stopped
+
+volumes:
+  ombi_data:
+    external: true
+
+networks:
+  medianet:
+    external: true

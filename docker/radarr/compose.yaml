@@ -1,0 +1,24 @@
+services:
+  radarr:
+    image: linuxserver/radarr:4.4.3-nightly
+    networks:
+      - medianet
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    volumes:
+      - radarr_data:/config
+      - /chungus/media/movies:/movies
+      - /chungus/media/downloads:/downloads
+    ports:
+      - "7878:7878"
+    restart: always
+
+networks:
+  medianet:
+    external: true
+
+volumes:
+  radarr_data:
+    external: true

@@ -1,0 +1,24 @@
+services:
+  sonarr:
+    image: linuxserver/sonarr:develop
+    networks:
+      - medianet
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    volumes:
+      - sonarr_data:/config
+      - /chungus/media/tvshows:/tvshows
+      - /chungus/media/downloads:/downloads
+    ports:
+      - "8989:8989"
+    restart: always
+
+networks:
+  medianet:
+    external: true
+
+volumes:
+  sonarr_data:
+    external: true

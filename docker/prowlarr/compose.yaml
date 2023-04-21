@@ -1,0 +1,22 @@
+services:
+  prowlarr:
+    image: linuxserver/prowlarr:1.3.0-develop
+    networks:
+      - medianet
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    volumes:
+      - prowlarr_data:/config
+    ports:
+      - "9696:9696"
+    restart: always
+
+networks:
+  medianet:
+    external: true
+
+volumes:
+  prowlarr_data:
+    external: true
