@@ -22,12 +22,6 @@ services:
       - /docker/data/etlegacy/etlegacy/etmain:/usr/share/nginx/html/etmain:ro
       - /docker/data/etlegacy/etlegacy/nitmod/nitmod_2.3.4_b4.pk3:/usr/share/nginx/html/nitmod/nitmod_2.3.4_b4.pk3:ro
     restart: always
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.etlegacy-mirror.rule=Host(`etlegacy-mirror.hogwarts.zone`)
-      - traefik.http.routers.etlegacy-mirror.tls.certresolver=letsencrypt
-      - traefik.http.routers.etlegacy-mirror.middlewares=secHeaders@file
-      - traefik.http.services.etlegacy-mirror.loadbalancer.server.port=80
 networks:
   etlegacy:
     name: etlegacy

@@ -1,37 +1,42 @@
 services:
   traefik:
-    container_name: traefik
     image: traefik:v3.0.0-beta2
     command:
       - --api
       - --api.dashboard=true
       - --api.insecure=true
-      #- --pilot.dashboard=false # Not found in v3.0.0 beta 2?
       - --log.level=WARN
       - --global.checknewversion=false
       - --global.sendanonymoususage=false
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
-      - --providers.file.directory=/etc/traefik
-      - --providers.file.watch=true
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.http3
+      - --entrypoints.websecure.http3.advertisedport=443
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
       - --certificatesresolvers.tailscale.tailscale=true
+    networks:
+      - traefik
+    environment:
+      - CF_DNS_API_TOKEN_FILE=/run/secrets/cf_dns_api_token
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    network_mode: "host"
-    restart: always
+      - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock:ro
+    ports:
+      - "443:443"
+      - "443:443/udp"
+      - "8080:8080"
+    secrets:
+      - cf_dns_api_token
     labels:
       - traefik.enable=true
-      - traefik.http.routers.dashboard.rule=Host(`mediaserver.risk-bee.ts.net`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      - traefik.http.routers.dashboard.rule=Host(`hogsmeade.risk-bee.ts.net`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       - traefik.http.routers.dashboard.service=api@internal
       - traefik.http.services.dashboard.loadbalancer.server.port=8080
       - traefik.http.routers.dashboard.tls.certresolver=tailscale
-      - traefik.http.routers.dashboard.middlewares=secHeaders #, private-ipwhitelist Not working on v3.0.0 beta 2, inspect when this version is stable
-      #- traefik.http.middlewares.private-ipwhitelist.ipwhitelist.sourcerange=127.0.0.1/32, 100.0.0.0/8
+      - traefik.http.routers.dashboard.middlewares=secHeaders
       - traefik.http.middlewares.secHeaders.headers.browserXssFilter=true
       - traefik.http.middlewares.secHeaders.headers.contentTypeNosniff=true
       - traefik.http.middlewares.secHeaders.headers.frameDeny=true
@@ -41,6 +46,16 @@ services:
       - traefik.http.middlewares.secHeaders.headers.customFrameOptionsValue=SAMEORIGIN
       - traefik.http.middlewares.secHeaders.headers.referrerPolicy=same-origin
       - traefik.http.middlewares.secHeaders.headers.PermissionsPolicy="geolocation=(self), microphone=(), camera=(), fullscreen=*"
+
+secrets:
+  cf_dns_api_token:
+    external: true
+
+networks:
+  traefik:
+    external: true
+
 volumes:
-  traefik_acme:
+  acme:
     name: traefik_acme
+    external: true

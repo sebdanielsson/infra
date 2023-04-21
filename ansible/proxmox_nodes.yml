@@ -6,7 +6,7 @@
     - name: Remove PVE subscription nag, enable Dark Theme and manage repos
       role: simoncaron.pve_addons
       vars:
-        pve_addons_enable_dark_theme: true
+        pve_addons_enable_dark_theme: false
         pve_addons_remove_subscription_nag: true
         pve_addons_disable_enterprise_repo: true
         pve_addons_add_no_subscription_repo: true
@@ -39,6 +39,7 @@
     - name: Install and configure cloudflared
       role: sebdanielsson.cloudflared
       vars:
+        cloudflare_tunnel_enable: true
         cloudflare_tunnel_credential: "{{ lookup('community.general.onepassword', 'cf-tunnel-hogsmeade', field='credential', vault='Private') }}"
       state: present
 

@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  wireguard:
+    image: linuxserver/wireguard:1.0.20210914-alpine
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv4.conf.all.src_valid_mark=1
+    networks:
+      wgnet:
+        ipv4_address: 172.100.0.2
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    ports:
+      - 9091:9091
+    volumes:
+      - /lib/modules:/lib/modules
+      - ./wg0.conf:/config/wg0.conf
+    restart: always
+  transmission:
+    image: linuxserver/transmission:4.0.1
+    network_mode: "service:wireguard"
+    depends_on:
+      - wireguard
+    env_file:
+      - secrets.env
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+      - PEERPORT=54914
+    volumes:
+      - transmission_data:/config
+      - /chungus/media/downloads:/downloads
+    restart: always
+
+networks:
+  wgnet:
+    external: true
+
+volumes:
+  transmission_data:
+    name: transmission_data
+    external: true
