@@ -22,7 +22,7 @@ services:
       - ./wg0.conf:/config/wg0.conf
     restart: always
   transmission:
-    image: linuxserver/transmission:4.0.1
+    image: linuxserver/transmission:4.0.3
     network_mode: "service:wireguard"
     depends_on:
       - wireguard
