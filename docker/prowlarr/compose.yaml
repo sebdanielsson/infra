@@ -1,6 +1,6 @@
 services:
   prowlarr:
-    image: linuxserver/prowlarr:1.3.2-develop
+    image: linuxserver/prowlarr:1.4.0-develop
     networks:
       - medianet
     environment:
