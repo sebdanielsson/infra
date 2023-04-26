@@ -35,6 +35,12 @@
     attachable: true
     state: present
 
+- name: Deploy Watchtower
+  community.docker.docker_compose:
+    project_src: /watchtower
+    pull: true
+    state: present
+
 - name: Deploy Portainer
   community.docker.docker_stack:
     name: portainer
