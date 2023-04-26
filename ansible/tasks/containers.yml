@@ -37,7 +37,7 @@
 
 - name: Deploy Watchtower
   community.docker.docker_compose:
-    project_src: /watchtower
+    project_src: /docker/watchtower
     pull: true
     state: present
 
