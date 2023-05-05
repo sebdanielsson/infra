@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   wireguard:
     image: linuxserver/wireguard:1.0.20210914-alpine
@@ -21,6 +19,8 @@ services:
       - /lib/modules:/lib/modules
       - ./wg0.conf:/config/wg0.conf
     restart: always
+    labels:
+      - com.centurylinklabs.watchtower.monitor-only=true
   transmission:
     image: linuxserver/transmission:4.0.3
     network_mode: "service:wireguard"
