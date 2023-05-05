@@ -32,7 +32,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Stockholm
-      - PEERPORT=54914
+      - PEERPORT=60831
     volumes:
       - transmission_data:/config
       - /chungus/media/downloads:/downloads
