@@ -30,11 +30,48 @@
           #!/bin/sh
           mkdir -p /certs/jellyfin
           openssl pkcs12 -export -password pass:{{ jellyfin_pkcs12_password }} -out /certs/jellyfin/jellyfin.pfx -inkey /etc/letsencrypt/live/{{ jellyfin_domain }}/privkey.pem -in /etc/letsencrypt/live/{{ jellyfin_domain }}/cert.pem
-          chmod 644 /certs/jellyfin/jellyfin.pfx
+          chmod 755 /certs/jellyfin/jellyfin.pfx
           chown root:docker /certs/jellyfin/jellyfin.pfx
         create: true
         mode: "0750"
         state: present
+
+    - name: Create certbot-renew-jellyfin service
+      ansible.builtin.copy:
+        mode: "0644"
+        dest: /etc/systemd/system/certbot-renew-jellyfin.service
+        content: |
+          [Unit]
+          Description=Renew certificates acquired via Certbot
+          Documentation=https://eff-certbot.readthedocs.io/en/stable/
+
+          [Service]
+          Type=oneshot
+          ExecStart=/usr/local/bin/certbot renew --quiet --cert-name {{ jellyfin_domain }} --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/jellyfin-pkcs12.sh
+          PrivateTmp=true
+
+    - name: Create certbot-renew-jellyfin.timer
+      ansible.builtin.copy:
+        mode: "0644"
+        dest: /etc/systemd/system/certbot-renew-jellyfin.timer
+        content: |
+          [Unit]
+          Description=Run Certbot twice daily
+
+          [Timer]
+          OnCalendar=*-*-* 00/12:00:00
+          RandomizedDelaySec=12h
+          Persistent=true
+
+          [Install]
+          WantedBy=timers.target
+
+    - name: Enable certbot-renew-jellyfin.timer
+      ansible.builtin.systemd:
+        name: certbot-renew-jellyfin.timer
+        state: started
+        enabled: true
+        daemon_reload: true
 
     - name: Obtain cert for Jellyfin
       ansible.builtin.shell: |
