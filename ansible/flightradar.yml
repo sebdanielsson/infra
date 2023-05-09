@@ -1,0 +1,47 @@
+---
+- name: Flightradar Playbook
+  hosts: flightradar.local
+  become: yes
+
+  roles:
+    - name: Install and configure Tailscale
+      role: artis3n.tailscale
+      tailscale_args: "--ssh"
+      vars:
+        tailscale_authkey: "{{ lookup('community.general.onepassword', 'ts-authkey-server', field='credential', vault='Private') }}"
+      state: present
+
+  tasks:
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: flightradar
+        use: systemd
+
+    - name: SSH authorized key for 'root'
+      ansible.posix.authorized_key:
+        user: root
+        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Key', field='public key', vault='Private') }}"
+        state: present
+
+    - name: Disable root login over SSH
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^PermitRootLogin"
+        line: "PermitRootLogin prohibit-password"
+        state: present
+
+    - name: Disable password login
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^PasswordAuthentication"
+        line: "PasswordAuthentication no"
+        state: present
+
+    - name: Install packages
+      ansible.builtin.apt:
+        name:
+          - python3-pip
+          - python3-setuptools
+          - python3-wheel
+          - tmux
+        state: present

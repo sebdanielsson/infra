@@ -7,3 +7,7 @@ all:
     virtual_machines:
       hosts:
         mediaserver:
+    sbc:
+      hosts:
+        flightradar:
+          ansible_user: sebbo
