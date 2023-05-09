@@ -1,6 +1,6 @@
 ---
 - name: Hogsmeade Proxmox
-  hosts: proxmox_nodes
+  hosts: hogsmeade
   vars:
     cloudflare_dns_api_token: "{{ lookup('env', 'CLOUDFLARE_DNS_API_TOKEN') }}"
     jellyfin_email: "{{ lookup('env', 'CERTBOT_EMAIL') }}"
