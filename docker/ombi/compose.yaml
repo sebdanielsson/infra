@@ -1,6 +1,6 @@
 services:
   ombi:
-    image: linuxserver/ombi:4.35.10
+    image: linuxserver/ombi:4.35.11
     environment:
       - PUID=1000
       - PGID=1000
