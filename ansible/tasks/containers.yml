@@ -41,6 +41,20 @@
     pull: true
     state: present
 
+- name: Deploy tsrecorder
+  community.docker.docker_compose:
+    project_src: /docker/tsrecorder
+    pull: true
+    state: present
+  environment:
+    TSRECORDER_AUTHKEY: "{{ lookup('community.general.onepassword', 'ts-authkey-recorder', field='credential', vault='prod') }}"
+
+- name: Deploy prometheus-grafana
+  community.docker.docker_compose:
+    project_src: /docker/prometheus-grafana
+    pull: true
+    state: present
+
 - name: Deploy Portainer
   community.docker.docker_stack:
     name: portainer
