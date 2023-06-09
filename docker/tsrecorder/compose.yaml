@@ -1,0 +1,13 @@
+services:
+  tsrecorder:
+    image: tailscale/tsrecorder:v1.40.1
+    container_name: tsrecorder
+    environment:
+      - TS_AUTHKEY=$TSRECORDER_AUTHKEY
+    volumes:
+      - tsrecorder:/data
+    command: /tsrecorder --dst=/data/recordings --statedir=/data/state --ui
+
+volumes:
+  tsrecorder:
+    name: tsrecorder
