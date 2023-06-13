@@ -1,6 +1,6 @@
 services:
   jellyfin:
-    image: linuxserver/jellyfin:10.8.10
+    image: linuxserver/jellyfin:2021.12.16
     networks:
       - medianet
     environment:
