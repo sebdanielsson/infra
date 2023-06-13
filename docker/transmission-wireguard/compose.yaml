@@ -22,7 +22,7 @@ services:
     labels:
       - com.centurylinklabs.watchtower.monitor-only=true
   transmission:
-    image: linuxserver/transmission:4.0.3
+    image: linuxserver/transmission:version-4.0.3-r2
     network_mode: "service:wireguard"
     depends_on:
       - wireguard
