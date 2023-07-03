@@ -8,6 +8,9 @@
     jellyfin_domain: "{{ lookup('env', 'JELLYFIN_DOMAIN') }}"
     jellyfin_pkcs12_password: "{{ lookup('env', 'JELLYFIN_PKCS12_PASSWORD') }}"
 
+    venv_path: ~/python_docker/venv
+    ansible_python_interpreter: "~/python_docker/venv/bin/python"
+
   tasks:
     - name: Set hostname
       ansible.builtin.hostname:
@@ -99,14 +102,24 @@
           sharenfs: crossmnt,no_root_squash,rw=192.168.1.0/24
         state: present
 
-    - name: Add community.docker.docker_compose dependencies
+    - name: Install python3-full
+      ansible.builtin.apt:
+        name:
+          - python3-full
+          - python3-virtualenv
+        state: present
+
+    - name: Install required Python packages in the virtual environment
       ansible.builtin.pip:
         name:
           - pyyaml
           - jsondiff
           - docker
           - docker-compose
+          - proxmoxer
         state: present
+        virtualenv: ~/python_docker/venv
+        virtualenv_site_packages: yes
 
     - name: Synchronize docker files
       ansible.posix.synchronize:
