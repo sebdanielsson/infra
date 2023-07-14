@@ -18,16 +18,6 @@
     attachable: true
     state: present
 
-- name: Create network wgnet
-  community.docker.docker_network:
-    name: wgnet
-    driver: bridge
-    ipam_config:
-      - subnet: 172.100.0.0/24
-        gateway: 172.100.0.1
-    attachable: true
-    state: present
-
 - name: Create network plausible_network
   community.docker.docker_network:
     name: plausible_network
