@@ -34,7 +34,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Stockholm
-      - DOCKER_MODS="jordanpotter/docker-mods:transmission-nat-pmp"
+      - DOCKER_MODS=jordanpotter/docker-mods:transmission-nat-pmp
     volumes:
       - transmission_data:/config
       - /chungus/media/downloads:/downloads
