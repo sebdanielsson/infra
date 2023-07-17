@@ -124,6 +124,12 @@
     data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_secret_key_base', vault='prod') }}"
     state: present
 
+- name: Create secret plausible_maxmind_license_key
+  community.docker.docker_secret:
+    name: plausible_maxmind_license_key
+    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_maxmind_license_key', vault='prod') }}"
+    state: present
+
 - name: Create secret plausible_google_client_id
   community.docker.docker_secret:
     name: plausible_google_client_id
@@ -136,28 +142,16 @@
     data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_google_client_secret', vault='prod') }}"
     state: present
 
-- name: Create secret plausible_mailer_email
+- name: Create secret plausible_mailgun_api_key
   community.docker.docker_secret:
-    name: plausible_mailer_email
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_mailer_email', vault='prod') }}"
+    name: plausible_mailgun_api_key
+    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_mailgun_api_key', vault='prod') }}"
     state: present
 
-- name: Create secret plausible_smtp_host_addr
+- name: Create secret plausible_mailgun_domain
   community.docker.docker_secret:
-    name: plausible_smtp_host_addr
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_smtp_host_addr', vault='prod') }}"
-    state: present
-
-- name: Create secret plausible_smtp_user_name
-  community.docker.docker_secret:
-    name: plausible_smtp_user_name
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_smtp_user_name', vault='prod') }}"
-    state: present
-
-- name: Create secret plausible_smtp_user_pwd
-  community.docker.docker_secret:
-    name: plausible_smtp_user_pwd
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_smtp_user_pwd', vault='prod') }}"
+    name: plausible_mailgun_domain
+    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_mailgun_domain', vault='prod') }}"
     state: present
 
 - name: Deploy Plausible

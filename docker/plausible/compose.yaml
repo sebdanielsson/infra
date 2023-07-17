@@ -47,32 +47,29 @@ services:
       - DISABLE_REGISTRATION=false
       - BASE_URL=/run/secrets/plausible_base_url
       - SECRET_KEY_BASE=/run/secrets/plausible_secret_key_base
+      - MAXMIND_LICENSE_KEY=/run/secrets/plausible_maxmind_license_key
+      - MAXMIND_EDITION=GeoLite2-City
       - GOOGLE_CLIENT_ID=/run/secrets/plausible_google_client_id
-      - GOOGLE_CLIENT_SECRET=/run/secrets/plausible_google_client_secretp
-      - MAILER_EMAIL=/run/secrets/plausible_mailer_email
-      - SMTP_HOST_ADDR=/run/secrets/plausible_smtp_host_addr
-      - SMTP_HOST_PORT=587
-      - SMTP_USER_NAME=/run/secrets/plausible_smtp_user_name
-      - SMTP_USER_PWD=/run/secrets/plausible_smtp_user_pwd
-      - SMTP_HOST_SSL_ENABLED=false
-      - SMTP_RETRIES=2
+      - GOOGLE_CLIENT_SECRET=/run/secrets/plausible_google_client_secret
+      - MAILGUN_API_KEY=/run/secrets/plausible_mailgun_api_key
+      - MAILGUN_DOMAIN=/run/secrets/plausible_mailgun_domain
+      - MAILER_ADAPTER=Bamboo.MailgunAdapter
+      - MAILGUN_BASE_URI=https://api.eu.mailgun.net/v3
     secrets:
       - source: plausible_base_url
         target: /run/secrets/BASE_URL
       - source: plausible_secret_key_base
         target: /run/secrets/SECRET_KEY_BASE
+      - source: plausible_maxmind_license_key
+        target: /run/secrets/MAXMIND_LICENSE_KEY
       - source: plausible_google_client_id
         target: /run/secrets/GOOGLE_CLIENT_ID
       - source: plausible_google_client_secret
         target: /run/secrets/GOOGLE_CLIENT_SECRET
-      - source: plausible_mailer_email
-        target: /run/secrets/MAILER_EMAIL
-      - source: plausible_smtp_host_addr
-        target: /run/secrets/SMTP_HOST_ADDR
-      - source: plausible_smtp_user_name
-        target: /run/secrets/SMTP_USER_NAME
-      - source: plausible_smtp_user_pwd
-        target: /run/secrets/SMTP_USER_PWD
+      - source: plausible_mailgun_api_key
+        target: /run/secrets/MAILGUN_API_KEY
+      - source: plausible_mailgun_domain
+        target: /run/secrets/MAILGUN_DOMAIN
     deploy:
       mode: replicated
       replicas: 1
@@ -99,15 +96,13 @@ secrets:
     external: true
   plausible_secret_key_base:
     external: true
+  plausible_maxmind_license_key:
+    external: true
   plausible_google_client_id:
     external: true
   plausible_google_client_secret:
     external: true
-  plausible_mailer_email:
+  plausible_mailgun_api_key:
     external: true
-  plausible_smtp_host_addr:
-    external: true
-  plausible_smtp_user_name:
-    external: true
-  plausible_smtp_user_pwd:
+  plausible_mailgun_domain:
     external: true
