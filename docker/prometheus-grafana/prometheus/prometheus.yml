@@ -12,4 +12,4 @@ scrape_configs:
     scrape_interval: 10s
     scrape_timeout: 5s
     static_configs:
-      - targets: ["flightradar.risk-bee.ts.net:80/dump1090/data"]
+      - targets: ["flightradar:80/dump1090/data"]
