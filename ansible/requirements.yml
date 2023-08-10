@@ -14,7 +14,7 @@ roles:
     version: 1.5.0
 
   - name: geerlingguy.docker
-    version: 6.1.0
+    version: 6.2.0
 
   - name: sebdanielsson.cloudflared
     version: 2.0.0
