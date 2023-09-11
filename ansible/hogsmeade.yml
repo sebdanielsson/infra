@@ -12,6 +12,28 @@
     ansible_python_interpreter: "~/python_docker/venv/bin/python"
 
   tasks:
+    - name: Add vector repository
+      ansible.builtin.deb822_repository:
+        name: vector
+        types: deb
+        uris: https://repositories.timber.io/public/vector/deb/debian
+        suites: "{{ ansible_distribution_release }}"
+        components: main
+        signed_by: https://repositories.timber.io/public/vector/gpg.3543DB2D0A2BC4B8.key
+        state: present
+
+    - name: Install vector for Logto logging
+      ansible.builtin.apt:
+        name:
+          - vector
+        state: present
+
+    - name: Start and enable vector
+      ansible.builtin.service:
+        name: vector
+        enabled: true
+        state: started
+
     - name: Set hostname
       ansible.builtin.hostname:
         name: hogsmeade
@@ -59,7 +81,7 @@
 
           [Service]
           Type=oneshot
-          ExecStart=/usr/local/bin/certbot renew --quiet --cert-name {{ jellyfin_domain }} --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/jellyfin-pkcs12.sh
+          ExecStart=/root/python_docker/venv/bin/certbot renew --quiet --cert-name {{ jellyfin_domain }} --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/jellyfin-pkcs12.sh
           PrivateTmp=true
 
     - name: Create certbot-renew-jellyfin.timer
