@@ -15,7 +15,7 @@
       role: artis3n.tailscale
       tailscale_args: "--ssh"
       vars:
-        tailscale_authkey: "{{ lookup('community.general.onepassword', 'ts-authkey-server', field='credential', vault='Private') }}"
+        tailscale_authkey: "{{ lookup('community.general.onepassword', 'ts-authkey-server', field='credential', vault='prod') }}"
       state: present
 
     - name: Install Docker
@@ -35,6 +35,11 @@
         docker_service_state: started
         docker_service_enabled: true
         docker_restart_handler_state: restarted
+        docker_daemon_options:
+        log-driver: "json-file"
+        log-opts:
+          max-size: "10m"
+          max-file: "3"
 
     - name: Install and configure cloudflared
       role: sebdanielsson.cloudflared
@@ -108,25 +113,10 @@
         key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Key', field='public key', vault='Private') }}"
         state: present
 
-    - name: Install proxmox_kvm
-      ansible.builtin.pip:
-        name:
-          - proxmoxer
-          - requests
-        state: present
-
-    - name: Install packages
+    - name: Install python3-full
       ansible.builtin.apt:
         name:
           - nfs-kernel-server
-          - python3-pip
-          - python3-setuptools
-          - python3-wheel
-        state: present
-
-    - name: Install certbot
-      ansible.builtin.pip:
-        name:
-          - certbot
-          - certbot-dns-cloudflare
+          - python3-full
+          - python3-virtualenv
         state: present
