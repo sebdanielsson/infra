@@ -173,8 +173,8 @@
     - name: Run all containers
       ansible.builtin.import_tasks: tasks/containers.yml
 
-    # - name: Create Fedora VM
-    #   ansible.builtin.import_tasks: tasks/fedora_vm.yml
+      # - name: Create Fedora VM
+      #   ansible.builtin.import_tasks: tasks/fedora_vm.yml
 
   handlers:
     - name: Restart pveproxy
