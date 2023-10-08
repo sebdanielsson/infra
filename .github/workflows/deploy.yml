@@ -6,7 +6,7 @@ on:
 
 defaults:
   run:
-    working-directory: 'sebdanielsson.infra'
+    working-directory: 'sebdanielsson.infra/ansible'
 
 jobs:
   run-playbook:
