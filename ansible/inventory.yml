@@ -4,6 +4,7 @@ all:
     proxmox_nodes:
       hosts:
         hogsmeade:
+          ansible_user: root
     virtual_machines:
       hosts:
         mediaserver:
