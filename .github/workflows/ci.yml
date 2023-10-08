@@ -1,0 +1,27 @@
+---
+name: Lint
+
+'on':
+  pull_request:
+  push:
+    branches:
+      - main
+
+defaults:
+  run:
+    working-directory: 'sebdanielsson.cloudflared'
+
+jobs:
+  lint:
+    name: Run yaml-lint and ansible-lint
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+    
+      - name: Run yaml-lint
+        uses: ibiqlik/action-yamllint@v3.1.1
+    
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@v6.20.3
