@@ -2,8 +2,8 @@
   hosts: hogsmeade
 
   tasks:
-    # Create a file with the current date and time
-    - name: Create a file with the current date and time
-      ansible.builtin.command: date > /tmp/date.txt
+    # Create a file
+    - name: Create a file
+      ansible.builtin.command: touch /ci.txt
       args:
-        creates: /tmp/date.txt
+        creates: /ci.txt
