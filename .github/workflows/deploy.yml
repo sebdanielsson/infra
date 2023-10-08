@@ -38,6 +38,7 @@ jobs:
           version: '1.50.1'
           authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
           tags: tag:ci
+          args: --ssh
 
       - name: Run playbook
         run: |
