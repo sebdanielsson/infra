@@ -32,7 +32,7 @@ jobs:
         run: |
           ansible-galaxy install -r requirements.yml
 
-      - name: Tailscale
+      - name: Setup Tailscale
         uses: tailscale/github-action@v2
         with:
           version: '1.50.1'
@@ -40,9 +40,15 @@ jobs:
           tags: tag:ci
           args: --ssh
 
-      - name: Ping hogsmeade
+      - name: Cat .ssh/config
         run: |
-          ping -c 5 hogsmeade
+          cat ~/.ssh/config
+
+      - name: Disable host key checking
+        run: |
+          mkdir -p ~/.ssh
+          echo "Host *" >> ~/.ssh/config
+          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
 
       - name: Run playbook
         run: |
