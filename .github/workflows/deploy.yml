@@ -40,6 +40,10 @@ jobs:
           tags: tag:ci
           args: --ssh
 
+      - name: Ping hogsmeade
+        run: |
+          ping -c 5 hogsmeade
+
       - name: Run playbook
         run: |
           ansible-playbook -i inventory.yml ci-test.yml
