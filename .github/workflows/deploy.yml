@@ -40,10 +40,6 @@ jobs:
           tags: tag:ci
           args: --ssh
 
-      - name: Cat .ssh/config
-        run: |
-          cat ~/.ssh/config
-
       - name: Disable host key checking
         run: |
           mkdir -p ~/.ssh
