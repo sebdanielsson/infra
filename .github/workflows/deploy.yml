@@ -1,8 +1,8 @@
 ---
 name: Run playbook
-on:
+'on'  :
   push:
-    branches: [ main ]
+    branches: [main]
 
 defaults:
   run:

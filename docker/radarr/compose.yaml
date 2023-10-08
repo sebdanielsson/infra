@@ -1,3 +1,4 @@
+---
 services:
   radarr:
     image: linuxserver/radarr:5.0.3

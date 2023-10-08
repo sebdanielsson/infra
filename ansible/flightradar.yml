@@ -1,7 +1,7 @@
 ---
 - name: Flightradar Playbook
   hosts: flightradar.local
-  become: yes
+  become: true
 
   roles:
     - name: Install and configure Tailscale

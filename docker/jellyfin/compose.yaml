@@ -1,3 +1,4 @@
+---
 services:
   jellyfin:
     image: linuxserver/jellyfin:version-10.8.10-1

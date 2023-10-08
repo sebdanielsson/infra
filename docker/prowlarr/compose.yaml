@@ -1,3 +1,4 @@
+---
 services:
   prowlarr:
     image: linuxserver/prowlarr:version-1.5.2.3484
@@ -22,7 +23,7 @@ services:
     environment:
       - LOG_LEVEL=info
       - LOG_HTML=false
-      - CAPTCHA_SOLVER=none # Check repo for more options
+      - CAPTCHA_SOLVER=none  # Check repo for more options
       - TZ=Europe/Stockholm
     ports:
       - "8191:8191"

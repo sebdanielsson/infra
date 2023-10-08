@@ -1,3 +1,4 @@
+---
 services:
   agent:
     image: portainer/agent:2.19.1-alpine

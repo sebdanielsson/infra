@@ -1,3 +1,4 @@
+---
 services:
   minecraft:
     container_name: minecraft
@@ -14,13 +15,13 @@ services:
       ALLOW_CHEATS: "true"
       MAX_PLAYERS: "16"
       ONLINE_MODE: "true"
-      #WHITE_LIST: "true"
+      # WHITE_LIST: "true"
       VIEW_DISTANCE: "12"
       TICK_DISTANCE: "12"
       PLAYER_IDLE_TIMEOUT: "0"
       MAX_THREADS: "8"
       LEVEL_NAME: "level"
-      #LEVEL_SEED: ""
+      # LEVEL_SEED: ""
       DEFAULT_PLAYER_PERMISSION_LEVEL: "member"
       TEXTUREPACK_REQUIRED: "false"
       SERVER_AUTHORITATIVE_MOVEMENT: "true"
