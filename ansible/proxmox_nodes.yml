@@ -120,3 +120,9 @@
           - python3-full
           - python3-virtualenv
         state: present
+
+  handlers:
+    - name: Update grub
+      ansible.builtin.command:
+        cmd: update-grub
+      listen: update-grub
