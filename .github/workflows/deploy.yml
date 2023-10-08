@@ -1,0 +1,37 @@
+---
+name: Run playbook
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+    run-playbook:
+        runs-on: ubuntu-22.04
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Setup Python
+          uses: actions/setup-python@v4
+          with:
+            python-version: '3.11'
+
+        - name: Install dependencies
+          run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+
+        - name: Install Ansible dependencies
+          run: |
+            ansible-galaxy install -r requirements.yml
+
+        - name: Tailscale
+          uses: tailscale/github-action@v2
+          with:
+            version: '1.50.1'
+            authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+            tags: tag:ci
+
+        - name: Run playbook
+          run: |
+            ansible-playbook -i inventory.yml ci-test.yml

@@ -1,0 +1,9 @@
+- name: CI Test
+  hosts: hogsmeade
+
+  tasks:
+    # Create a file with the current date and time
+    - name: Create a file with the current date and time
+      ansible.builtin.command: date > /tmp/date.txt
+      args:
+        creates: /tmp/date.txt
