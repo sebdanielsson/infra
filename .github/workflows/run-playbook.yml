@@ -1,8 +1,10 @@
 ---
 name: Run playbook
-'on'  :
+'on':
   push:
     branches: [main]
+    paths:
+      - ansible/**
 
 defaults:
   run:
