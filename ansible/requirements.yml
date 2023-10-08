@@ -17,4 +17,5 @@ roles:
     version: 7.0.1
 
   - name: sebdanielsson.cloudflared
-    version: 2.0.0
+    src: https://github.com/sebdanielsson/ansible-role-cloudflared.git
+    version: 2.3.0
