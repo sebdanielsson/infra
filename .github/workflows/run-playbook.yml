@@ -1,5 +1,6 @@
 ---
 name: Run playbook
+
 'on':
   push:
     branches: [main]
