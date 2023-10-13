@@ -3,7 +3,8 @@ name: Run playbook
 
 'on':
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
       - ansible/**
 
