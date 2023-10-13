@@ -18,6 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          path: 'sebdanielsson.infra'
           fetch-depth: 0
 
       - name: Setup Python
