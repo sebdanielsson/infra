@@ -34,7 +34,7 @@ jobs:
       - name: Install Ansible dependencies
         run: |
           ansible-galaxy install -r requirements.yml
-  
+
       - name: Lint code.
         run: |
           yamllint .
