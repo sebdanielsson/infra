@@ -16,10 +16,10 @@ jobs:
     name: Run yaml-lint and ansible-lint
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           path: 'sebdanielsson.infra'
-          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v4
