@@ -37,10 +37,6 @@ terraform.rc
 # Ignore Terraform .lock files
 .terraform.lock.hcl
 
-# Ignore macOS metadata files
-.DS_Store
-
 # Ignore certs and sensitive config files
 wg0.conf
 secrets.env
-.vscode
