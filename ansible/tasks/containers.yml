@@ -2,7 +2,7 @@
 - name: Create secret transmission_user
   community.docker.docker_secret:
     name: transmission_user
-    data: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_user', vault='prod', service_account_token=env['OP_SERVICE_ACCOUNT_TOKEN']) }}"
+    data: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_user', vault='prod', service_account_token=service_account_token) }}"
     state: present
 
 - name: Create secret transmission_pass
