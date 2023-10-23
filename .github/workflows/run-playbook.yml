@@ -42,31 +42,32 @@ jobs:
           mkdir -p ~/.ssh
           echo "Host *" >> ~/.ssh/config
           echo "  StrictHostKeyChecking no" >> ~/.ssh/config
-  
-      - name: Configure 1Password Service Account
-        uses: 1password/load-secrets-action/configure@v1
-        with:
-          service-account-token: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
-      - name: Load Tailscale token
+      - name: Install 1Password CLI
+        uses: 1password/install-cli-action@v1
+        with:
+          version: latest
+
+      - name: Load secret ts-authkey
+        id: op-load-ts-authkey
         uses: 1password/load-secrets-action@v1
         with:
-          export-env: true
+          export-env: false
         env:
-          TAILSCALE_AUTHKEY: op://prod/ts-authkey-ci/credential
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          TS_AUTHKEY: op://prod/ts-authkey-ci/credential
 
       - name: Setup Tailscale
         uses: tailscale/github-action@v2
         with:
           version: '1.50.1'
-          authkey: ${{ env.TAILSCALE_AUTHKEY }}
+          authkey: ${{ steps.op-load-ts-authkey.outputs.TS_AUTHKEY }}
           tags: tag:ci
           args: --ssh
 
-      - name: Check op version
-        run: |
-          op --version
-
       - name: Run playbook
         run: |
-          ansible-playbook -i inventory.yml ci-test.yml
+          op run --env-file=.env -- ansible-playbook -i inventory.yml ci-test.yml
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
