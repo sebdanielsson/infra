@@ -8,7 +8,7 @@
 - name: Create secret transmission_pass
   community.docker.docker_secret:
     name: transmission_pass
-    data: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_pass', vault='prod') }}"
+    data: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_pass', vault='prod', service_account_token=service_account_token) }}"
     state: present
 
 - name: Create network medianet
@@ -37,7 +37,7 @@
     pull: true
     state: present
   environment:
-    TSRECORDER_AUTHKEY: "{{ lookup('community.general.onepassword', 'ts-authkey-recorder', field='credential', vault='prod') }}"
+    TSRECORDER_AUTHKEY: "{{ lookup('community.general.onepassword', 'ts-authkey-recorder', field='credential', vault='prod', service_account_token=service_account_token) }}"
 
 - name: Deploy prometheus-grafana
   community.docker.docker_compose:
@@ -89,7 +89,7 @@
 - name: Create secret cf_dns_api_token
   community.docker.docker_secret:
     name: cf_dns_api_token
-    data: "{{ lookup('community.general.onepassword', 'cloudflare-dns-api-token', field='credential', vault='prod') }}"
+    data: "{{ lookup('community.general.onepassword', 'cloudflare-dns-api-token', field='credential', vault='prod', service_account_token=service_account_token) }}"
     state: present
 
 - name: Create network traefik
@@ -109,49 +109,49 @@
 - name: Create secret plausible_postgres_password
   community.docker.docker_secret:
     name: plausible_postgres_password
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_postgres_password', vault='prod') }}"
+    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_postgres_password', vault='prod', service_account_token=service_account_token) }}"
     state: present
 
 - name: Create secret plausible_base_url
   community.docker.docker_secret:
     name: plausible_base_url
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_base_url', vault='prod') }}"
+    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_base_url', vault='prod', service_account_token=service_account_token) }}"
     state: present
 
 - name: Create secret plausible_secret_key_base
   community.docker.docker_secret:
     name: plausible_secret_key_base
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_secret_key_base', vault='prod') }}"
+    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_secret_key_base', vault='prod', service_account_token=service_account_token) }}"
     state: present
 
 - name: Create secret plausible_maxmind_license_key
   community.docker.docker_secret:
     name: plausible_maxmind_license_key
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_maxmind_license_key', vault='prod') }}"
+    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_maxmind_license_key', vault='prod', service_account_token=service_account_token) }}"
     state: present
 
 - name: Create secret plausible_google_client_id
   community.docker.docker_secret:
     name: plausible_google_client_id
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_google_client_id', vault='prod') }}"
+    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_google_client_id', vault='prod', service_account_token=service_account_token) }}"
     state: present
 
 - name: Create secret plausible_google_client_secret
   community.docker.docker_secret:
     name: plausible_google_client_secret
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_google_client_secret', vault='prod') }}"
+    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_google_client_secret', vault='prod', service_account_token=service_account_token) }}"
     state: present
 
 - name: Create secret plausible_mailgun_api_key
   community.docker.docker_secret:
     name: plausible_mailgun_api_key
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_mailgun_api_key', vault='prod') }}"
+    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_mailgun_api_key', vault='prod', service_account_token=service_account_token) }}"
     state: present
 
 - name: Create secret plausible_mailgun_domain
   community.docker.docker_secret:
     name: plausible_mailgun_domain
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_mailgun_domain', vault='prod') }}"
+    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_mailgun_domain', vault='prod', service_account_token=service_account_token) }}"
     state: present
 
 - name: Deploy Plausible
