@@ -18,17 +18,17 @@
     attachable: true
     state: present
 
+- name: Deploy Watchtower
+  community.docker.docker_compose:
+    project_src: /docker/watchtower
+    pull: true
+    state: present
+
 - name: Create network plausible_network
   community.docker.docker_network:
     name: plausible_network
     driver: overlay
     attachable: true
-    state: present
-
-- name: Deploy Watchtower
-  community.docker.docker_compose:
-    project_src: /docker/watchtower
-    pull: true
     state: present
 
 - name: Deploy tsrecorder
