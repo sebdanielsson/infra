@@ -29,12 +29,14 @@ services:
     network_mode: "service:wireguard"
     depends_on:
       - wireguard
-    env_file:
-      - secrets.env
+    #env_file: # Comment out to test Docker secrets
+    #  - secrets.env
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Stockholm
+      - FILE__USER=/run/secrets/transmission_user
+      - FILE__PASS=/run/secrets/transmission_pass
       - DOCKER_MODS=jordanpotter/docker-mods:transmission-nat-pmp
     volumes:
       - transmission_data:/config
