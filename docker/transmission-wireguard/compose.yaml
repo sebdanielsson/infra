@@ -41,6 +41,11 @@ services:
     volumes:
       - transmission_data:/config
       - /chungus/media/downloads:/downloads
+    secrets:
+      - source: transmission_user
+        target: /run/secrets/transmission_user
+      - source: transmission_pass
+        target: /run/secrets/transmission_pass
     restart: always
 
 networks:
@@ -55,3 +60,9 @@ networks:
 volumes:
   transmission_data:
     name: transmission_data
+
+secrets:
+  transmission_user:
+    external: true
+  transmission_pass:
+    external: true
