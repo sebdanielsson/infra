@@ -7,6 +7,7 @@ name: Run playbook
       - main
     paths:
       - ansible/**
+      - docker/**
   workflow_dispatch:
 
 defaults:
