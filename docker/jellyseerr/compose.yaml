@@ -11,7 +11,7 @@ services:
     networks:
       - medianet
     volumes:
-      - jellyseerr_config:/app/config
+      - ./jellyseerr_config:/app/config
     restart: unless-stopped
 
 volumes:
