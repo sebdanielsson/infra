@@ -70,8 +70,8 @@
 
 - name: Add transmission secrets
   ansible.builtin.template:
-    src: secrets.env.j2
-    dest: secrets.env
+    src: ../..//docker/transmission-wireguard/secrets.env.j2
+    dest: /docker/transmission-wireguard/secrets.env
   vars:
     transmission_user: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_user', vault='prod', service_account_token=service_account_token) }}"
     transmission_pass: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_pass', vault='prod', service_account_token=service_account_token) }}"
