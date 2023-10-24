@@ -39,4 +39,3 @@ terraform.rc
 
 # Ignore certs and sensitive config files
 wg0.conf
-secrets.env
