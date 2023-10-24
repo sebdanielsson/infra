@@ -1,16 +1,4 @@
 ---
-- name: Create secret transmission_user
-  community.docker.docker_secret:
-    name: transmission_user
-    data: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_user', vault='prod', service_account_token=service_account_token) }}"
-    state: present
-
-- name: Create secret transmission_pass
-  community.docker.docker_secret:
-    name: transmission_pass
-    data: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_pass', vault='prod', service_account_token=service_account_token) }}"
-    state: present
-
 - name: Create network medianet
   community.docker.docker_network:
     name: medianet
@@ -80,6 +68,13 @@
       - /docker/jellyfin/compose.yaml
     state: present
 
+- name: Add transmission secrets
+  ansible.builtin.template:
+    src: secrets.env.j2
+    dest: secrets.env
+  vars:
+    transmission_user: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_user', vault='prod', service_account_token=service_account_token) }}"
+    transmission_pass: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_pass', vault='prod', service_account_token=service_account_token) }}"
 - name: Deploy transmission-wireguard
   community.docker.docker_compose:
     project_src: /docker/transmission-wireguard
