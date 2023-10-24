@@ -167,3 +167,9 @@
     compose:
       - /docker/ombi/compose.yaml
     state: present
+
+- name: Deploy Jellyseerr
+  community.docker.docker_compose:
+    project_src: /docker/jellyseerr
+    pull: true
+    state: present
