@@ -6,17 +6,17 @@
     attachable: true
     state: present
 
-- name: Deploy Watchtower
-  community.docker.docker_compose:
-    project_src: /docker/watchtower
-    pull: true
-    state: present
-
 - name: Create network plausible_network
   community.docker.docker_network:
     name: plausible_network
     driver: overlay
     attachable: true
+    state: present
+
+- name: Deploy Watchtower
+  community.docker.docker_compose:
+    project_src: /docker/watchtower
+    pull: true
     state: present
 
 - name: Deploy tsrecorder
@@ -26,12 +26,6 @@
     state: present
   environment:
     TSRECORDER_AUTHKEY: "{{ lookup('community.general.onepassword', 'ts-authkey-recorder', field='credential', vault='prod', service_account_token=service_account_token) }}"
-
-- name: Deploy prometheus-grafana
-  community.docker.docker_compose:
-    project_src: /docker/prometheus-grafana
-    pull: true
-    state: present
 
 - name: Deploy Portainer
   community.docker.docker_stack:
@@ -75,31 +69,25 @@
   vars:
     transmission_user: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_user', vault='prod', service_account_token=service_account_token) }}"
     transmission_pass: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_pass', vault='prod', service_account_token=service_account_token) }}"
+
 - name: Deploy transmission-wireguard
   community.docker.docker_compose:
     project_src: /docker/transmission-wireguard
     pull: true
     state: present
 
-- name: Create secret cf_dns_api_token
-  community.docker.docker_secret:
-    name: cf_dns_api_token
-    data: "{{ lookup('community.general.onepassword', 'cloudflare-dns-api-token', field='credential', vault='prod', service_account_token=service_account_token) }}"
-    state: present
-
-- name: Create network traefik
-  community.docker.docker_network:
-    name: traefik
-    driver: overlay
-    attachable: true
-    state: present
-
-- name: Deploy Traefik
+- name: Deploy Ombi
   community.docker.docker_stack:
-    name: traefik
+    name: ombi
     compose:
-      - /docker/traefik/compose.yaml
-    state: absent
+      - /docker/ombi/compose.yaml
+    state: present
+
+- name: Deploy Jellyseerr
+  community.docker.docker_compose:
+    project_src: /docker/jellyseerr
+    pull: true
+    state: present
 
 - name: Create secret plausible_postgres_password
   community.docker.docker_secret:
@@ -154,17 +142,4 @@
     name: plausible
     compose:
       - /docker/plausible/compose.yaml
-    state: present
-
-- name: Deploy Ombi
-  community.docker.docker_stack:
-    name: ombi
-    compose:
-      - /docker/ombi/compose.yaml
-    state: present
-
-- name: Deploy Jellyseerr
-  community.docker.docker_compose:
-    project_src: /docker/jellyseerr
-    pull: true
     state: present
