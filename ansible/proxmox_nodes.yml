@@ -36,10 +36,10 @@
         docker_service_enabled: true
         docker_restart_handler_state: restarted
         docker_daemon_options:
-        log-driver: "json-file"
-        log-opts:
-          max-size: "10m"
-          max-file: "3"
+          log-driver: "json-file"
+          log-opts:
+            max-size: "10m"
+            max-file: "3"
 
     - name: Install and configure cloudflared
       role: sebdanielsson.cloudflared
@@ -84,19 +84,21 @@
         key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Key', field='public key', vault='Private') }}"
         state: present
 
-    - name: Disable root login over SSH
-      ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: "^PermitRootLogin"
-        line: "PermitRootLogin prohibit-password"
-        state: present
+    - name: Copy sshd hardening config
+      ansible.builtin.copy:
+        src: 49-sshd-hardening.conf
+        dest: /etc/ssh/sshd_config.d/49-sshd-hardening.conf
+        owner: root
+        group: root
+        mode: 0644
 
-    - name: Disable password login
-      ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: "^PasswordAuthentication"
-        line: "PasswordAuthentication no"
-        state: present
+    - name: Copy ssh hardening config
+      ansible.builtin.copy:
+        src: 49-ssh-hardening.conf
+        dest: /etc/ssh/ssh_config.d/49-ssh-hardening.conf
+        owner: root
+        group: root
+        mode: 0644
 
     - name: Ensure 'sebastian' user exists
       ansible.builtin.user:
