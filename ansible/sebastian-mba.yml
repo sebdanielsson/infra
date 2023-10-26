@@ -19,16 +19,24 @@
         src: 49-sshd-hardening.conf
         dest: /etc/ssh/sshd_config.d/49-sshd-hardening.conf
         owner: root
-        group: root
+        group: wheel
         mode: "0644"
+      become: true
 
     - name: Copy ssh hardening config
       ansible.builtin.copy:
         src: 49-ssh-hardening.conf
         dest: /etc/ssh/ssh_config.d/49-ssh-hardening.conf
         owner: root
-        group: root
+        group: wheel
         mode: "0644"
+      become: true
+
+    - name: Update Homebrew
+      community.general.homebrew:
+        update_homebrew: true
+        upgrade_all: false
+        state: latest
 
     - name: Install Homebrew formulae
       community.general.homebrew:
@@ -59,19 +67,18 @@
           - zsh-autosuggestions
           - zsh-completions
           - zsh-syntax-highlighting
-        update_homebrew: true
-        upgrade_all: true
+        update_homebrew: false
+        upgrade_all: false
         state: present
 
     - name: Install Homebrew casks
-      community.general.homebrew:
+      community.general.homebrew_cask:
         name:
           - 1password
           - 1password-cli
           - brave-browser
           - discord
           - disk-diet
-          - geekbench
           - github
           - grandperspective
           - httpie
@@ -92,7 +99,8 @@
           - transmit
           - visual-studio-code
           - warp
-        update_homebrew: true
+        update_homebrew: false
+        upgrade_all: false
         state: present
 
     - name: Install Mac App Store apps
