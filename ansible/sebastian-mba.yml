@@ -1,0 +1,120 @@
+---
+- name: Configure Sebastian's MacBook Air
+  hosts: localhost
+
+  tasks:
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: "Sebastian's MacBook Air"
+        use: macos
+
+    - name: SSH authorized key for 'sebastian'
+      ansible.posix.authorized_key:
+        user: sebastian
+        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Key', field='public key', vault='Private') }}"
+        state: present
+
+    - name: Copy sshd hardening config
+      ansible.builtin.copy:
+        src: 49-sshd-hardening.conf
+        dest: /etc/ssh/sshd_config.d/49-sshd-hardening.conf
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Copy ssh hardening config
+      ansible.builtin.copy:
+        src: 49-ssh-hardening.conf
+        dest: /etc/ssh/ssh_config.d/49-ssh-hardening.conf
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Install Homebrew formulae
+      community.general.homebrew:
+        name:
+          - ansible
+          - asciinema
+          - autorestic
+          - coreutils
+          - curl
+          - fd
+          - fio
+          - git
+          - httpie
+          - iperf3
+          - linode-cli
+          - mas
+          - mtr
+          - nano
+          - nmap
+          - node@20
+          - rsync
+          - shellcheck
+          - ssh-audit
+          - tmux
+          - wget
+          - xdg-ninja
+          - zsh
+          - zsh-autosuggestions
+          - zsh-completions
+          - zsh-syntax-highlighting
+        update_homebrew: true
+        upgrade_all: true
+        state: present
+
+    - name: Install Homebrew casks
+      community.general.homebrew:
+        name:
+          - 1password
+          - 1password-cli
+          - brave-browser
+          - discord
+          - disk-diet
+          - geekbench
+          - github
+          - grandperspective
+          - httpie
+          - netnewswire
+          - notion
+          - obs
+          - obsidian
+          - optimus-player
+          - orbstack
+          - pacifist
+          - raycast
+          - rectangle-pro
+          - screens
+          - signal
+          - silicon-info
+          - textsniper
+          - tg-pro
+          - transmit
+          - visual-studio-code
+          - warp
+        update_homebrew: true
+        state: present
+
+    - name: Install Mac App Store apps
+      community.general.mas:
+        id:
+          - 1365531024 # 1Blocker
+          - 1569813296 # 1Password for Safari
+          - 1601151613 # Baking Soda
+          - 1287239339 # ColorSlurp
+          - 1548544614 # Controlly
+          - 640199958  # Developer
+          - 1474335294 # GoodLinks
+          - 6444915884 # Ice Cubes
+          - 1136220934 # Infuse
+          - 462058435  # Microsoft Excel
+          - 462062816  # Microsoft PowerPoint
+          - 462054704  # Microsoft Word
+          - 1592917505 # Noir
+          - 1289583905 # Pixelmator Pro
+          - 1496833156 # Playgrounds
+          - 1568262835 # Super Agent
+          - 1475387142 # Tailscale
+          - 899247664  # TestFlight
+          - 1591303229 # Vinegar
+        state: present
