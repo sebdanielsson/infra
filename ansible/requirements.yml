@@ -11,12 +11,15 @@ collections:
 
 roles:
   - name: artis3n.tailscale
+    src: https://github.com/artis3n/ansible-role-tailscale.git
     version: v4.2.3
 
   - name: simoncaron.pve_addons
+    src: https://github.com/simoncaron/ansible-role-pve_addons.git
     version: 1.5.0
 
   - name: geerlingguy.docker
+    src: https://github.com/geerlingguy/ansible-role-docker.git
     version: 7.0.1
 
   - name: sebdanielsson.cloudflared
