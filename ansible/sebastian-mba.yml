@@ -38,6 +38,11 @@
         upgrade_all: false
         state: latest
 
+    - name: Add Homebrew fonts
+      community.general.homebrew_tap:
+        name: homebrew/cask-fonts
+        state: present
+
     - name: Install Homebrew formulae
       community.general.homebrew:
         name:
@@ -79,6 +84,8 @@
           - brave-browser
           - discord
           - disk-diet
+          - font-geist
+          - font-geist-mono
           - github
           - grandperspective
           - httpie
