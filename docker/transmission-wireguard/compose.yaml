@@ -1,7 +1,7 @@
 ---
 services:
   wireguard:
-    image: linuxserver/wireguard:1.0.20210914
+    image: linuxserver/wireguard:v1.0.20210914-ls8
     container_name: wireguard
     cap_add:
       - NET_ADMIN
@@ -19,12 +19,12 @@ services:
       - 9091:9091
     volumes:
       - /lib/modules:/lib/modules
-      - ./wg0.conf:/config/wg0.conf
+      - ./wg0.conf:/config/wg_confs/wg0.conf
     restart: always
     labels:
       - com.centurylinklabs.watchtower.monitor-only=true
   transmission:
-    image: linuxserver/transmission:version-4.0.3-r2
+    image: linuxserver/transmission:4.0.4
     container_name: transmission
     network_mode: "service:wireguard"
     depends_on:
