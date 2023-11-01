@@ -62,9 +62,18 @@
       - /docker/jellyfin/compose.yaml
     state: present
 
+- name: Add wireguard secrets
+  ansible.builtin.template:
+    src: ../../docker/transmission-wireguard/wg0.conf.j2
+    dest: /docker/transmission-wireguard/wg0.conf
+  vars:
+    private_key: "{{ lookup('community.general.onepassword', 'wg0', field='private_key', vault='prod', service_account_token=service_account_token) }}"
+    public_key: "{{ lookup('community.general.onepassword', 'wg0', field='public_key', vault='prod', service_account_token=service_account_token) }}"
+    endpoint: "{{ lookup('community.general.onepassword', 'wg0', field='endpoint', vault='prod', service_account_token=service_account_token) }}"
+
 - name: Add transmission secrets
   ansible.builtin.template:
-    src: ../..//docker/transmission-wireguard/secrets.env.j2
+    src: ../../docker/transmission-wireguard/secrets.env.j2
     dest: /docker/transmission-wireguard/secrets.env
   vars:
     transmission_user: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_user', vault='prod', service_account_token=service_account_token) }}"
