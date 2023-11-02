@@ -68,7 +68,7 @@ jobs:
 
       - name: Run playbook
         run: |
-          op run --env-file=.env -- ansible-playbook -i inventory.yml hogsmeade.yml
+          ansible-playbook -i inventory.yml hogsmeade.yml
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
