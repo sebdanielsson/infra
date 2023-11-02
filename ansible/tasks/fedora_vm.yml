@@ -7,8 +7,8 @@
 
 - name: Create Fedora Template
   community.general.proxmox_kvm:
-    api_user: "{{ lookup('community.general.onepassword', 'hogsmeade', field='username', vault='Private') }}@pam"
-    api_password: "{{ lookup('community.general.onepassword', 'hogsmeade', field='password', vault='Private') }}"
+    api_user: "{{ lookup('community.general.onepassword', 'hogsmeade', field='username', vault='prod', service_account_token=service_account_token) }}@pam"
+    api_password: "{{ lookup('community.general.onepassword', 'hogsmeade', field='password', vault='prod', service_account_token=service_account_token) }}"
     api_host: hogsmeade
     node: hogsmeade
 
@@ -35,9 +35,9 @@
       serial0: socket
     vga: serial0
     bootdisk: scsi0
-    ciuser: "{{ lookup('community.general.onepassword', 'mediaserver', field='username', vault='Private') }}"
-    cipassword: "{{ lookup('community.general.onepassword', 'mediaserver', field='password', vault='Private') }}"
-    sshkeys: "{{ lookup('community.general.onepassword', 'Sebastian SSH Key', field='public key', vault='Private') }}"
+    ciuser: "{{ lookup('community.general.onepassword', 'mediaserver', field='username', vault='prod', service_account_token=service_account_token) }}"
+    cipassword: "{{ lookup('community.general.onepassword', 'mediaserver', field='password', vault='prod', service_account_token=service_account_token) }}"
+    sshkeys: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"
     timeout: 180
     state: present
   register: fedora_template
@@ -48,8 +48,8 @@
 
 - name: Clone fedora_template to mediaserver
   community.general.proxmox_kvm:
-    api_user: "{{ lookup('community.general.onepassword', 'hogsmeade', field='username', vault='Private') }}@pam"
-    api_password: "{{ lookup('community.general.onepassword', 'hogsmeade', field='password', vault='Private') }}"
+    api_user: "{{ lookup('community.general.onepassword', 'hogsmeade', field='username', vault='prod', service_account_token=service_account_token) }}@pam"
+    api_password: "{{ lookup('community.general.onepassword', 'hogsmeade', field='password', vault='prod', service_account_token=service_account_token) }}"
     api_host: hogsmeade
     node: hogsmeade
     clone: fedora-template

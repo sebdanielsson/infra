@@ -7,5 +7,5 @@
       role: sebdanielsson.cloudflared
       vars:
         cloudflare_tunnel_enable: true
-        cloudflare_tunnel_credential: "{{ lookup('community.general.onepassword', 'cf-tunnel-hogsmeade', field='credential', vault='Private') }}"
+        cloudflare_tunnel_credential: "{{ lookup('community.general.onepassword', 'cf-tunnel-hogsmeade', field='credential', vault='prod', service_account_token=service_account_token) }}"
       state: present

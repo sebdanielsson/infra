@@ -45,7 +45,7 @@
       role: sebdanielsson.cloudflared
       vars:
         cloudflare_tunnel_enable: true
-        cloudflare_tunnel_credential: "{{ lookup('community.general.onepassword', 'cf-tunnel-hogsmeade', field='credential', vault='Private') }}"
+        cloudflare_tunnel_credential: "{{ lookup('community.general.onepassword', 'cf-tunnel-hogsmeade', field='credential', vault='prod', service_account_token=service_account_token) }}"
       state: present
 
   tasks:
@@ -81,7 +81,7 @@
     - name: SSH authorized key for 'root'
       ansible.posix.authorized_key:
         user: root
-        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Key', field='public key', vault='Private') }}"
+        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"
         state: present
 
     - name: Copy sshd hardening config
@@ -112,7 +112,7 @@
     - name: SSH authorized key for 'sebastian'
       ansible.posix.authorized_key:
         user: sebastian
-        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Key', field='public key', vault='Private') }}"
+        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"
         state: present
 
     - name: Install python3-full

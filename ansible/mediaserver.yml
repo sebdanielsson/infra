@@ -13,7 +13,7 @@
       role: artis3n.tailscale
       tailscale_args: "--ssh"
       vars:
-        tailscale_authkey: "{{ lookup('community.general.onepassword', 'ts-authkey-server', field='credential', vault='Private') }}"
+        tailscale_authkey: "{{ lookup('community.general.onepassword', 'ts-authkey-server', field='credential', vault='prod', service_account_token=service_account_token) }}"
       state: present
 
     - name: Install Docker
@@ -52,7 +52,7 @@
     - name: SSH authorized key for 'sebastian'
       ansible.posix.authorized_key:
         user: sebastian
-        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Key', field='public key', vault='Private') }}"
+        key: "{{ lookup('community.general.onepassword', '', field='public key', vault='Private', service_account_token=service_account_token) }}"
         state: present
 
     - name: Add cloudflared repository
@@ -83,14 +83,14 @@
 
     - name: Enable 'cloudflared' service
       ansible.builtin.command:
-        cmd: cloudflared service install {{ lookup('community.general.onepassword', 'cf-tunnel-hogsmeade-mediaserver', field='credential', vault='Private') }}
+        cmd: cloudflared service install {{ lookup('community.general.onepassword', 'cf-tunnel-hogsmeade-mediaserver', field='credential', vault='prod', service_account_token=service_account_token) }}
         creates: /etc/systemd/system/cloudflared.service
 
     - name: Add cloudflare_api_key for certbot plugin
       ansible.builtin.lineinfile:
         path: /etc/letsencrypt/cloudflare.ini
         regexp: '^dns_cloudflare_api_token'
-        line: "dns_cloudflare_api_token = {{ lookup('community.general.onepassword', 'Cloudflare API Key', field='cf_dns_api_token', vault='prod') }}"  # noqa yaml
+        line: "dns_cloudflare_api_token = {{ lookup('community.general.onepassword', 'cloudflare-dns-api-token', field='credential', vault='prod', service_account_token=service_account_token) }}"  # noqa yaml
         create: true
         mode: '0640'
         state: present
@@ -139,13 +139,13 @@
     - name: Create secret cf_dns_api_token for Traefik
       community.docker.docker_secret:
         name: cf_dns_api_token
-        data: "{{ lookup('community.general.onepassword', 'Cloudflare API Key', field='cf_dns_api_token', vault='prod') }}"
+        data: "{{ lookup('community.general.onepassword', 'cloudflare-dns-api-token', field='credential', vault='prod', service_account_token=service_account_token) }}"
         state: present
 
     - name: Create secret plausible_postgres_password
       community.docker.docker_secret:
         name: plausible_postgres_password
-        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_postgres_password', vault='prod') }}"
+        data: "{{ lookup('community.general.onepassword', 'Plausible Container Secrets', field='plausible_postgres_password', vault='prod', service_account_token=service_account_token) }}"
         state: present
 
     - name: Create secret plausible_secret_key_base
