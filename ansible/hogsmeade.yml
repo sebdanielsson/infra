@@ -4,12 +4,6 @@
   vars:
     service_account_token: "{{ lookup('env', 'OP_SERVICE_ACCOUNT_TOKEN') }}"
 
-    cloudflare_dns_api_token: "{{ lookup('env', 'CLOUDFLARE_DNS_API_TOKEN') }}"
-    jellyfin_email: "{{ lookup('env', 'CERTBOT_EMAIL') }}"
-
-    jellyfin_domain: "{{ lookup('env', 'JELLYFIN_DOMAIN') }}"
-    jellyfin_pkcs12_password: "{{ lookup('env', 'JELLYFIN_PKCS12_PASSWORD') }}"
-
     venv_path: ~/python_docker/venv
     ansible_python_interpreter: "~/python_docker/venv/bin/python"
 
@@ -54,7 +48,7 @@
       ansible.builtin.lineinfile:
         path: /etc/letsencrypt/cloudflare.ini
         regexp: "^dns_cloudflare_api_token"
-        line: "dns_cloudflare_api_token = {{ cloudflare_dns_api_token }}"
+        line: "dns_cloudflare_api_token = {{ lookup('community.general.onepassword', 'cloudflare-dns-api-token', field='credential', vault='prod', service_account_token=service_account_token) }}"
         create: true
         mode: "0640"
         state: present
@@ -65,7 +59,7 @@
         block: |
           #!/bin/sh
           mkdir -p /certs/jellyfin
-          openssl pkcs12 -export -password pass:{{ jellyfin_pkcs12_password }} -out /certs/jellyfin/jellyfin.pfx -inkey /etc/letsencrypt/live/{{ jellyfin_domain }}/privkey.pem -in /etc/letsencrypt/live/{{ jellyfin_domain }}/cert.pem
+          openssl pkcs12 -export -password pass:{{ lookup('community.general.onepassword', 'certbot-jellyfin', field='pkcs12_password', vault='prod', service_account_token=service_account_token) }} -out /certs/jellyfin/jellyfin.pfx -inkey /etc/letsencrypt/live/{{ lookup('community.general.onepassword', 'certbot-jellyfin', field='domain', vault='prod', service_account_token=service_account_token) }}/privkey.pem -in /etc/letsencrypt/live/{{ lookup('community.general.onepassword', 'certbot-jellyfin', field='domain', vault='prod', service_account_token=service_account_token) }}/cert.pem
           chmod 755 /certs/jellyfin/jellyfin.pfx
           chown root:docker /certs/jellyfin/jellyfin.pfx
         create: true
@@ -83,7 +77,7 @@
 
           [Service]
           Type=oneshot
-          ExecStart=/root/python_docker/venv/bin/certbot renew --quiet --cert-name {{ jellyfin_domain }} --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/jellyfin-pkcs12.sh
+          ExecStart=/root/python_docker/venv/bin/certbot renew --quiet --cert-name {{ lookup('community.general.onepassword', 'certbot-jellyfin', field='domain', vault='prod', service_account_token=service_account_token) }} --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/jellyfin-pkcs12.sh
           PrivateTmp=true
 
     - name: Create certbot-renew-jellyfin.timer
@@ -114,7 +108,7 @@
         ~/python_docker/venv/bin/certbot certonly \
         --dns-cloudflare \
         --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini \
-        --email {{ jellyfin_email }} \
+        --email {{ lookup('community.general.onepassword', 'certbot-jellyfin', field='email', vault='prod', service_account_token=service_account_token) }} \
         --agree-tos \
         --key-type ecdsa \
         --elliptic-curve secp384r1 \
@@ -124,9 +118,9 @@
         --uir \
         --must-staple \
         --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/jellyfin-pkcs12.sh \
-        --domain {{ jellyfin_domain }}
+        --domain {{ lookup('community.general.onepassword', 'certbot-jellyfin', field='domain', vault='prod', service_account_token=service_account_token) }}
       args:
-        creates: /etc/letsencrypt/live/{{ jellyfin_domain }}/fullchain.pem
+        creates: /etc/letsencrypt/live/{{ lookup('community.general.onepassword', 'certbot-jellyfin', field='domain', vault='prod', service_account_token=service_account_token) }}/fullchain.pem
 
     - name: Create ZFS filesystem and set sharenfs property
       community.general.zfs:
