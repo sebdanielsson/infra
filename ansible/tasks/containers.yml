@@ -36,11 +36,11 @@
     PG_USER: "{{ lookup('community.general.onepassword', 'docker-authentik', field='PG_USER', vault='prod', service_account_token=service_account_token) }}"
     PG_PASS: "{{ lookup('community.general.onepassword', 'docker-authentik', field='PG_PASS', vault='prod', service_account_token=service_account_token) }}"
     AUTHENTIK_SECRET_KEY: "{{ lookup('community.general.onepassword', 'docker-authentik', field='AUTHENTIK_SECRET_KEY', vault='prod', service_account_token=service_account_token) }}"
-    AUTHENTIK_EMAIL__HOST: "{{ lookup('community.general.onepassword', 'Mailgun SMTP', field='SMTP Server', vault='prod', service_account_token=service_account_token) }}"
-    AUTHENTIK_EMAIL__PORT: "{{ lookup('community.general.onepassword', 'Mailgun SMTP', field='port number', vault='prod', service_account_token=service_account_token) }}"
-    AUTHENTIK_EMAIL__USERNAME: "{{ lookup('community.general.onepassword', 'Mailgun SMTP', field='username', vault='prod', service_account_token=service_account_token) }}"
-    AUTHENTIK_EMAIL__PASSWORD: "{{ lookup('community.general.onepassword', 'Mailgun SMTP', field='password', vault='prod', service_account_token=service_account_token) }}"
-    AUTHENTIK_EMAIL__FROM: "{{ lookup('community.general.onepassword', 'Mailgun SMTP', field='username', vault='prod', service_account_token=service_account_token) }}"
+    AUTHENTIK_EMAIL__HOST: "{{ lookup('community.general.onepassword', 'mailgun-smtp', field='SMTP Server', vault='prod', service_account_token=service_account_token) }}"
+    AUTHENTIK_EMAIL__PORT: "{{ lookup('community.general.onepassword', 'mailgun-smtp', field='port number', vault='prod', service_account_token=service_account_token) }}"
+    AUTHENTIK_EMAIL__USERNAME: "{{ lookup('community.general.onepassword', 'mailgun-smtp', field='username', vault='prod', service_account_token=service_account_token) }}"
+    AUTHENTIK_EMAIL__PASSWORD: "{{ lookup('community.general.onepassword', 'mailgun-smtp', field='password', vault='prod', service_account_token=service_account_token) }}"
+    AUTHENTIK_EMAIL__FROM: "{{ lookup('community.general.onepassword', 'mailgun-smtp', field='username', vault='prod', service_account_token=service_account_token) }}"
 
 - name: Deploy authentik
   community.docker.docker_compose:
