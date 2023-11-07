@@ -15,7 +15,7 @@ services:
       POSTGRES_USER: ${PG_USER:?database user required}
       POSTGRES_DB: ${PG_DB:?database name required}
     env_file:
-      - .env
+      - secrets.env
     restart: unless-stopped
   redis:
     image: docker.io/library/redis:alpine
@@ -42,7 +42,7 @@ services:
       - media:/media
       - templates:/templates
     env_file:
-      - .env
+      - secrets.env
     ports:
       - "${COMPOSE_PORT_HTTP:-6000}:9000"
       - "${COMPOSE_PORT_HTTPS:-6443}:9443"
@@ -64,7 +64,7 @@ services:
       - certs:/certs
       - templates:/templates
     env_file:
-      - .env
+      - secrets.env
     depends_on:
       - postgresql
       - redis
