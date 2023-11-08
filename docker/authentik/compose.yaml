@@ -15,7 +15,7 @@ services:
       POSTGRES_USER: ${PG_USER:?database user required}
       POSTGRES_DB: ${PG_DB:?database name required}
     env_file:
-      - secrets.env
+      - .env
     restart: unless-stopped
   redis:
     image: docker.io/library/redis:alpine
@@ -30,7 +30,7 @@ services:
       - redis:/data
     restart: unless-stopped
   server:
-    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2023.10.2}
+    image: ghcr.io/goauthentik/server:2023.10.2
     command: server
     environment:
       AUTHENTIK_REDIS__HOST: redis
@@ -42,7 +42,7 @@ services:
       - media:/media
       - templates:/templates
     env_file:
-      - secrets.env
+      - .env
     ports:
       - "${COMPOSE_PORT_HTTP:-6000}:9000"
       - "${COMPOSE_PORT_HTTPS:-6443}:9443"
@@ -51,7 +51,7 @@ services:
       - redis
     restart: unless-stopped
   worker:
-    image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2023.10.2}
+    image: ghcr.io/goauthentik/server:2023.10.2
     command: worker
     environment:
       AUTHENTIK_REDIS__HOST: redis
@@ -64,7 +64,7 @@ services:
       - certs:/certs
       - templates:/templates
     env_file:
-      - secrets.env
+      - .env
     depends_on:
       - postgresql
       - redis

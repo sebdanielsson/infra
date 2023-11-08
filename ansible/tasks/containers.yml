@@ -29,8 +29,8 @@
 
 - name: Add authentik secrets
   ansible.builtin.template:
-    src: ../../docker/authentik/secrets.env.j2
-    dest: /docker/authentik/secrets.env
+    src: ../../docker/authentik/.env.j2
+    dest: /docker/authentik/.env
   vars:
     PG_DB: "{{ lookup('community.general.onepassword', 'docker-authentik', field='PG_DB', vault='prod', service_account_token=service_account_token) }}"
     PG_USER: "{{ lookup('community.general.onepassword', 'docker-authentik', field='PG_USER', vault='prod', service_account_token=service_account_token) }}"
