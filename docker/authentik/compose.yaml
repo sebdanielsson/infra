@@ -30,7 +30,7 @@ services:
       - redis:/data
     restart: unless-stopped
   server:
-    image: ghcr.io/goauthentik/server:2023.10.2
+    image: ghcr.io/goauthentik/server:2023.10.3
     command: server
     environment:
       AUTHENTIK_REDIS__HOST: redis
@@ -51,7 +51,7 @@ services:
       - redis
     restart: unless-stopped
   worker:
-    image: ghcr.io/goauthentik/server:2023.10.2
+    image: ghcr.io/goauthentik/server:2023.10.3
     command: worker
     environment:
       AUTHENTIK_REDIS__HOST: redis
