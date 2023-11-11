@@ -1,7 +1,7 @@
 ---
 services:
   radarr:
-    image: linuxserver/radarr:5.0.3
+    image: linuxserver/radarr:5.1.3
     networks:
       - medianet
     environment:
