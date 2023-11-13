@@ -16,7 +16,7 @@ services:
     restart: always
 
   flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:v3.3.7
+    image: ghcr.io/flaresolverr/flaresolverr:v3.3.8
     container_name: flaresolverr
     networks:
       - medianet
