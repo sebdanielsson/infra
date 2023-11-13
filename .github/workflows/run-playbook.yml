@@ -58,10 +58,19 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           TS_AUTHKEY: op://prod/ts-authkey-ci/credential
 
+      - name: Get latest Tailscale version
+        id: get_latest_ts_version
+        run: |
+          echo "::set-output name=ts_latest::$(curl --silent https://api.github.com/repos/tailscale/tailscale/releases/latest | grep '\"tag_name\":' | sed -E 's/.*\"([^"]+)\".*/\1/' | sed 's/^v\(.*\)/\1/')"
+
+      - name: Print latest Tailscale version
+        run: |
+          echo ${{ steps.get_latest_ts_version.outputs.ts_latest }}
+
       - name: Setup Tailscale
         uses: tailscale/github-action@v2
         with:
-          version: '1.50.1'
+          version: ${{ steps.get_latest_ts_version.outputs.ts_latest }}
           authkey: ${{ steps.op-load-ts-authkey.outputs.TS_AUTHKEY }}
           tags: tag:ci
           args: --ssh
@@ -71,4 +80,3 @@ jobs:
           ansible-playbook -i inventory.yml hogsmeade.yml
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-
