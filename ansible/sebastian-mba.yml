@@ -53,6 +53,7 @@
           - curl
           - fd
           - fio
+          - fx
           - git
           - httpie
           - iperf3
@@ -87,6 +88,7 @@
           - font-fira-mono-nerd-font
           - font-geist
           - font-geist-mono
+          - font-montserrat
           - font-noto-sans
           - font-roboto
           - github
