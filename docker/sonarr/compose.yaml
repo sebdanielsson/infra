@@ -1,7 +1,7 @@
 ---
 services:
   sonarr:
-    image: linuxserver/sonarr:develop
+    image: linuxserver/sonarr:4.0.0-develop
     networks:
       - medianet
     environment:
