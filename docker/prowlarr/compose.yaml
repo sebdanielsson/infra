@@ -1,7 +1,7 @@
 ---
 services:
   prowlarr:
-    image: linuxserver/prowlarr:version-1.5.2.3484
+    image: linuxserver/prowlarr:1.9.4
     container_name: prowlarr
     networks:
       - medianet
