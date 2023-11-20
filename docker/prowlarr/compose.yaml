@@ -15,20 +15,6 @@ services:
       - "9696:9696"
     restart: always
 
-  flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:v3.3.10
-    container_name: flaresolverr
-    networks:
-      - medianet
-    environment:
-      - LOG_LEVEL=info
-      - LOG_HTML=false
-      - CAPTCHA_SOLVER=none  # Check repo for more options
-      - TZ=Europe/Stockholm
-    ports:
-      - "8191:8191"
-    restart: always
-
 networks:
   medianet:
     external: true
