@@ -1,7 +1,7 @@
 ---
 services:
   agent:
-    image: portainer/agent:2.19.2-alpine
+    image: portainer/agent:2.19.3-alpine
     networks:
       - agent_network
     volumes:
