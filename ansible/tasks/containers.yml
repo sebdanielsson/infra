@@ -27,6 +27,12 @@
   environment:
     TSRECORDER_AUTHKEY: "{{ lookup('community.general.onepassword', 'ts-authkey-recorder', field='credential', vault='prod', service_account_token=service_account_token) }}"
 
+- name: Deploy ladder
+  community.docker.docker_compose:
+    project_src: /docker/ladder
+    pull: true
+    state: present
+
 - name: Add authentik secrets
   ansible.builtin.template:
     src: ../../docker/authentik/.env.j2
