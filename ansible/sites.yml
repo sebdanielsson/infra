@@ -1,3 +1,4 @@
 ---
 - import_playbook: proxmox_nodes.yml
 - import_playbook: virtual_machines.yml
+- import_playbook: routers.yml

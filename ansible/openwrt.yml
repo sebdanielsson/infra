@@ -1,0 +1,61 @@
+---
+- name: Configure EdgeRouter X OpenWrt
+  hosts: er-x
+  gather_facts: false
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  tasks:
+    - name: Check if python3 is installed
+      ansible.builtin.raw: which python3
+      changed_when: false
+      failed_when: python_check.rc not in [0, 1]
+      register: python_check
+
+    - name: Install python3
+      ansible.builtin.raw: opkg update && opkg install python3
+      when: python_check.rc != 0
+      register: opkg_install_python3
+      changed_when: '"installed in root is up to date" not in opkg_install_python3.stdout'
+
+    - name: Gather facts
+      ansible.builtin.setup:
+
+    - name: Install packages
+      community.general.opkg:
+        name:
+          - bash
+          - openssh-sftp-server
+          - luci-app-https-dns-proxy
+          - luci-app-acme
+          - luci-proto-wireguard
+          - tailscale
+        update_cache: true
+        state: present
+
+    - name: Enable and start service https-dns-proxy
+      community.general.openwrt_init:
+        name: https-dns-proxy
+        enabled: true
+        state: started
+
+    - name: Enable and start service tailscale
+      community.general.openwrt_init:
+        name: tailscale
+        enabled: true
+        state: started
+
+    - name: SSH authorized key for 'root'
+      ansible.posix.authorized_key:
+        user: root
+        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"  # noqa: E501
+        state: present
+
+    - name: Copy ssh hardening config --- CHANGE FOR DROPBEAR ---
+      ansible.builtin.copy:
+        src: 49-ssh-hardening.conf
+        dest: /etc/ssh/ssh_config.d/49-ssh-hardening.conf
+        owner: root
+        group: wheel
+        mode: "0644"
