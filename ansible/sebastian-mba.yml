@@ -49,6 +49,9 @@
           - ansible
           - asciinema
           - autorestic
+          - bash
+          - bat
+          - bottom
           - coreutils
           - curl
           - fd
@@ -57,7 +60,7 @@
           - git
           - httpie
           - iperf3
-          - linode-cli
+          - iterm2
           - mas
           - mtr
           - nano
@@ -70,9 +73,6 @@
           - wget
           - xdg-ninja
           - zsh
-          - zsh-autosuggestions
-          - zsh-completions
-          - zsh-syntax-highlighting
         update_homebrew: false
         upgrade_all: false
         state: present
