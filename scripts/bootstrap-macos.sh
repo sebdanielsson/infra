@@ -5,6 +5,12 @@ REPO_URL="https://github.com/sebdanielsson/infra.git"
 TARGET_DIR="$HOME/Git/infra"
 HOMEBREW_PACKAGES=(ansible 1password 1password-cli)
 
+# Check for root privileges
+if [ $UID -eq 0 ]; then
+    echo "You should not run this script as root. Exiting."
+    exit 0
+fi
+
 # Clone the infra repo if not cloned
 if [ -d "$TARGET_DIR" ]; then
     echo "Repository directory already exists. Pulling latest changes."
@@ -13,6 +19,13 @@ if [ -d "$TARGET_DIR" ]; then
 else
     echo "Cloning repository."
     git clone "$REPO_URL" "$TARGET_DIR"
+fi
+
+# Install Ansible dependencies
+if [ -d "$TARGET_DIR" ]; then
+    echo "Installing Ansible dependencies."
+    cd "$TARGET_DIR/ansible" || exit
+    ansible-galaxy install -r requirements.yml
 fi
 
 # Install Homebrew if not installed
