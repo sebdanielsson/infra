@@ -1,6 +1,8 @@
 ---
 - name: Configure Sebastian's MacBook Air
   hosts: localhost
+  vars:
+    service_account_token: "{{ lookup('env', 'OP_SERVICE_ACCOUNT_TOKEN') }}"
 
   tasks:
     - name: Set hostname
@@ -60,7 +62,6 @@
           - git
           - httpie
           - iperf3
-          - iterm2
           - mas
           - mtr
           - nano
@@ -94,6 +95,7 @@
           - github
           - grandperspective
           - httpie
+          - iterm2
           - netnewswire
           - notion
           - obs
