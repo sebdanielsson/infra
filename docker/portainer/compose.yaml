@@ -1,7 +1,7 @@
 ---
 services:
   agent:
-    image: portainer/agent:2.19.3-alpine
+    image: portainer/agent:2.19.4-alpine
     networks:
       - agent_network
     volumes:
@@ -13,7 +13,7 @@ services:
         constraints: [node.platform.os == linux]
 
   portainer:
-    image: portainer/portainer-ee:2.19.3-alpine
+    image: portainer/portainer-ee:2.19.4-alpine
     command: -H tcp://tasks.agent:9001 --tlsskipverify
     ports:
       - "9443:9443"
