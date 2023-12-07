@@ -1,3 +1,9 @@
 {
-  "extends": ["config:base"]
+  "extends": ["config:base"],
+  "packageRules": [
+    {
+      "groupName": "portainer",
+      "packagePatterns": ["^portainer\/portainer-ee$", "^portainer\/agent$"]
+    }
+  ]
 }
