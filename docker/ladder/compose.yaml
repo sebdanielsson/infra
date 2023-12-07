@@ -1,6 +1,6 @@
 services:
   ladder:
-    image: ghcr.io/everywall/ladder:v0.0.20
+    image: ghcr.io/everywall/ladder:v0.0.21
     container_name: ladder
     environment:
       - PORT=8080
