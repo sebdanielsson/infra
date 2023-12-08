@@ -5,6 +5,7 @@
 
   vars:
     ansible_python_interpreter: /usr/bin/python3
+    service_account_token: "{{ lookup('env', 'OP_SERVICE_ACCOUNT_TOKEN') }}"
 
   tasks:
     - name: Check if python3 is installed
@@ -25,6 +26,10 @@
     - name: Install packages
       community.general.opkg:
         name:
+          - shadow-useradd
+          - coreutils-od
+          - coreutils-sort
+          - coreutils-stty
           - bash
           - openssh-sftp-server
           - luci-app-https-dns-proxy
@@ -46,16 +51,21 @@
         enabled: true
         state: started
 
+    - name: Ensure user 'sebastian' exists
+      ansible.builtin.user:
+        name: sebastian
+        shell: /bin/bash
+        createhome: yes
+        state: present
+
     - name: SSH authorized key for 'root'
       ansible.posix.authorized_key:
         user: root
         key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"  # noqa: E501
         state: present
 
-    - name: Copy ssh hardening config --- CHANGE FOR DROPBEAR ---
-      ansible.builtin.copy:
-        src: 49-ssh-hardening.conf
-        dest: /etc/ssh/ssh_config.d/49-ssh-hardening.conf
-        owner: root
-        group: wheel
-        mode: "0644"
+    - name: SSH authorized key for 'sebastian'
+      ansible.posix.authorized_key:
+        user: sebastian
+        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"  # noqa: E501
+        state: present
