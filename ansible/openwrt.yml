@@ -57,6 +57,8 @@
     - name: Ensure user 'sebastian' exists
       ansible.builtin.user:
         name: sebastian
+        groups:
+          - sudo
         shell: /bin/bash
         createhome: yes
         state: present
