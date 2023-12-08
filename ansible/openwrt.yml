@@ -29,6 +29,7 @@
           - shadow-useradd
           - shadow-usermod
           - shadow-groupadd
+          - shadow-groupmod
           - sudo
           - coreutils-od
           - coreutils-sort
