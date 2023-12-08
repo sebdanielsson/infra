@@ -54,6 +54,11 @@
         enabled: true
         state: started
 
+    - name: Create group 'sudo'
+      ansible.builtin.group:
+        name: sudo
+        state: present
+
     - name: Ensure user 'sebastian' exists
       ansible.builtin.user:
         name: sebastian
