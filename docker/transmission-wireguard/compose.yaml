@@ -24,7 +24,7 @@ services:
     labels:
       - com.centurylinklabs.watchtower.monitor-only=true
   transmission:
-    image: linuxserver/transmission:4.0.4
+    image: linuxserver/transmission:4.0.5
     container_name: transmission
     network_mode: "service:wireguard"
     depends_on:
