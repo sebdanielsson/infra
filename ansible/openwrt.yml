@@ -27,6 +27,9 @@
       community.general.opkg:
         name:
           - shadow-useradd
+          - shadow-usermod
+          - shadow-groupadd
+          - sudo
           - coreutils-od
           - coreutils-sort
           - coreutils-stty
