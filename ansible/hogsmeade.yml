@@ -7,6 +7,14 @@
     venv_path: ~/python_docker/venv
     ansible_python_interpreter: "~/python_docker/venv/bin/python"
 
+  roles:
+    - name: Install and configure cloudflared
+      role: sebdanielsson.cloudflared
+      vars:
+        cloudflare_tunnel_enable: true
+        cloudflare_tunnel_credential: "{{ lookup('community.general.onepassword', 'cf-tunnel-hogsmeade', field='credential', vault='prod', service_account_token=service_account_token) }}"
+      state: present
+
   tasks:
     - name: Add vector repository
       ansible.builtin.deb822_repository:
