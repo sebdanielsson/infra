@@ -56,7 +56,8 @@ jobs:
           export-env: false
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          TS_AUTHKEY: op://prod/ts-authkey-ci/credential
+          TS_CLIENTID: op://prod/ts-infra-oauth/username
+          TS_CLIENTSECRET: op://prod/ts-infra-oauth/credential
 
       - name: Get latest Tailscale version
         id: get_latest_ts_version
@@ -67,7 +68,8 @@ jobs:
         uses: tailscale/github-action@v2
         with:
           version: ${{ steps.get_latest_ts_version.outputs.ts_latest }}
-          authkey: ${{ steps.op-load-ts-authkey.outputs.TS_AUTHKEY }}
+          oauth-client-id: ${{ steps.op-load-ts-authkey.outputs.TS_CLIENTID }}
+          oauth-secret: ${{ steps.op-load-ts-authkey.outputs.TS_CLIENTSECRET }}
           tags: tag:ci
           args: --ssh
 
