@@ -19,6 +19,6 @@ op run --env-file=.env -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml
 Run Ansible playbook for sebastian-mba
 
 ```sh
-export OP_SERVICE_ACCOUNT_TOKEN=<service-account-token>
-ansible-playbook sebastian-mba.yml
+export OP_CREDENTIAL="op://Private/onkb65jhnceyyid7ope2zg5s2m/credential"
+op run -- ansible-playbook sebastian-mba.yml --ask-become-pass
 ```
