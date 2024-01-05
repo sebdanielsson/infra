@@ -152,16 +152,57 @@
   vars:
     service_account_token: "{{ lookup('env', 'OP_SERVICE_ACCOUNT_TOKEN') }}"
     dockutil_install: false
-    dockitems_remove:
-      - Launchpad
-      - TV
-      - Podcasts
-      - 'App Store'
+    #dockitems_remove:  # Need to figure out what the default dock items are first
     dockitems_persist:
-      - name: Messages
-        path: "/Applications/Messages.app/"
       - name: Safari
         path: "/Applications/Safari.app/"
-        pos: 2
+        pos: 1
+      #  ChatGPT web app at pos 2, need to find a way to add them with Ansible
+      - name: Mail
+        path: "/Applications/Mail.app/"
+        pos: 3
+      - name: Calendar
+        path: "/Applications/Calendar.app/"
+        pos: 4
+      - name: Reminders
+        path: "/Applications/Reminders.app/"
+        pos: 5
+      - name: Notes
+        path: "/Applications/Notes.app/"
+        pos: 6
+      - name: 1Password
+        path: "/Applications/1Password.app/"
+        pos: 7
+      - name: GitHub Desktop
+        path: "/Applications/GitHub Desktop.app/"
+        pos: 8
+      - name: Warp
+        path: "/Applications/Warp.app/"
+        pos: 9
+      - name: Visual Studio Code
+        path: "/Applications/Visual Studio Code.app/"
+        pos: 10
+      - name: Messages
+        path: "/Applications/Messages.app/"
+        pos: 11
+      - name: Signal
+        path: "/Applications/Signal.app/"
+        pos: 12
+      - name: Discord
+        path: "/Applications/Discord.app/"
+        pos: 13
+      - name: Photos
+        path: "/System/Applications/Photos.app/"
+        pos: 14
+      - name: Music
+        path: "/System/Applications/Music.app/"
+        pos: 15
+      - name: App Store
+        path: "/Applications/App Store.app/"
+        pos: 16
+      - name: System Settings
+        path: "/Applications/System Settings.app/"
+        pos: 17
+
   roles:
     - geerlingguy.mac.dock
