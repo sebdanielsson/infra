@@ -7,10 +7,10 @@ services:
     ports:
       - 3001:3001
     volumes:
-      - anythingllm_storage:/app/server/storage
+      - storage:/app/server/storage
       - ./.env:/app/server/.env
     environment:
       - STORAGE_DIR=/app/server/storage
 volumes:
-  anythingllm_storage:
+  storage:
     driver: local
