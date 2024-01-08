@@ -1,7 +1,7 @@
 ---
 services:
   tsrecorder:
-    image: tailscale/tsrecorder:v1.40.1
+    image: tailscale/tsrecorder:stable-v1.54
     command: /tsrecorder --dst=/data/recordings --statedir=/data/state --ui
     container_name: tsrecorder
     environment:
