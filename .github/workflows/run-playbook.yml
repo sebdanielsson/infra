@@ -71,7 +71,6 @@ jobs:
           oauth-client-id: ${{ steps.op-load-ts-authkey.outputs.TS_CLIENTID }}
           oauth-secret: ${{ steps.op-load-ts-authkey.outputs.TS_CLIENTSECRET }}
           tags: tag:ci
-          args: --ssh
 
       - name: Run playbook
         run: |
