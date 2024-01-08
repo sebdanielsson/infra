@@ -1,0 +1,16 @@
+services:
+  anythingllm:
+    image: mintplexlabs/anythingllm:master
+    # No version tag available yet, hmm...
+    cap_add:
+      - SYS_ADMIN
+    ports:
+      - 3001:3001
+    volumes:
+      - anythingllm_storage:/app/server/storage
+      - ./.env:/app/server/.env
+    environment:
+      - STORAGE_DIR=/app/server/storage
+volumes:
+  anythingllm_storage:
+    driver: local

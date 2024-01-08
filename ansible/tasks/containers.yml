@@ -54,6 +54,12 @@
     pull: true
     state: present
 
+- name: Deploy anythingllm
+  community.docker.docker_compose:
+    project_src: /docker/anythingllm
+    pull: true
+    state: present
+
 - name: Deploy Portainer
   community.docker.docker_stack:
     name: portainer
