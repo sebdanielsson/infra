@@ -16,6 +16,28 @@
       state: present
 
   tasks:
+    - name: Install sudo
+      ansible.builtin.apt:
+        name:
+          - sudo
+        state: present
+
+    - name: Add sebastian to sudoers group
+      ansible.builtin.user:
+        name: sebastian
+        groups: sudo
+        append: yes
+        state: present
+
+    - name: Let sudoers group use sudo
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        regexp: "^%sudo"
+        line: "%sudo ALL=(ALL:ALL) NOPASSWD:ALL"
+        create: true
+        mode: "0440"
+        state: present
+
     - name: Add vector repository
       ansible.builtin.deb822_repository:
         name: vector
