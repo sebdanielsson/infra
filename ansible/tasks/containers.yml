@@ -54,6 +54,14 @@
     pull: true
     state: present
 
+- name: Add anythingllm secrets
+  ansible.builtin.template:
+    src: ../../docker/authentik/.env.j2
+    dest: /docker/authentik/.env
+  vars:
+    JWT_SECRET: "{{ lookup('community.general.onepassword', 'docker-anythingllm', field='jwt_secret', vault='prod', service_account_token=service_account_token) }}"
+    OPEN_AI_KEY: "{{ lookup('community.general.onepassword', 'OpenAI-API-Key-AnythingLLM', field='credential', vault='prod', service_account_token=service_account_token) }}"
+
 - name: Deploy anythingllm
   community.docker.docker_compose:
     project_src: /docker/anythingllm
