@@ -14,23 +14,23 @@
     state: present
 
 - name: Deploy Watchtower
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: /docker/watchtower
-    pull: true
+    pull: always
     state: present
 
 - name: Deploy tsrecorder
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: /docker/tsrecorder
-    pull: true
+    pull: always
     state: present
   environment:
     TSRECORDER_AUTHKEY: "{{ lookup('community.general.onepassword', 'ts-authkey-recorder', field='credential', vault='prod', service_account_token=service_account_token) }}"
 
 - name: Deploy ladder
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: /docker/ladder
-    pull: true
+    pull: always
     state: present
 
 - name: Add authentik secrets
@@ -49,9 +49,9 @@
     AUTHENTIK_EMAIL__FROM: "{{ lookup('community.general.onepassword', 'mailgun-smtp', field='smtp_username', vault='prod', service_account_token=service_account_token) }}"
 
 - name: Deploy authentik
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: /docker/authentik
-    pull: true
+    pull: always
     state: present
 
 - name: Add anythingllm secrets
@@ -63,9 +63,9 @@
     ANYTHINGLLM_OPEN_AI_KEY: "{{ lookup('community.general.onepassword', 'OpenAI-API-Key-AnythingLLM', field='credential', vault='prod', service_account_token=service_account_token) }}"
 
 - name: Deploy anythingllm
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: /docker/anythingllm
-    pull: true
+    pull: always
     state: present
 
 - name: Deploy Portainer
@@ -121,9 +121,9 @@
     transmission_pass: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_pass', vault='prod', service_account_token=service_account_token) }}"
 
 - name: Deploy transmission-wireguard
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: /docker/transmission-wireguard
-    pull: true
+    pull: always
     state: present
 
 - name: Deploy Ombi
