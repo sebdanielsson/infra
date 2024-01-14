@@ -7,13 +7,15 @@ GitOps all the things!
 Run Ansible group playbook
 
 ```sh
-op run --env-file=.env -- ansible-playbook -i ./inventory.yml ./proxmox_nodes.yml
+export OP_CREDENTIAL="op://Private/onkb65jhnceyyid7ope2zg5s2m/credential"
+op run -- ansible-playbook -i ./inventory.yml ./proxmox_nodes.yml
 ```
 
 Run Ansible playbook for the host hogsmeade
 
 ```sh
-op run --env-file=.env -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml
+export OP_CREDENTIAL="op://Private/onkb65jhnceyyid7ope2zg5s2m/credential"
+op run -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml
 ```
 
 Run Ansible playbook for sebastian-mba

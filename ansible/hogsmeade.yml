@@ -2,7 +2,7 @@
 - name: Hogsmeade Proxmox
   hosts: hogsmeade
   vars:
-    service_account_token: "{{ lookup('env', 'OP_SERVICE_ACCOUNT_TOKEN') }}"
+    service_account_token: "{{ lookup('env', 'OP_CREDENTIAL') }}"  # Do not use OP_SERVICE_ACCOUNT_TOKEN as variable name since it will reduce access to private secrets on the local machine
 
     venv_path: ~/python_docker/venv
     ansible_python_interpreter: "~/python_docker/venv/bin/python"
