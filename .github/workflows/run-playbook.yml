@@ -55,7 +55,7 @@ jobs:
         with:
           export-env: false
         env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_CREDENTIAL: ${{ secrets.OP_CREDENTIAL }}
           TS_CLIENTID: op://prod/ts-infra-oauth/username
           TS_CLIENTSECRET: op://prod/ts-infra-oauth/credential
 
@@ -76,4 +76,4 @@ jobs:
         run: |
           ansible-playbook -i inventory.yml hogsmeade.yml
         env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          OP_CREDENTIAL: ${{ secrets.OP_CREDENTIAL }}
