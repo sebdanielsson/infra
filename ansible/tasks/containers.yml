@@ -39,41 +39,6 @@
     pull: always
     state: present
 
-- name: Add authentik secrets
-  ansible.builtin.template:
-    src: ../../docker/authentik/.env.j2
-    dest: /docker/authentik/.env
-  vars:
-    PG_DB: "{{ lookup('community.general.onepassword', 'docker-authentik', field='PG_DB', vault='prod', service_account_token=service_account_token) }}"
-    PG_USER: "{{ lookup('community.general.onepassword', 'docker-authentik', field='PG_USER', vault='prod', service_account_token=service_account_token) }}"
-    PG_PASS: "{{ lookup('community.general.onepassword', 'docker-authentik', field='PG_PASS', vault='prod', service_account_token=service_account_token) }}"
-    AUTHENTIK_SECRET_KEY: "{{ lookup('community.general.onepassword', 'docker-authentik', field='AUTHENTIK_SECRET_KEY', vault='prod', service_account_token=service_account_token) }}"
-    AUTHENTIK_EMAIL__HOST: "{{ lookup('community.general.onepassword', 'mailgun-smtp', field='smtp_host', vault='prod', service_account_token=service_account_token) }}"
-    AUTHENTIK_EMAIL__PORT: "{{ lookup('community.general.onepassword', 'mailgun-smtp', field='smtp_port', vault='prod', service_account_token=service_account_token) }}"
-    AUTHENTIK_EMAIL__USERNAME: "{{ lookup('community.general.onepassword', 'mailgun-smtp', field='smtp_username', vault='prod', service_account_token=service_account_token) }}"
-    AUTHENTIK_EMAIL__PASSWORD: "{{ lookup('community.general.onepassword', 'mailgun-smtp', field='smtp_password', vault='prod', service_account_token=service_account_token) }}"
-    AUTHENTIK_EMAIL__FROM: "{{ lookup('community.general.onepassword', 'mailgun-smtp', field='smtp_username', vault='prod', service_account_token=service_account_token) }}"
-
-- name: Deploy authentik
-  community.docker.docker_compose_v2:
-    project_src: /docker/authentik
-    pull: always
-    state: absent
-
-- name: Add anythingllm secrets
-  ansible.builtin.template:
-    src: ../../docker/anythingllm/.env.j2
-    dest: /docker/anythingllm/.env
-  vars:
-    ANYTHINGLLM_JWT_SECRET: "{{ lookup('community.general.onepassword', 'docker-anythingllm', field='jwt_secret', vault='prod', service_account_token=service_account_token) }}"
-    ANYTHINGLLM_OPEN_AI_KEY: "{{ lookup('community.general.onepassword', 'OpenAI-API-Key-AnythingLLM', field='credential', vault='prod', service_account_token=service_account_token) }}"
-
-- name: Deploy anythingllm
-  community.docker.docker_compose_v2:
-    project_src: /docker/anythingllm
-    pull: always
-    state: absent
-
 - name: Deploy Portainer
   community.docker.docker_stack:
     name: portainer
@@ -108,6 +73,16 @@
     compose:
       - /docker/jellyfin/compose.yaml
     state: present
+
+- name: Deploy Jellystat
+  community.docker.docker_compose_v2:
+    project_src: /docker/jellystat
+    pull: always
+    state: present
+  environment:
+    JWT_SECRET: "{{ lookup('community.general.onepassword', 'docker-jellystat', field='JWT', vault='prod', service_account_token=service_account_token) }}"
+    POSTGRES_USER: "{{ lookup('community.general.onepassword', 'docker-jellystat', field='POSTGRES_USER', vault='prod', service_account_token=service_account_token) }}"
+    POSTGRES_PASSWORD: "{{ lookup('community.general.onepassword', 'docker-jellystat', field='POSTGRES_PASSWORD', vault='prod', service_account_token=service_account_token) }}"
 
 - name: Add wireguard secrets
   ansible.builtin.template:
