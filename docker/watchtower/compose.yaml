@@ -6,4 +6,4 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       cleanup: true
-    restart: always
+    restart: unless-stopped

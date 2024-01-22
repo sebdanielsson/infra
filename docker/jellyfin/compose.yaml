@@ -16,6 +16,7 @@ services:
     ports:
       - "8920:8920"
       - "8096:8096"
+    restart: unless-stopped
 
 networks:
   medianet:

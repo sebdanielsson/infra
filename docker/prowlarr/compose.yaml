@@ -13,7 +13,7 @@ services:
       - prowlarr_data:/config
     ports:
       - "9696:9696"
-    restart: always
+    restart: unless-stopped
 
 networks:
   medianet:

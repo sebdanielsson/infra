@@ -20,7 +20,7 @@ services:
     volumes:
       - /lib/modules:/lib/modules
       - ./wg0.conf:/config/wg_confs/wg0.conf
-    restart: always
+    restart: unless-stopped
     labels:
       - com.centurylinklabs.watchtower.monitor-only=true
   transmission:
@@ -39,7 +39,7 @@ services:
     volumes:
       - transmission_data:/config
       - /chungus/media/downloads:/downloads
-    restart: always
+    restart: unless-stopped
 
 networks:
   wgnet:

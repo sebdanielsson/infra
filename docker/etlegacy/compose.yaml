@@ -13,7 +13,7 @@ services:
       - /docker/data/etlegacy/etlegacy/legacy/omni-bot/et/nav:/etlegacy/legacy/omni-bot/et/nav
       - /docker/data/etlegacy/etlegacy/nitmod:/etlegacy/nitmod
       - /docker/data/etlegacy/etlegacy/etmain:/etlegacy/etmain
-    restart: always
+    restart: unless-stopped
   etlegacy-mirror:
     container_name: etlegacy-mirror
     image: nginx:1.25.3-alpine
@@ -22,7 +22,7 @@ services:
     volumes:
       - /docker/data/etlegacy/etlegacy/etmain:/usr/share/nginx/html/etmain:ro
       - /docker/data/etlegacy/etlegacy/nitmod/nitmod_2.3.4_b4.pk3:/usr/share/nginx/html/nitmod/nitmod_2.3.4_b4.pk3:ro
-    restart: always
+    restart: unless-stopped
 networks:
   etlegacy:
     name: etlegacy

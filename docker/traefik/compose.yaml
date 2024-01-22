@@ -47,6 +47,7 @@ services:
       - traefik.http.middlewares.secHeaders.headers.customFrameOptionsValue=SAMEORIGIN
       - traefik.http.middlewares.secHeaders.headers.referrerPolicy=same-origin
       - traefik.http.middlewares.secHeaders.headers.PermissionsPolicy="geolocation=(self), microphone=(), camera=(), fullscreen=*"
+    restart: unless-stopped
 
 secrets:
   cf_dns_api_token:

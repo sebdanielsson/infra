@@ -7,6 +7,7 @@ services:
       POSTGRES_PASSWORD: ${JELLYSTAT_POSTGRES_PASSWORD}
     volumes:
       - db:/var/lib/postgresql/data
+    restart: unless-stopped
   app:
     image: cyfershepard/jellystat:1.0.9
     environment:
@@ -21,6 +22,7 @@ services:
       - app-backup:/app/backend/backup-data
     depends_on:
       - db
+    restart: unless-stopped
 
 volumes:
   db:

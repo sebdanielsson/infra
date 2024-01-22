@@ -47,31 +47,27 @@
     state: present
 
 - name: Deploy Radarr
-  community.docker.docker_stack:
-    name: radarr
-    compose:
-      - /docker/radarr/compose.yaml
+  community.docker.docker_compose_v2:
+    project_src: /docker/radarr
+    pull: always
     state: present
 
 - name: Deploy Sonarr
-  community.docker.docker_stack:
-    name: sonarr
-    compose:
-      - /docker/sonarr/compose.yaml
+  community.docker.docker_compose_v2:
+    project_src: /docker/sonarr
+    pull: always
     state: present
 
 - name: Deploy Prowlarr
-  community.docker.docker_stack:
-    name: prowlarr
-    compose:
-      - /docker/prowlarr/compose.yaml
+  community.docker.docker_compose_v2:
+    project_src: /docker/prowlarr
+    pull: always
     state: present
 
 - name: Deploy Jellyfin
-  community.docker.docker_stack:
-    name: jellyfin
-    compose:
-      - /docker/jellyfin/compose.yaml
+  community.docker.docker_compose_v2:
+    project_src: /docker/jellyfin
+    pull: always
     state: present
 
 - name: Deploy Jellystat
@@ -108,10 +104,9 @@
     state: present
 
 - name: Deploy Ombi
-  community.docker.docker_stack:
-    name: ombi
-    compose:
-      - /docker/ombi/compose.yaml
+  community.docker.docker_compose_v2:
+    project_src: /docker/ombi
+    pull: always
     state: present
 
 - name: Create secret plausible_postgres_password

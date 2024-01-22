@@ -34,7 +34,7 @@ services:
     ports:
       - "19132:19132/udp"
       - "19133:19133/udp"
-    restart: always
+    restart: unless-stopped
 volumes:
   minecraft:
     name: minecraft
