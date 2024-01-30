@@ -18,7 +18,7 @@ services:
       replicas: 1
     restart: always
   plausible_events_db:
-    image: clickhouse/clickhouse-server:23.3-alpine
+    image: clickhouse/clickhouse-server:24.1-alpine
     networks:
       - plausible_network
     volumes:
