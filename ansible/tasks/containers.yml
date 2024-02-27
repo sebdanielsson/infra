@@ -127,6 +127,12 @@
     data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_secret_key_base', vault='prod', service_account_token=service_account_token) }}"
     state: present
 
+- name: Create secret plausible_totp_vault_key
+  community.docker.docker_secret:
+    name: plausible_totp_vault_key
+    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_totp_vault_key', vault='prod', service_account_token=service_account_token) }}"
+    state: present
+
 - name: Create secret plausible_maxmind_license_key
   community.docker.docker_secret:
     name: plausible_maxmind_license_key

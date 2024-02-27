@@ -34,7 +34,7 @@ services:
         hard: 262144
     restart: always
   app:
-    image: plausible/analytics:v2.0.0
+    image: ghcr.io/plausible/community-edition:v2.1.0-rc.0
     command: sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run"
     networks:
       - plausible_network
@@ -48,6 +48,7 @@ services:
       - DISABLE_REGISTRATION=false
       - BASE_URL=/run/secrets/plausible_base_url
       - SECRET_KEY_BASE=/run/secrets/plausible_secret_key_base
+      - TOTP_VAULT_KEY=/run/secrets/plausible_totp_vault_key
       - MAXMIND_LICENSE_KEY=/run/secrets/plausible_maxmind_license_key
       - MAXMIND_EDITION=GeoLite2-City
       - GOOGLE_CLIENT_ID=/run/secrets/plausible_google_client_id
@@ -61,6 +62,8 @@ services:
         target: /run/secrets/BASE_URL
       - source: plausible_secret_key_base
         target: /run/secrets/SECRET_KEY_BASE
+      - source: plausible_totp_vault_key
+        target: /run/secrets/TOTP_VAULT_KEY
       - source: plausible_maxmind_license_key
         target: /run/secrets/MAXMIND_LICENSE_KEY
       - source: plausible_google_client_id
@@ -96,6 +99,8 @@ secrets:
   plausible_base_url:
     external: true
   plausible_secret_key_base:
+    external: true
+  plausible_totp_vault_key:
     external: true
   plausible_maxmind_license_key:
     external: true
