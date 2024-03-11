@@ -1,7 +1,7 @@
 ---
 services:
   prowlarr:
-    image: linuxserver/prowlarr:1.13.3
+    image: ghcr.io/linuxserver/prowlarr:1.13.3
     container_name: prowlarr
     networks:
       - medianet
