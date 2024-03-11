@@ -24,7 +24,7 @@ services:
     labels:
       - com.centurylinklabs.watchtower.monitor-only=true
   transmission:
-    image: ghcr.io/linuxserver/transmission:4.0.5
+    image: ghcr.io/linuxserver/transmission:2021.11.18
     container_name: transmission
     network_mode: "service:wireguard"
     depends_on:
