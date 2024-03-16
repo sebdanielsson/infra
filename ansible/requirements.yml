@@ -4,7 +4,7 @@ collections:
     version: 8.4.0
 
   - name: community.docker
-    version: 3.8.0
+    version: 3.8.1
 
   - name: ansible.posix
     version: 1.5.4
