@@ -19,7 +19,7 @@ roles:
 
   - name: simoncaron.pve_addons
     src: https://github.com/simoncaron/ansible-role-pve_addons.git
-    version: 1.5.0
+    version: 1.6.0
 
   - name: geerlingguy.docker
     src: https://github.com/geerlingguy/ansible-role-docker.git
