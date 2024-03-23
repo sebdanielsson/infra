@@ -70,6 +70,13 @@
         createhome: yes
         state: present
 
+    - name: Add group 'sudo' to sudoers
+      community.general.sudoers:
+        name: sudo-group
+        commands: ALL
+        group: sudo
+        state: present
+
     - name: SSH authorized key for 'root'
       ansible.posix.authorized_key:
         user: root
