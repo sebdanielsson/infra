@@ -18,6 +18,13 @@ export OP_CREDENTIAL="op://Private/onkb65jhnceyyid7ope2zg5s2m/credential"
 op run -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml
 ```
 
+Run Ansible playbook for the host er-x
+
+```sh
+export OP_CREDENTIAL="op://Private/onkb65jhnceyyid7ope2zg5s2m/credential"
+op run -- ansible-playbook -i ./inventory.yml ./openwrt.yml
+```
+
 Run Ansible playbook for sebastian-mba
 
 ```sh
