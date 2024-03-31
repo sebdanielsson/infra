@@ -20,6 +20,11 @@
       register: opkg_install_python3
       changed_when: '"installed in root is up to date" not in opkg_install_python3.stdout'
 
+    - name: End the play if python3 was not installed previously
+      ansible.builtin.meta: end_host
+      when:
+      - python_check.rc != 0
+
     - name: Gather facts
       ansible.builtin.setup:
 
