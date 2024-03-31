@@ -154,7 +154,7 @@
   vars:
     service_account_token: "{{ lookup('env', 'OP_SERVICE_ACCOUNT_TOKEN') }}"
     dockutil_install: false
-    #dockitems_remove:  # Need to figure out what the default dock items are first
+    # dockitems_remove:  # Need to figure out what the default dock items are first
     dockitems_persist:
       - name: Safari
         path: "/Applications/Safari.app/"
@@ -207,4 +207,4 @@
         pos: 17
 
   roles:
-    #- geerlingguy.mac.dock
+    # - geerlingguy.mac.dock

@@ -23,7 +23,7 @@
     - name: End the play if python3 was not installed previously
       ansible.builtin.meta: end_host
       when:
-      - python_check.rc != 0
+        - python_check.rc != 0
 
     - name: Gather facts
       ansible.builtin.setup:
@@ -67,7 +67,7 @@
       ansible.builtin.shell: tailscale status
       register: tailscale_status
       changed_when: false
-      check_mode: no
+      check_mode: false
       failed_when: tailscale_status.rc not in [0, 1]
 
     - name: Login to Tailscale
@@ -85,7 +85,7 @@
         groups:
           - sudo
         shell: /bin/bash
-        createhome: yes
+        createhome: true
         state: present
 
     - name: Add group 'sudo' to sudoers
@@ -98,11 +98,11 @@
     - name: SSH authorized key for 'root'
       ansible.posix.authorized_key:
         user: root
-        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"  # noqa: E501
+        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}" # noqa: E501
         state: present
 
     - name: SSH authorized key for 'sebastian'
       ansible.posix.authorized_key:
         user: sebastian
-        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"  # noqa: E501
+        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}" # noqa: E501
         state: present
