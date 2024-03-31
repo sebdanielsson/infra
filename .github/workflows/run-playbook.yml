@@ -1,7 +1,7 @@
 ---
 name: Run playbook
 
-'on':
+"on":
   push:
     branches:
       - main
@@ -12,7 +12,7 @@ name: Run playbook
 
 defaults:
   run:
-    working-directory: 'sebdanielsson.infra/ansible'
+    working-directory: "sebdanielsson.infra/ansible"
 
 jobs:
   run-playbook:
@@ -22,12 +22,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: 'sebdanielsson.infra'
+          path: "sebdanielsson.infra"
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
@@ -67,7 +67,7 @@ jobs:
       - name: Setup Tailscale
         uses: tailscale/github-action@v2
         with:
-          version: 1.56.1 # or "steps.get_latest_ts_version.outputs.ts_latest" for latest
+          version: 1.62.1 # or "steps.get_latest_ts_version.outputs.ts_latest" for latest
           oauth-client-id: ${{ steps.op-load-ts-authkey.outputs.TS_CLIENTID }}
           oauth-secret: ${{ steps.op-load-ts-authkey.outputs.TS_CLIENTSECRET }}
           tags: tag:ci
