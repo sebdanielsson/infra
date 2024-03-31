@@ -47,6 +47,7 @@
           - luci-proto-wireguard
           - tailscale
           - iptables-nft
+          - curl
         update_cache: true
         state: present
 
