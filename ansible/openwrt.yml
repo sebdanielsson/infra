@@ -41,6 +41,7 @@
           - luci-app-acme
           - luci-proto-wireguard
           - tailscale
+          - iptables-nft
         update_cache: true
         state: present
 
@@ -55,6 +56,17 @@
         name: tailscale
         enabled: true
         state: started
+
+    - name: Check Tailscale status
+      ansible.builtin.shell: tailscale status
+      register: tailscale_status
+      changed_when: false
+      check_mode: no
+      failed_when: tailscale_status.rc not in [0, 1]
+
+    - name: Login to Tailscale
+      ansible.builtin.shell: tailscale up --netfilter-mode=off --ssh --authkey "{{ lookup('community.general.onepassword', 'ts-authkey-router', field='credential', vault='prod', service_account_token=service_account_token) }}"
+      when: '"Logged out" in tailscale_status.stdout'
 
     - name: Create group 'sudo'
       ansible.builtin.group:
