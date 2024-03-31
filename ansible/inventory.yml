@@ -11,7 +11,6 @@ all:
     sbc:
       hosts:
         flightradar:
-          ansible_user: sebbo
     routers:
       hosts:
         er-x:
