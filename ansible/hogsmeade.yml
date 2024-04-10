@@ -38,28 +38,6 @@
         mode: "0440"
         state: present
 
-    - name: Add vector repository
-      ansible.builtin.deb822_repository:
-        name: vector
-        types: deb
-        uris: https://repositories.timber.io/public/vector/deb/debian
-        suites: "{{ ansible_distribution_release }}"
-        components: main
-        signed_by: https://repositories.timber.io/public/vector/gpg.3543DB2D0A2BC4B8.key
-        state: present
-
-    - name: Install vector for Logto logging
-      ansible.builtin.apt:
-        name:
-          - vector
-        state: present
-
-    - name: Start and enable vector
-      ansible.builtin.service:
-        name: vector
-        enabled: true
-        state: started
-
     - name: Set hostname
       ansible.builtin.hostname:
         name: hogsmeade
