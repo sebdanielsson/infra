@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
   etlegacy-mirror:
     container_name: etlegacy-mirror
-    image: nginx:1.25.4-alpine
+    image: nginx:1.25.5-alpine
     networks:
       - etlegacy
     volumes:
