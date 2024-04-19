@@ -15,7 +15,7 @@ collections:
 roles:
   - name: artis3n.tailscale
     src: https://github.com/artis3n/ansible-role-tailscale.git
-    version: v4.4.4
+    version: v4.5.0
 
   - name: simoncaron.pve_addons
     src: https://github.com/simoncaron/ansible-role-pve_addons.git
