@@ -2,7 +2,7 @@
 services:
   etlegacy:
     container_name: etlegacy
-    image: sebdanielsson/etlegacy:2.82.0
+    image: sebdanielsson/etlegacy:2.82.1
     command: +set fs_game nitmod +set fs_homepath /etlegacy +set g_protect 1 +exec nitmod.cfg
     networks:
       - etlegacy
