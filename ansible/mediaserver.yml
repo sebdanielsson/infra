@@ -13,7 +13,9 @@
       role: artis3n.tailscale
       tailscale_args: "--ssh"
       vars:
-        tailscale_authkey: "{{ lookup('community.general.onepassword', 'ts-authkey-server', field='credential', vault='prod', service_account_token=service_account_token) }}"
+        tailscale_authkey: "{{ lookup('community.general.onepassword', 'ts-server-oauth', field='credential', vault='prod', service_account_token=service_account_token) }}"
+        tailscale_oauth_preauthorized: true
+        tailscale_tags: ["server"]
       state: present
 
     - name: Install Docker
@@ -64,7 +66,7 @@
         gpgkey: https://pkg.cloudflare.com/cloudflare-ascii-pubkey.gpg
         state: present
 
-    - name: Upgrade all packages  # noqa package-latest
+    - name: Upgrade all packages # noqa package-latest
       ansible.builtin.dnf:
         name: "*"
         state: latest
@@ -89,10 +91,10 @@
     - name: Add cloudflare_api_key for certbot plugin
       ansible.builtin.lineinfile:
         path: /etc/letsencrypt/cloudflare.ini
-        regexp: '^dns_cloudflare_api_token'
-        line: "dns_cloudflare_api_token = {{ lookup('community.general.onepassword', 'cloudflare-dns-api-token', field='credential', vault='prod', service_account_token=service_account_token) }}"  # noqa yaml
+        regexp: "^dns_cloudflare_api_token"
+        line: "dns_cloudflare_api_token = {{ lookup('community.general.onepassword', 'cloudflare-dns-api-token', field='credential', vault='prod', service_account_token=service_account_token) }}" # noqa yaml
         create: true
-        mode: '0640'
+        mode: "0640"
         state: present
 
     - name: Add renew hook for Jellyfin cert
@@ -102,7 +104,7 @@
           #!/bin/sh
           openssl pkcs12 -export -password pass:{{ lookup('community.general.onepassword', 'jellyfin_pkcs12_cert_password', field='password', vault='prod') }} -out /docker/jellyfin/certs/hogsmeade.pfx -inkey /etc/letsencrypt/live/hogsmeade.hogwarts.zone/privkey.pem -in /etc/letsencrypt/live/hogsmeade.hogwarts.zone/cert.pem
         create: true
-        mode: '0750'
+        mode: "0750"
         state: present
 
     - name: Obtain cert for Jellyfin
