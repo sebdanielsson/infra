@@ -56,8 +56,8 @@ jobs:
           export-env: false
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          TS_CLIENTID: op://prod/ts-infra-oauth/username
-          TS_CLIENTSECRET: op://prod/ts-infra-oauth/credential
+          TS_CLIENTID: op://prod/ts-gh-action-oauth/username
+          TS_CLIENTSECRET: op://prod/ts-gh-action-oauth/credential
 
       - name: Get latest Tailscale version
         id: get_latest_ts_version
