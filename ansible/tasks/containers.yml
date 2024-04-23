@@ -109,7 +109,9 @@
     pull: always
     state: present
   environment:
-    OLLAMA_BASE_URL: "{{ lookup('community.general.onepassword', 'ollama-macbook', field='website', vault='prod', service_account_token=service_account_token) }}"
+    OLLAMA_BASE_URL: "{{ lookup('community.general.onepassword', 'docker-open-webui', field='OLLAMA_BASE_URL', vault='prod', service_account_token=service_account_token) }}"
+    OPENAI_API_BASE_URL: "{{ lookup('community.general.onepassword', 'docker-open-webui', field='OPENAI_API_BASE_URL', vault='prod', service_account_token=service_account_token) }}"
+    OPENAI_API_KEY: "{{ lookup('community.general.onepassword', 'docker-open-webui', field='OPENAI_API_KEY', vault='prod', service_account_token=service_account_token) }}"
 
 - name: Create secret plausible_postgres_password
   community.docker.docker_secret:
