@@ -17,7 +17,7 @@ services:
       #- LOG_URLS=true
       #- GODEBUG=netdns=go
     ports:
-      - "8080:8080"
+      - "8888:8080"
     volumes:
       - ./ruleset.yaml:/app/ruleset.yaml
       - ./handlers/form.html:/app/form.html
