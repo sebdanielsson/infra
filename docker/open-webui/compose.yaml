@@ -1,13 +1,13 @@
 services:
-  open-webui:
+  app:
     image: ghcr.io/open-webui/open-webui:main
-    container_name: open-webui
     volumes:
       - data:/app/backend/data
     environment:
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL}
       - OPENAI_API_BASE_URL=${OPENAI_API_BASE_URL}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PORT=8083
     network_mode: host
     restart: unless-stopped
 
