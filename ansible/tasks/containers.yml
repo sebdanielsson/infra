@@ -109,6 +109,14 @@
     pull: always
     state: present
 
+- name: Deploy open-webui
+  community.docker.docker_compose_v2:
+    project_src: /docker/open-webui
+    pull: always
+    state: present
+  environment:
+    OLLAMA_BASE_URL: "{{ lookup('community.general.onepassword', 'ollama-macbook', field='website', vault='prod', service_account_token=service_account_token) }}"
+
 - name: Create secret plausible_postgres_password
   community.docker.docker_secret:
     name: plausible_postgres_password
