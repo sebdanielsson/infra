@@ -5,8 +5,12 @@ services:
     ports:
       - 3100:8080
     volumes:
-      - open-webui:/app/backend/data
+      - data:/app/backend/data
     environment:
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL}
     network_mode: host
     restart: unless-stopped
+
+volumes:
+  data:
+    driver: local
