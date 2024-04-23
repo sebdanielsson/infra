@@ -6,6 +6,8 @@ services:
       - data:/app/backend/data
     environment:
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL}
+      - OPENAI_API_BASE_URL=${OPENAI_API_BASE_URL}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     network_mode: host
     restart: unless-stopped
 
