@@ -1,13 +1,9 @@
 ---
 services:
-  jellyfin:
+  app:
     image: ghcr.io/linuxserver/jellyfin:10.9.0
     networks:
       - medianet
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Stockholm
     volumes:
       - jellyfin_data:/config
       - /certs/jellyfin:/certs
@@ -25,4 +21,3 @@ networks:
 volumes:
   jellyfin_data:
     name: jellyfin_data
-    external: true
