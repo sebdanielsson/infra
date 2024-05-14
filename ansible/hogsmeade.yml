@@ -175,7 +175,7 @@
         state: present
 
     - name: Docker System Prune
-      ansible.builtin.shell: docker system prune --all
+      ansible.builtin.shell: docker system prune --all -f
 
     - name: Run all containers
       ansible.builtin.import_tasks: tasks/containers.yml
