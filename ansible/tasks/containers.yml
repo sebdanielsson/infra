@@ -13,6 +13,27 @@
     attachable: true
     state: present
 
+- name: Create network proxy
+  community.docker.docker_network:
+    name: proxy
+    driver: overlay
+    attachable: true
+    state: present
+
+- name: Create volume traefik_acme
+  community.docker.docker_volume:
+    name: traefik_acme
+    driver: local
+    state: present
+
+- name: Deploy Traefik
+  community.docker.docker_compose_v2:
+    project_src: /docker/traefik
+    pull: always
+    state: present
+  environment:
+    CF_DNS_API_TOKEN: "{{ lookup('community.general.onepassword', 'docker-traefik', field='cf_dns_api_token', vault='prod', service_account_token=service_account_token) }}"
+
 - name: Deploy Watchtower
   community.docker.docker_compose_v2:
     project_src: /docker/watchtower

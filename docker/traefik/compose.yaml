@@ -1,42 +1,46 @@
 ---
 services:
   traefik:
-    image: traefik:v3.0.0-beta2
+    image: traefik:v3.0
     command:
+      - --log.level=INFO
+      - --global.checknewversion=false
+      - --global.sendanonymoususage=false
+      - --serverstransport.insecureskipverify
       - --api
       - --api.dashboard=true
       - --api.insecure=true
-      - --log.level=WARN
-      - --global.checknewversion=false
-      - --global.sendanonymoususage=false
+      - --api.disabledashboardad=true
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
+      - --providers.docker.endpoint=unix:///var/run/docker.sock
+      - --certificatesresolvers.tailscale.tailscale=true
       - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      - --entrypoints.websecure.http3
-      - --entrypoints.websecure.http3.advertisedport=443
       - --entrypoints.web.http.redirections.entryPoint.to=websecure
       - --entrypoints.web.http.redirections.entryPoint.scheme=https
-      - --certificatesresolvers.tailscale.tailscale=true
+      - --entrypoints.websecure.address=:443
+      - --entryPoints.websecure.http2.maxConcurrentStreams=250
+      - --entrypoints.websecure.http3
+      - --entrypoints.websecure.http3.advertisedport=443
     networks:
-      - traefik
+      - proxy
     environment:
-      - CF_DNS_API_TOKEN_FILE=/run/secrets/cf_dns_api_token
+      - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock:ro
+      - traefik_acme:/etc/traefik/acme
     ports:
       - "443:443"
       - "443:443/udp"
       - "8088:8080"
-    secrets:
-      - cf_dns_api_token
     labels:
       - traefik.enable=true
-      - traefik.http.routers.dashboard.rule=Host(`hogsmeade.risk-bee.ts.net`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      - traefik.http.routers.dashboard.rule=Host(`hogsmeade.risk-bee.ts.net`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+      - traefik.http.routers.dashboard.tls.certresolver=tailscale
       - traefik.http.routers.dashboard.service=api@internal
       - traefik.http.services.dashboard.loadbalancer.server.port=8080
-      - traefik.http.routers.dashboard.tls.certresolver=tailscale
       - traefik.http.routers.dashboard.middlewares=secHeaders
       - traefik.http.middlewares.secHeaders.headers.browserXssFilter=true
       - traefik.http.middlewares.secHeaders.headers.contentTypeNosniff=true
@@ -49,15 +53,11 @@ services:
       - traefik.http.middlewares.secHeaders.headers.PermissionsPolicy="geolocation=(self), microphone=(), camera=(), fullscreen=*"
     restart: unless-stopped
 
-secrets:
-  cf_dns_api_token:
-    external: true
-
 networks:
-  traefik:
+  proxy:
     external: true
 
 volumes:
-  acme:
+  traefik_acme:
     name: traefik_acme
     external: true
