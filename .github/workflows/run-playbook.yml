@@ -72,6 +72,9 @@ jobs:
           oauth-secret: ${{ steps.op-load-ts-authkey.outputs.TS_CLIENTSECRET }}
           tags: tag:ci
 
+      - name: Check connection
+        run: tailscale ping hogsmeade
+
       - name: Run playbook
         run: |
           ansible-playbook -i inventory.yml hogsmeade.yml
