@@ -15,6 +15,18 @@
         cloudflare_tunnel_credential: "{{ lookup('community.general.onepassword', 'cloudflare-tunnel-hogsmeade', field='credential', vault='prod', service_account_token=service_account_token) }}"
       state: present
 
+    - name: Configure ACME on Proxmox node
+      role: simoncaron.pve_acme
+      vars:
+        pve_acme_domain: "{{ lookup('community.general.onepassword', 'proxmox-acme', field='pve_acme_domain', vault='prod', service_account_token=service_account_token) }}"
+        pve_acme_account_name: default
+        pve_acme_account_email: "{{ lookup('community.general.onepassword', 'proxmox-acme', field='pve_acme_account_email', vault='prod', service_account_token=service_account_token) }}"
+        pve_acme_account_directory: "https://acme-v02.api.letsencrypt.org/directory"
+        pve_acme_validation_delay: "30"
+        pve_acme_plugin_name: "cloudflare"
+        pve_acme_plugin_api: "cf"
+        pve_acme_plugin_data: "{{ lookup('community.general.onepassword', 'proxmox-acme', field='pve_acme_plugin_data', vault='prod', service_account_token=service_account_token) }}"
+
   tasks:
     - name: Install sudo
       ansible.builtin.apt:
