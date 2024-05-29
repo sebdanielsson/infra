@@ -34,6 +34,14 @@
         mode: "0644"
       become: true
 
+    - name: Add Homebrew taps
+      community.general.homebrew_tap:
+        name:
+          - cloudflare/cloudflare
+          - hashicorp/tap
+          - teamookla/speedtest
+        state: present
+
     - name: Update Homebrew
       community.general.homebrew:
         update_homebrew: true
@@ -49,6 +57,7 @@
           - bash
           - bat
           - bottom
+          - cloudflare/cloudflare/cf-terraforming
           - coreutils
           - curl
           - dockutil
@@ -56,6 +65,7 @@
           - fio
           - fx
           - git
+          - hashicorp/tap/terraform
           - httpie
           - iperf3
           - mas
