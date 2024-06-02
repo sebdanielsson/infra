@@ -39,6 +39,7 @@
         name:
           - cloudflare/cloudflare
           - hashicorp/tap
+          - oven-sh/bun
           - teamookla/speedtest
         state: present
 
@@ -73,6 +74,7 @@
           - nano
           - nmap
           - node@20
+          - oven-sh/bun/bun
           - rsync
           - shellcheck
           - ssh-audit
