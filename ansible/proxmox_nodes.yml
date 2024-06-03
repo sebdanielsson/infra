@@ -44,35 +44,6 @@
             max-file: "3"
 
   tasks:
-    - name: Enable nomodeset in GRUB
-      ansible.builtin.lineinfile:
-        path: /etc/default/grub
-        regexp: '^GRUB_CMDLINE_LINUX_DEFAULT="((:?(?!nomodeset).)*?)"$'
-        line: 'GRUB_CMDLINE_LINUX_DEFAULT="\1 nomodeset"'
-        backup: true
-        backrefs: true
-      notify: update-grub
-
-    - name: Enable IOMMU in GRUB
-      ansible.builtin.lineinfile:
-        path: /etc/default/grub
-        regexp: '^GRUB_CMDLINE_LINUX_DEFAULT="((:?(?!intel_iommu=on).)*?)"$'
-        line: 'GRUB_CMDLINE_LINUX_DEFAULT="\1 intel_iommu=on"'
-        backup: true
-        backrefs: true
-      notify: update-grub
-
-    - name: Enable vfio kernel modules
-      ansible.builtin.lineinfile:
-        path: /etc/modules
-        line: "{{ item }}"
-        state: present
-      with_items:
-        - vfio
-        - vfio_iommu_type1
-        - vfio_pci
-        - vfio_virqfd
-
     - name: SSH authorized key for 'root'
       ansible.posix.authorized_key:
         user: root
@@ -117,9 +88,3 @@
           - python3-full
           - python3-virtualenv
         state: present
-
-  handlers:
-    - name: Update grub
-      ansible.builtin.command:
-        cmd: update-grub
-      listen: update-grub
