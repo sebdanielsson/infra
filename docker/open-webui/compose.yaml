@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/open-webui/open-webui:dev # Switch back to main when https://github.com/open-webui/open-webui/issues/2337#issuecomment-2132099742 is resolved
+    image: ghcr.io/open-webui/open-webui:0.2.5 # Switch back to main when https://github.com/open-webui/open-webui/issues/2337#issuecomment-2132099742 is resolved
     volumes:
       - data:/app/backend/data
     environment:
