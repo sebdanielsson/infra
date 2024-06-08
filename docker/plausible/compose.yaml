@@ -86,12 +86,16 @@ networks:
 volumes:
   db:
     name: plausible_db
+    external: true
   event_db:
     name: plausible_event_db
+    external: true
   event_db_logs:
     name: plausible_event_db_logs
+    external: true
   event_db_config:
     name: plausible_event_db_config
+    external: true
 
 secrets:
   plausible_postgres_password:
