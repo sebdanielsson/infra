@@ -7,10 +7,7 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
-    secrets:
-      - source: plausible_postgres_password
-        target: /run/secrets/postgres_password
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     deploy:
@@ -44,39 +41,18 @@ services:
     ports:
       - "8888:8000"
     environment:
-      - CONFIG_DIR=/run/secrets
       - DISABLE_REGISTRATION=false
-      - BASE_URL=/run/secrets/plausible_base_url
-      - SECRET_KEY_BASE=/run/secrets/plausible_secret_key_base
-      - TOTP_VAULT_KEY=/run/secrets/plausible_totp_vault_key
-      - MAXMIND_LICENSE_KEY=/run/secrets/plausible_maxmind_license_key
+      - BASE_URL=${BASE_URL}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - TOTP_VAULT_KEY=${TOTP_VAULT_KEY}
+      - MAXMIND_LICENSE_KEY=${MAXMIND_LICENSE_KEY}
       - MAXMIND_EDITION=GeoLite2-City
-      - GOOGLE_CLIENT_ID=/run/secrets/plausible_google_client_id
-      - GOOGLE_CLIENT_SECRET=/run/secrets/plausible_google_client_secret
-      - MAILGUN_API_KEY=/run/secrets/plausible_mailgun_api_key
-      - MAILGUN_DOMAIN=/run/secrets/plausible_mailgun_domain
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - MAILGUN_API_KEY=${MAILGUN_API_KEY}
+      - MAILGUN_DOMAIN=${MAILGUN_DOMAIN}
       - MAILER_ADAPTER=Bamboo.MailgunAdapter
       - MAILGUN_BASE_URI=https://api.eu.mailgun.net/v3
-    secrets:
-      - source: plausible_base_url
-        target: /run/secrets/BASE_URL
-      - source: plausible_secret_key_base
-        target: /run/secrets/SECRET_KEY_BASE
-      - source: plausible_totp_vault_key
-        target: /run/secrets/TOTP_VAULT_KEY
-      - source: plausible_maxmind_license_key
-        target: /run/secrets/MAXMIND_LICENSE_KEY
-      - source: plausible_google_client_id
-        target: /run/secrets/GOOGLE_CLIENT_ID
-      - source: plausible_google_client_secret
-        target: /run/secrets/GOOGLE_CLIENT_SECRET
-      - source: plausible_mailgun_api_key
-        target: /run/secrets/MAILGUN_API_KEY
-      - source: plausible_mailgun_domain
-        target: /run/secrets/MAILGUN_DOMAIN
-    deploy:
-      mode: replicated
-      replicas: 1
     restart: always
 
 networks:
@@ -95,24 +71,4 @@ volumes:
     external: true
   event_db_config:
     name: plausible_event_db_config
-    external: true
-
-secrets:
-  plausible_postgres_password:
-    external: true
-  plausible_base_url:
-    external: true
-  plausible_secret_key_base:
-    external: true
-  plausible_totp_vault_key:
-    external: true
-  plausible_maxmind_license_key:
-    external: true
-  plausible_google_client_id:
-    external: true
-  plausible_google_client_secret:
-    external: true
-  plausible_mailgun_api_key:
-    external: true
-  plausible_mailgun_domain:
     external: true

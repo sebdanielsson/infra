@@ -134,63 +134,18 @@
     OPENAI_API_BASE_URL: "{{ lookup('community.general.onepassword', 'docker-open-webui', field='OPENAI_API_BASE_URL', vault='prod', service_account_token=service_account_token) }}"
     OPENAI_API_KEY: "{{ lookup('community.general.onepassword', 'docker-open-webui', field='OPENAI_API_KEY', vault='prod', service_account_token=service_account_token) }}"
 
-- name: Create secret plausible_postgres_password
-  community.docker.docker_secret:
-    name: plausible_postgres_password
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_postgres_password', vault='prod', service_account_token=service_account_token) }}"
-    state: present
-
-- name: Create secret plausible_base_url
-  community.docker.docker_secret:
-    name: plausible_base_url
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_base_url', vault='prod', service_account_token=service_account_token) }}"
-    state: present
-
-- name: Create secret plausible_secret_key_base
-  community.docker.docker_secret:
-    name: plausible_secret_key_base
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_secret_key_base', vault='prod', service_account_token=service_account_token) }}"
-    state: present
-
-- name: Create secret plausible_totp_vault_key
-  community.docker.docker_secret:
-    name: plausible_totp_vault_key
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_totp_vault_key', vault='prod', service_account_token=service_account_token) }}"
-    state: present
-
-- name: Create secret plausible_maxmind_license_key
-  community.docker.docker_secret:
-    name: plausible_maxmind_license_key
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_maxmind_license_key', vault='prod', service_account_token=service_account_token) }}"
-    state: present
-
-- name: Create secret plausible_google_client_id
-  community.docker.docker_secret:
-    name: plausible_google_client_id
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_google_client_id', vault='prod', service_account_token=service_account_token) }}"
-    state: present
-
-- name: Create secret plausible_google_client_secret
-  community.docker.docker_secret:
-    name: plausible_google_client_secret
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_google_client_secret', vault='prod', service_account_token=service_account_token) }}"
-    state: present
-
-- name: Create secret plausible_mailgun_api_key
-  community.docker.docker_secret:
-    name: plausible_mailgun_api_key
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_mailgun_api_key', vault='prod', service_account_token=service_account_token) }}"
-    state: present
-
-- name: Create secret plausible_mailgun_domain
-  community.docker.docker_secret:
-    name: plausible_mailgun_domain
-    data: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_mailgun_domain', vault='prod', service_account_token=service_account_token) }}"
-    state: present
-
 - name: Deploy Plausible
-  community.docker.docker_stack:
-    name: plausible
-    compose:
-      - /docker/plausible/compose.yaml
+  community.docker.docker_compose_v2:
+    project_src: /docker/plausible
+    pull: always
     state: present
+  environment:
+    POSTGRES_PASSWORD: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_postgres_password', vault='prod', service_account_token=service_account_token) }}"
+    BASE_URL: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_base_url', vault='prod', service_account_token=service_account_token) }}"
+    SECRET_KEY_BASE: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_secret_key_base', vault='prod', service_account_token=service_account_token) }}"
+    TOTP_VAULT_KEY: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_totp_vault_key', vault='prod', service_account_token=service_account_token) }}"
+    MAXMIND_LICENSE_KEY: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_maxmind_license_key', vault='prod', service_account_token=service_account_token) }}"
+    GOOGLE_CLIENT_ID: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_google_client_id', vault='prod', service_account_token=service_account_token) }}"
+    GOOGLE_CLIENT_SECRET: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_google_client_secret', vault='prod', service_account_token=service_account_token) }}"
+    MAILGUN_API_KEY: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_mailgun_api_key', vault='prod', service_account_token=service_account_token) }}"
+    MAILGUN_DOMAIN: "{{ lookup('community.general.onepassword', 'docker-plausible', field='plausible_mailgun_domain', vault='prod', service_account_token=service_account_token) }}"
