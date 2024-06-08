@@ -1,7 +1,7 @@
 ---
 services:
   plausible_db:
-    image: postgres:14-alpine
+    image: postgres:16-alpine
     networks:
       - plausible_network
     volumes:
@@ -18,7 +18,7 @@ services:
       replicas: 1
     restart: always
   plausible_events_db:
-    image: clickhouse/clickhouse-server:23.3-alpine
+    image: clickhouse/clickhouse-server:24.3-alpine
     networks:
       - plausible_network
     volumes:
@@ -34,7 +34,7 @@ services:
         hard: 262144
     restart: always
   app:
-    image: ghcr.io/plausible/community-edition:v2.1.0-rc.0
+    image: ghcr.io/plausible/community-edition:v2.1.1
     command: sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run"
     networks:
       - plausible_network
