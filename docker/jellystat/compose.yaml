@@ -9,7 +9,7 @@ services:
       - db:/var/lib/postgresql/data
     restart: unless-stopped
   app:
-    image: cyfershepard/jellystat:1.0.9
+    image: cyfershepard/jellystat:1.1.0
     environment:
       POSTGRES_IP: db
       POSTGRES_PORT: 5432
