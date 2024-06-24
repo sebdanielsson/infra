@@ -1,6 +1,7 @@
 ---
 services:
   portainer:
+    container_name: portainer
     image: portainer/portainer-ee:2.20.3-alpine
     ports:
       - "9443:9443"
