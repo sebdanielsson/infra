@@ -2,6 +2,7 @@
 - name: Hogsmeade Proxmox
   hosts: hogsmeade
   vars:
+    ansible_python_interpreter: "/usr/bin/python3"
     service_account_token: "{{ lookup('env', 'OP_CREDENTIAL') }}" # Do not use OP_SERVICE_ACCOUNT_TOKEN as variable name since it will reduce access to private secrets on the local machine
 
   roles:
@@ -176,12 +177,6 @@
         mode: push
         rsync_opts:
           - "--exclude=.DS_Store"
-
-    - name: Init a new swarm with default parameters
-      community.docker.docker_swarm:
-        listen_addr: 0.0.0.0:2377
-        advertise_addr: 192.168.1.116:2377
-        state: present
 
     - name: Docker System Prune
       ansible.builtin.shell: docker system prune --all -f
