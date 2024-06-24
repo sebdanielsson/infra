@@ -2,7 +2,6 @@
 services:
   portainer:
     image: portainer/portainer-ee:2.20.3-alpine
-    command: -H tcp://tasks.agent:9001 --tlsskipverify
     ports:
       - "9443:9443"
       - "8000:8000"
