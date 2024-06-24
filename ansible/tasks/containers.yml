@@ -55,10 +55,9 @@
     state: present
 
 - name: Deploy Portainer
-  community.docker.docker_stack:
-    name: portainer
-    compose:
-      - /docker/portainer/compose.yaml
+  community.docker.docker_compose_v2:
+    project_src: /docker/portainer
+    pull: always
     state: present
 
 - name: Deploy Radarr
