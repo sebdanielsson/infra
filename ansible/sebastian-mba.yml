@@ -91,7 +91,9 @@
         name:
           - 1password
           - 1password-cli
+          - arc
           - brave-browser
+          - chatgpt
           - discord
           - disk-diet
           - font-fira-mono-nerd-font
@@ -114,6 +116,7 @@
           - orbstack
           - pacifist
           - proton-drive
+          - proton-mail
           - protonvpn
           - raycast
           - rectangle-pro
