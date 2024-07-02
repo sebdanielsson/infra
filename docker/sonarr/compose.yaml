@@ -1,7 +1,7 @@
 ---
 services:
   sonarr:
-    image: ghcr.io/linuxserver/sonarr:4.0.5
+    image: ghcr.io/linuxserver/sonarr:4.0.6
     networks:
       - medianet
     environment:
