@@ -76,6 +76,7 @@
           - nano
           - nmap
           - node@20
+          - node@22
           - oven-sh/bun/bun
           - rsync
           - shellcheck
@@ -84,6 +85,7 @@
           - wget
           - xdg-ninja
           - zsh
+        force_formula: true
         update_homebrew: false
         upgrade_all: false
         state: present

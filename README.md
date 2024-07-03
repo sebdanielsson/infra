@@ -2,7 +2,13 @@
 
 GitOps all the things!
 
-## Usage
+## Installing the requirements
+
+```sh
+ansible-galaxy install -r requirements.yml --force
+```
+
+## Running the playbooks
 
 Run Ansible group playbook
 
