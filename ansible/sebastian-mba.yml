@@ -37,6 +37,7 @@
     - name: Add Homebrew taps
       community.general.homebrew_tap:
         name:
+          - charmbracelet/tap
           - cloudflare/cloudflare
           - hashicorp/tap
           - oven-sh/bun
@@ -58,6 +59,7 @@
           - bash
           - bat
           - bottom
+          - charmbracelet/tap/mods
           - cloudflare/cloudflare/cf-terraforming
           - coreutils
           - curl
