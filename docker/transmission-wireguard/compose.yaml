@@ -20,6 +20,12 @@ services:
     volumes:
       - /lib/modules:/lib/modules
       - ./wg0.conf:/config/wg_confs/wg0.conf
+    healthcheck:
+      test: ["CMD-SHELL", "wg show | grep -q 'latest handshake:'"]
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     restart: unless-stopped
     labels:
       - com.centurylinklabs.watchtower.monitor-only=true
@@ -28,14 +34,16 @@ services:
     container_name: transmission
     network_mode: "service:wireguard"
     depends_on:
-      - wireguard
+      wireguard:
+        condition: service_healthy
+        restart: true
     env_file:
       - secrets.env
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Stockholm
-      - DOCKER_MODS=jordanpotter/docker-mods:transmission-nat-pmp-20240702121311
+      - DOCKER_MODS=jordanpotter/docker-mods:transmission-nat-pmp
     volumes:
       - transmission_data:/config
       - /chungus/media/downloads:/downloads
