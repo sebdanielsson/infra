@@ -4,7 +4,7 @@ services:
     image: nginx:1.26.1-alpine
     container_name: nginx
     ports:
-      - "80:80"
+      - "8080:80"
     volumes:
       - /opt/election-map:/usr/share/nginx/html:ro
     restart: unless-stopped

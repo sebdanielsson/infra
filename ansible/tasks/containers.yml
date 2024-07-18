@@ -48,6 +48,12 @@
   environment:
     TSRECORDER_AUTHKEY: "{{ lookup('community.general.onepassword', 'ts-authkey-recorder', field='credential', vault='prod', service_account_token=service_account_token) }}"
 
+- name: Deploy nginx election-map
+  community.docker.docker_compose_v2:
+    project_src: /docker/nginx
+    pull: always
+    state: present
+
 - name: Deploy homepage
   community.docker.docker_compose_v2:
     project_src: /docker/homepage
