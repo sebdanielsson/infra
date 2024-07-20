@@ -7,5 +7,5 @@ services:
       - "8765:80"
     volumes:
       - /opt/election-map:/usr/share/nginx/html:ro
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./default.conf:/etc/nginx/conf.d/default.conf:ro
     restart: unless-stopped
