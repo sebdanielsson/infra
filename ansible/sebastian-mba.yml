@@ -39,6 +39,7 @@
         name:
           - charmbracelet/tap
           - cloudflare/cloudflare
+          - dotenvx/brew
           - hashicorp/tap
           - oven-sh/bun
           - teamookla/speedtest
@@ -64,6 +65,7 @@
           - coreutils
           - curl
           - dockutil
+          - dotenvx/brew/dotenvx
           - fd
           - fio
           - fx
