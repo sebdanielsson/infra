@@ -6,6 +6,13 @@
     service_account_token: "{{ lookup('env', 'OP_CREDENTIAL') }}" # Do not use OP_SERVICE_ACCOUNT_TOKEN as variable name since it will reduce access to private secrets on the local machine
 
   roles:
+    - name: Install and configure cloudflared
+      role: sebdanielsson.cloudflared
+      vars:
+        cloudflare_tunnel_enable: true
+        cloudflare_tunnel_credential: "{{ lookup('community.general.onepassword', 'cloudflare-tunnel-flightradar', field='credential', vault='prod', service_account_token=service_account_token) }}"
+      state: present
+
     - name: Install and configure Tailscale
       role: artis3n.tailscale
       tailscale_args: "--ssh"
