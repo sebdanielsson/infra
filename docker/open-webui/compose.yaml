@@ -8,7 +8,8 @@ services:
       - OPENAI_API_BASE_URL=${OPENAI_API_BASE_URL}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - PORT=8083
-    network_mode: host
+    ports:
+      - 8083:8083
     restart: unless-stopped
 
   pipelines:
