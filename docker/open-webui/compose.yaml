@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/open-webui/open-webui:v0.3.12 # Switch back to main when https://github.com/open-webui/open-webui/issues/2337#issuecomment-2132099742 is resolved
+    image: ghcr.io/open-webui/open-webui:v0.3.12
     volumes:
       - data:/app/backend/data
     environment:
@@ -11,6 +11,16 @@ services:
     network_mode: host
     restart: unless-stopped
 
+  pipelines:
+    image: ghcr.io/open-webui/pipelines:main
+    ports:
+      - 9099:9099
+    volumes:
+      - pipelines:/app/pipelines
+    restart: unless-stopped
+
 volumes:
   data:
+    driver: local
+  pipelines:
     driver: local
