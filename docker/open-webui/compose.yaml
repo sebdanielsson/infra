@@ -4,20 +4,20 @@ services:
     volumes:
       - data:/app/backend/data
     environment:
-      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL}
       - OPENAI_API_BASE_URL=${OPENAI_API_BASE_URL}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - PORT=8083
     ports:
-      - 8083:8083
+      - 8083:8080
     restart: unless-stopped
 
   pipelines:
     image: ghcr.io/open-webui/pipelines:main
-    ports:
-      - 9099:9099
+    environment:
+      - PIPELINES_URLS="https://raw.githubusercontent.com/open-webui/pipelines/main/examples/pipelines/providers/anthropic_manifold_pipeline.py"
     volumes:
       - pipelines:/app/pipelines
+    ports:
+      - 9099:9099
     restart: unless-stopped
 
 volumes:
