@@ -10,7 +10,7 @@ collections:
     version: 1.5.4
 
   - name: geerlingguy.mac
-    version: 4.0.1
+    version: 4.0.2
 
 roles:
   - name: artis3n.tailscale
