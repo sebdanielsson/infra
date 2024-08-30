@@ -13,6 +13,15 @@
         cloudflare_tunnel_credential: "{{ lookup('community.general.onepassword', 'cloudflare-tunnel-hogsmeade', field='credential', vault='prod', service_account_token=service_account_token) }}"
       state: present
 
+    - name: Install and configure Tailscale
+      role: artis3n.tailscale
+      tailscale_args: "--ssh --advertise-routes=192.168.100.0/24"
+      vars:
+        tailscale_authkey: "{{ lookup('community.general.onepassword', 'ts-server-oauth', field='credential', vault='prod', service_account_token=service_account_token) }}"
+        tailscale_oauth_preauthorized: true
+        tailscale_tags: ["server"]
+      state: present
+
     - name: Configure ACME on Proxmox node
       role: simoncaron.pve_acme
       vars:
@@ -26,6 +35,24 @@
         pve_acme_plugin_data: "{{ lookup('community.general.onepassword', 'proxmox-acme', field='pve_acme_plugin_data', vault='prod', service_account_token=service_account_token) }}"
 
   tasks:
+    - name: Ensure net.ipv4.ip_forward is enabled
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: "1"
+        sysctl_set: yes
+        reload: yes
+        sysctl_file: /etc/sysctl.d/99-tailscale.conf
+        state: present
+
+    - name: Ensure net.ipv6.conf.all.forwarding is enabled
+      sysctl:
+        name: net.ipv6.conf.all.forwarding
+        value: "1"
+        sysctl_set: yes
+        reload: yes
+        sysctl_file: /etc/sysctl.d/99-tailscale.conf
+        state: present
+
     - name: Install sudo
       ansible.builtin.apt:
         name:

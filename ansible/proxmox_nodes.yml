@@ -11,15 +11,6 @@
         pve_addons_disable_enterprise_repo: true
         pve_addons_add_no_subscription_repo: true
 
-    - name: Install and configure Tailscale
-      role: artis3n.tailscale
-      tailscale_args: "--ssh"
-      vars:
-        tailscale_authkey: "{{ lookup('community.general.onepassword', 'ts-server-oauth', field='credential', vault='prod', service_account_token=service_account_token) }}"
-        tailscale_oauth_preauthorized: true
-        tailscale_tags: ["server"]
-      state: present
-
     - name: Install Docker
       role: geerlingguy.docker
       vars:
