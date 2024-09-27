@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:15-bookworm
+    image: postgres:17-bookworm
     environment:
       POSTGRES_DB: jfstat
       POSTGRES_USER: ${JELLYSTAT_POSTGRES_USER}
