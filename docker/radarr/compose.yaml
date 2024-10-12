@@ -1,7 +1,7 @@
 ---
 services:
   radarr:
-    image: ghcr.io/linuxserver/radarr:5.11.0
+    image: ghcr.io/linuxserver/radarr:5.12.2
     networks:
       - medianet
     environment:
