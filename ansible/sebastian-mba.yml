@@ -42,6 +42,7 @@
           - dotenvx/brew
           - hashicorp/tap
           - oven-sh/bun
+          - pulumi/tap/pulumi
           - teamookla/speedtest
         state: present
 
@@ -80,6 +81,7 @@
           - node@20
           - node@22
           - oven-sh/bun/bun
+          - pulumi/tap/pulumi
           - rsync
           - shellcheck
           - ssh-audit
