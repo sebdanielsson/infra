@@ -38,6 +38,8 @@ services:
     depends_on:
       - plausible_db
       - plausible_events_db
+    volumes:
+      - app_data:/var/lib/plausible
     ports:
       - "8888:8000"
     environment:
@@ -71,4 +73,7 @@ volumes:
     external: true
   event_db_config:
     name: plausible_event_db_config
+    external: true
+  app_data:
+    name: plausible_app
     external: true
