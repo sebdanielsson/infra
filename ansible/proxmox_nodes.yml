@@ -47,7 +47,7 @@
         dest: /etc/ssh/sshd_config.d/49-sshd-hardening.conf
         owner: root
         group: root
-        mode: 0644
+        mode: "0o0644"
 
     - name: Copy ssh hardening config
       ansible.builtin.copy:
@@ -55,7 +55,7 @@
         dest: /etc/ssh/ssh_config.d/49-ssh-hardening.conf
         owner: root
         group: root
-        mode: 0644
+        mode: "0o0644"
 
     - name: Ensure 'sebastian' user exists
       ansible.builtin.user:
