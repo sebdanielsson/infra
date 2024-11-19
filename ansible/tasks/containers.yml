@@ -91,16 +91,6 @@
     pull: always
     state: present
 
-- name: Deploy Jellystat
-  community.docker.docker_compose_v2:
-    project_src: /docker/jellystat
-    pull: always
-    state: present
-  environment:
-    JELLYSTAT_JWT_SECRET: "{{ lookup('community.general.onepassword', 'docker-jellystat', field='JWT', vault='prod', service_account_token=service_account_token) }}"
-    JELLYSTAT_POSTGRES_USER: "{{ lookup('community.general.onepassword', 'docker-jellystat', field='POSTGRES_USER', vault='prod', service_account_token=service_account_token) }}"
-    JELLYSTAT_POSTGRES_PASSWORD: "{{ lookup('community.general.onepassword', 'docker-jellystat', field='POSTGRES_PASSWORD', vault='prod', service_account_token=service_account_token) }}"
-
 - name: Add wireguard secrets
   ansible.builtin.template:
     src: ../../docker/transmission-wireguard/wg0.conf.j2
