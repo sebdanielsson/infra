@@ -75,7 +75,7 @@ jobs:
           tags: tag:ci
 
       - name: Check connection
-        run: tailscale ping hogsmeade
+        run: tailscale ping --icmp hogsmeade
 
       - name: Run playbook
         run: |
