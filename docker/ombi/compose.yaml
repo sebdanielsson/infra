@@ -1,7 +1,7 @@
 ---
 services:
   ombi:
-    image: linuxserver/ombi:4.46.6-development
+    image: linuxserver/ombi:4.46.7-development
     environment:
       - PUID=1000
       - PGID=1000
