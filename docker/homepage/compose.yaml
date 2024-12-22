@@ -1,6 +1,6 @@
 services:
   homepage:
-    image: ghcr.io/gethomepage/homepage:v0.10.1
+    image: ghcr.io/gethomepage/homepage:v0.10.2
     container_name: homepage
     ports:
       - 3010:3000
