@@ -55,12 +55,6 @@
     MINIO_ROOT_USER: "{{ lookup('community.general.onepassword', 'docker-minio', field='MINIO_ROOT_USER', vault='prod', service_account_token=service_account_token) }}"
     MINIO_ROOT_PASSWORD: "{{ lookup('community.general.onepassword', 'docker-minio', field='MINIO_ROOT_PASSWORD', vault='prod', service_account_token=service_account_token) }}"
 
-- name: Deploy homepage
-  community.docker.docker_compose_v2:
-    project_src: /docker/homepage
-    pull: always
-    state: present
-
 - name: Deploy Portainer
   community.docker.docker_compose_v2:
     project_src: /docker/portainer
