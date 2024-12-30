@@ -28,7 +28,7 @@ Run Ansible playbook for the host er-x
 
 ```sh
 export OP_CREDENTIAL="op://Private/onkb65jhnceyyid7ope2zg5s2m/credential"
-op run -- ansible-playbook -i ./inventory.yml ./openwrt.yml
+op run -- ansible-playbook -i ./inventory.yml ./home-gateway.yml
 ```
 
 Run Ansible playbook for sebastian-mba

@@ -1,0 +1,169 @@
+---
+- name: Configure home gateway
+  hosts: bpi-r4
+  gather_facts: false
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    service_account_token: "{{ lookup('env', 'OP_SERVICE_ACCOUNT_TOKEN') }}"
+
+  tasks:
+    - name: Check if python3 is installed
+      ansible.builtin.raw: which python3
+      changed_when: false
+      failed_when: python_check.rc not in [0, 1]
+      register: python_check
+
+    - name: Install python3
+      ansible.builtin.raw: opkg update && opkg install python3
+      when: python_check.rc != 0
+      register: opkg_install_python3
+      changed_when: '"installed in root is up to date" not in opkg_install_python3.stdout'
+
+    - name: End the play if python3 was not installed previously
+      ansible.builtin.meta: end_host
+      when:
+        - python_check.rc != 0
+
+    - name: Gather facts
+      ansible.builtin.setup:
+
+    - name: Remove `ra_slaac` from DHCP configuration if it exists
+      ansible.builtin.shell: |
+        if uci get dhcp.lan.ra_slaac >/dev/null 2>&1; then
+          uci del dhcp.lan.ra_slaac && echo "Removed ra_slaac from DHCP configuration"
+        fi
+      register: dhcp_lan_ra_slaac
+      changed_when: "'Removed ra_slaac from DHCP configuration' in dhcp_lan_ra_slaac.stdout"
+      notify: Commit changes
+
+    - name: Set Dropbear interface to LAN if not set
+      ansible.builtin.shell: |
+        if [ "$(uci get dropbear.main.Interface 2>/dev/null)" != "lan" ]; then
+          uci set dropbear.main.Interface='lan' && echo "Set Dropbear interface to LAN"
+        fi
+      register: dropbear_main_interface
+      changed_when: "'Set dropbear interface to LAN' in dropbear_main_interface.stdout"
+      notify: Commit changes
+
+    - name: Set LAN IP address if different
+      ansible.builtin.shell: |
+        if [ "$(uci get network.lan.ipaddr 2>/dev/null)" != "192.168.100.1" ]; then
+          uci set network.lan.ipaddr='192.168.100.1' && echo "Set LAN IP address to 192.168.100.1"
+        fi
+      register: network_lan_ipaddr
+      changed_when: "'Set LAN IP address to 192.168.100.1' in network_lan_ipaddr.stdout"
+      notify: Commit changes
+
+    - name: Set hostname if different
+      ansible.builtin.shell: |
+        if [ "$(uci get system.cfg01e48a.hostname 2>/dev/null)" != "bpi-r4" ]; then
+          uci set system.cfg01e48a.hostname='bpi-r4' && echo "Set hostname to bpi-r4"
+        fi
+      register: system_cfg01e48a_hostname
+      changed_when: "'Set hostname to bpi-r4' in system_cfg01e48a_hostname.stdout"
+      notify: Commit changes
+
+    - name: Set console log level if different
+      ansible.builtin.shell: |
+        if [ "$(uci get system.cfg01e48a.conloglevel 2>/dev/null)" != "6" ]; then
+          uci set system.cfg01e48a.conloglevel='6' && echo "Set console log level to 6"
+        fi
+      register: system_cfg01e48a_conloglevel
+      changed_when: "'Set console log level to 6' in system_cfg01e48a_conloglevel.stdout"
+      notify: Commit changes
+
+    - name: Enable HTTPS redirect in uHTTPd if not set
+      ansible.builtin.shell: |
+        if [ "$(uci get uhttpd.main.redirect_https 2>/dev/null)" != "1" ]; then
+          uci set uhttpd.main.redirect_https='1' && echo "Enabled HTTPS redirect in uHTTPd"
+        fi
+      register: uhttpd_main_redirect_https
+      changed_when: "'Enabled HTTPS redirect in uHTTPd' in uhttpd_main_redirect_https.stdout"
+      notify: Commit changes
+
+    - name: Install packages
+      community.general.opkg:
+        name:
+          - shadow-useradd
+          - shadow-usermod
+          - shadow-groupadd
+          - shadow-groupmod
+          - sudo
+          - coreutils-comm
+          - coreutils-od
+          - coreutils-sort
+          - coreutils-stty
+          - bash
+          - openssh-sftp-server
+          - luci-app-https-dns-proxy
+          - luci-app-acme
+          - luci-proto-wireguard
+          - tailscale
+          - iptables-nft
+          - curl
+        update_cache: true
+        state: present
+
+    - name: Enable and start service https-dns-proxy
+      community.general.openwrt_init:
+        name: https-dns-proxy
+        enabled: true
+        state: started
+
+    - name: Enable and start service tailscale
+      community.general.openwrt_init:
+        name: tailscale
+        enabled: true
+        state: started
+
+    - name: Check Tailscale status
+      ansible.builtin.command: tailscale status
+      register: tailscale_status
+      changed_when: false
+      check_mode: false
+      failed_when: tailscale_status.rc not in [0, 1]
+
+    - name: Login to Tailscale
+      ansible.builtin.command: tailscale up --ssh --authkey "{{ lookup('community.general.onepassword', 'ts-authkey-router', field='credential', vault='prod', service_account_token=service_account_token) }} && tailscale status"
+      when: '"Logged out" or "Tailscale is stopped" in tailscale_status.stdout'
+      register: tailscale_login
+      changed_when: tailscale_login.stdout != ''
+
+    - name: Create group 'sudo'
+      ansible.builtin.group:
+        name: sudo
+        state: present
+
+    - name: Ensure user 'sebastian' exists
+      ansible.builtin.user:
+        name: sebastian
+        groups:
+          - sudo
+        shell: /bin/bash
+        createhome: true
+        state: present
+
+    - name: Add group 'sudo' to sudoers
+      community.general.sudoers:
+        name: sudo-group
+        commands: ALL
+        group: sudo
+        state: present
+
+    - name: SSH authorized key for 'root'
+      ansible.posix.authorized_key:
+        user: root
+        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"
+        state: present
+
+    - name: SSH authorized key for 'sebastian'
+      ansible.posix.authorized_key:
+        user: sebastian
+        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"
+        state: present
+
+  handlers:
+    - name: Commit changes
+      ansible.builtin.command: uci commit
+      changed_when: true
