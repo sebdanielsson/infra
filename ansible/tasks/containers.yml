@@ -95,6 +95,7 @@
   ansible.builtin.template:
     src: ../../docker/transmission-wireguard/wg0.conf.j2
     dest: /docker/transmission-wireguard/wg0.conf
+    mode: "0640"
   vars:
     private_key: "{{ lookup('community.general.onepassword', 'wg0', field='private_key', vault='prod', service_account_token=service_account_token) }}"
     public_key: "{{ lookup('community.general.onepassword', 'wg0', field='public_key', vault='prod', service_account_token=service_account_token) }}"
@@ -104,6 +105,7 @@
   ansible.builtin.template:
     src: ../../docker/transmission-wireguard/secrets.env.j2
     dest: /docker/transmission-wireguard/secrets.env
+    mode: "0640"
   vars:
     transmission_user: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_user', vault='prod', service_account_token=service_account_token) }}"
     transmission_pass: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_pass', vault='prod', service_account_token=service_account_token) }}"

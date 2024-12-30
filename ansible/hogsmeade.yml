@@ -36,7 +36,7 @@
 
   tasks:
     - name: Ensure net.ipv4.ip_forward is enabled
-      sysctl:
+      ansible.posix.sysctl:
         name: net.ipv4.ip_forward
         value: "1"
         sysctl_set: true
@@ -45,7 +45,7 @@
         state: present
 
     - name: Ensure net.ipv6.conf.all.forwarding is enabled
-      sysctl:
+      ansible.posix.sysctl:
         name: net.ipv6.conf.all.forwarding
         value: "1"
         sysctl_set: true
@@ -206,7 +206,8 @@
           - "--exclude=.DS_Store"
 
     - name: Docker System Prune
-      ansible.builtin.shell: docker system prune --all -f
+      ansible.builtin.command: docker system prune --all -f
+      changed_when: true
 
     - name: Run all containers
       ansible.builtin.import_tasks: tasks/containers.yml

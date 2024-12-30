@@ -226,6 +226,3 @@
       - name: System Settings
         path: "/Applications/System Settings.app/"
         pos: 17
-
-  roles:
-  # - geerlingguy.mac.dock

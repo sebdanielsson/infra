@@ -1,2 +1,5 @@
 ---
 offline: false
+
+skip_list:
+  - yaml[line-length]
