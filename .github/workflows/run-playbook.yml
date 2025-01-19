@@ -17,7 +17,7 @@ defaults:
 jobs:
   run-playbook:
     name: Run playbook
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
     concurrency:
       group: ${{ github.workflow }}
     steps:
