@@ -1,7 +1,7 @@
 ---
 services:
   app:
-    image: ghcr.io/linuxserver/jellyfin:10.10.3
+    image: ghcr.io/linuxserver/jellyfin:10.10.4
     networks:
       - medianet
     volumes:
