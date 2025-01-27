@@ -158,10 +158,8 @@
         --key-type ecdsa \
         --elliptic-curve secp384r1 \
         --rsa-key-size 4096 \
-        --staple-ocsp \
         --hsts \
         --uir \
-        --must-staple \
         --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/jellyfin-pkcs12.sh \
         --domain {{ lookup('community.general.onepassword', 'certbot-jellyfin', field='domain', vault='prod', service_account_token=service_account_token) }}
       args:
