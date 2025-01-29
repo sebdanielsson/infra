@@ -42,7 +42,7 @@
     state: present
   register: fedora_template
 
-- name: Import Fedora Cloud Base image # noqa no-handler
+- name: Import Fedora Cloud Base image # noqa: no-changed-when
   ansible.builtin.shell: /usr/sbin/qm disk import 1000 /var/lib/vz/template/cloudimg/Fedora-Cloud-Base-37-1.7.x86_64.qcow2 local-lvm --format qcow2; /usr/sbin/qm set 1000 --scsi0 local-lvm:vm-1000-disk-1;/usr/sbin/qm set 1000 --boot order=scsi0; /usr/sbin/qm template 1000 # noqa yaml
   when: fedora_template.changed
 
