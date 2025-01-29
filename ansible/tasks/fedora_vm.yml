@@ -3,7 +3,7 @@
   ansible.builtin.get_url:
     url: https://download.fedoraproject.org/pub/fedora/linux/releases/37/Cloud/x86_64/images/Fedora-Cloud-Base-37-1.7.x86_64.qcow2
     dest: /var/lib/vz/template/cloudimg/Fedora-Cloud-Base-37-1.7.x86_64.qcow2
-    mode: '0640'
+    mode: "0640"
 
 - name: Create Fedora Template
   community.general.proxmox_kvm:
@@ -42,8 +42,8 @@
     state: present
   register: fedora_template
 
-- name: Import Fedora Cloud Base image  # noqa no-handler
-  ansible.builtin.shell: /usr/sbin/qm disk import 1000 /var/lib/vz/template/cloudimg/Fedora-Cloud-Base-37-1.7.x86_64.qcow2 local-lvm --format qcow2; /usr/sbin/qm set 1000 --scsi0 local-lvm:vm-1000-disk-1;/usr/sbin/qm set 1000 --boot order=scsi0; /usr/sbin/qm template 1000  # noqa yaml
+- name: Import Fedora Cloud Base image # noqa no-handler
+  ansible.builtin.shell: /usr/sbin/qm disk import 1000 /var/lib/vz/template/cloudimg/Fedora-Cloud-Base-37-1.7.x86_64.qcow2 local-lvm --format qcow2; /usr/sbin/qm set 1000 --scsi0 local-lvm:vm-1000-disk-1;/usr/sbin/qm set 1000 --boot order=scsi0; /usr/sbin/qm template 1000 # noqa yaml
   when: fedora_template.changed
 
 - name: Clone fedora_template to mediaserver
