@@ -7,10 +7,6 @@ name: Lint
       - main
   pull_request:
 
-defaults:
-  run:
-    working-directory: 'sebdanielsson.infra/ansible'
-
 jobs:
   lint:
     name: ansible-lint
@@ -18,12 +14,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          path: 'sebdanielsson.infra'
 
       - name: Run ansible-lint
         uses: ansible/ansible-lint@v24
         with:
           setup_python: "true"
-          working_directory: "sebdanielsson.infra/ansible"
           requirements_file: "./requirements.yml"
