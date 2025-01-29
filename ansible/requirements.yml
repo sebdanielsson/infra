@@ -19,7 +19,7 @@ roles:
 
   - name: simoncaron.pve_addons
     src: https://github.com/simoncaron/ansible-role-pve_addons.git
-    version: 1.6.0
+    version: 2.0.0
 
   - name: simoncaron.pve_acme
     src: https://github.com/simoncaron/ansible-role-pve_acme
