@@ -5,9 +5,6 @@ all:
       hosts:
         hogsmeade:
           ansible_user: root
-    virtual_machines:
-      hosts:
-        mediaserver:
     sbc:
       hosts:
         flightradar:
