@@ -36,3 +36,6 @@ terraform.rc
 
 # Ignore Terraform .lock files
 .terraform.lock.hcl
+
+# Ignore .ansible directory
+.ansible/

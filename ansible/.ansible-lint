@@ -1,5 +1,8 @@
 ---
 offline: false
 
+exclude_paths:
+  - .ansible/
+
 skip_list:
   - yaml[line-length]
