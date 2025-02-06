@@ -27,7 +27,7 @@ roles:
 
   - name: geerlingguy.docker
     src: https://github.com/geerlingguy/ansible-role-docker.git
-    version: 7.4.4
+    version: 7.4.5
 
   - name: sebdanielsson.cloudflared
     src: https://github.com/sebdanielsson/ansible-role-cloudflared.git
