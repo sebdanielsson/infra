@@ -8,40 +8,48 @@ services:
       - db:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      start_period: 1m
     ports:
       - "5432:5432"
-    deploy:
-      mode: replicated
-      replicas: 1
     restart: always
+
   plausible_events_db:
-    image: clickhouse/clickhouse-server:24.12-alpine
+    image: clickhouse/clickhouse-server:24.3-alpine
     networks:
       - plausible_network
     volumes:
       - event_db:/var/lib/clickhouse
       - event_db_logs:/var/log/clickhouse-server
       - event_db_config:/etc/clickhouse-server
-    deploy:
-      mode: replicated
-      replicas: 1
     ulimits:
       nofile:
         soft: 262144
         hard: 262144
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 -O - http://127.0.0.1:8123/ping || exit 1"]
+      start_period: 1m
     restart: always
+
   app:
     image: ghcr.io/plausible/community-edition:v2.1.5
     command: sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run"
     networks:
       - plausible_network
     depends_on:
-      - plausible_db
-      - plausible_events_db
+      plausible_db:
+        condition: service_healthy
+      plausible_events_db:
+        condition: service_healthy
     volumes:
       - app_data:/var/lib/plausible
     ports:
       - "8888:8000"
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
     environment:
       - DISABLE_REGISTRATION=false
       - BASE_URL=${BASE_URL}
@@ -65,15 +73,19 @@ volumes:
   db:
     name: plausible_db
     external: true
+
   event_db:
     name: plausible_event_db
     external: true
+
   event_db_logs:
     name: plausible_event_db_logs
     external: true
+
   event_db_config:
     name: plausible_event_db_config
     external: true
+
   app_data:
     name: plausible_app
     external: true
