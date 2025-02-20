@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/open-webui/open-webui:v0.5.14
+    image: ghcr.io/open-webui/open-webui:v0.5.15
     volumes:
       - data:/app/backend/data
     environment:
