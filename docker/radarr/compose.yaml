@@ -14,6 +14,8 @@ services:
       - /chungus/media/downloads:/downloads
     ports:
       - "7878:7878"
+    labels:
+      tsdproxy.enable: "true"
     restart: unless-stopped
 
 networks:
