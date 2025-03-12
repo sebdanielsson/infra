@@ -1,6 +1,7 @@
 ---
 services:
   radarr:
+    container_name: radarr
     image: ghcr.io/linuxserver/radarr:5.19.3
     networks:
       - medianet

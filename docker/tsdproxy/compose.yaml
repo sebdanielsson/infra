@@ -1,6 +1,7 @@
 ---
 services:
   tsdproxy:
+    container_name: tsdproxy
     image: almeidapaulopt/tsdproxy:1.4.5
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -10,7 +11,6 @@ services:
       - "8080:8080"
     labels:
       - tsdproxy.enable=true
-      - tsdproxy.name=dash
     restart: unless-stopped
 volumes:
   data:
