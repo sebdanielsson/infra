@@ -8,6 +8,9 @@ services:
       - config:/config
     ports:
       - "8080:8080"
+    labels:
+      - tsdproxy.enable=true
+      - tsdproxy.name=dash
     restart: unless-stopped
 volumes:
   data:
