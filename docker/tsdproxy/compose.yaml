@@ -11,6 +11,7 @@ services:
       - "8080:8080"
     labels:
       - tsdproxy.enable=true
+      - tsdproxy.name=tsdproxy
     restart: unless-stopped
 volumes:
   data:
