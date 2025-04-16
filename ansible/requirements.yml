@@ -12,7 +12,7 @@ collections:
   - name: geerlingguy.mac
     version: 4.1.0
 
-  - name: ansible.tailscale
+  - name: artis3n.tailscale
     version: 1.0.0
 
 roles:
