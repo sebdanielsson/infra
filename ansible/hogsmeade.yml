@@ -14,7 +14,7 @@
       state: present
 
     - name: Install and configure Tailscale
-      role: artis3n.tailscale
+      role: artis3n.tailscale.machine
       tailscale_args: "--ssh --advertise-routes=192.168.1.0/24"
       vars:
         tailscale_authkey: "{{ lookup('community.general.onepassword', 'ts-server-oauth', field='credential', vault='prod', service_account_token=service_account_token) }}"

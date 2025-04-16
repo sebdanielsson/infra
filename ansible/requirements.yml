@@ -12,11 +12,10 @@ collections:
   - name: geerlingguy.mac
     version: 4.1.0
 
-roles:
   - name: artis3n.tailscale
-    src: https://github.com/artis3n/ansible-role-tailscale.git
-    version: v5.0.1
+    version: 1.0.0
 
+roles:
   - name: simoncaron.pve_addons
     src: https://github.com/simoncaron/ansible-role-pve_addons.git
     version: 2.0.0
