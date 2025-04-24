@@ -2,7 +2,7 @@
 services:
   portainer:
     container_name: portainer
-    image: portainer/portainer-ee:2.29.1-alpine
+    image: portainer/portainer-ee:2.29.2-alpine
     ports:
       - "9443:9443"
       - "8000:8000"
