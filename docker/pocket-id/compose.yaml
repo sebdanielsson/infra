@@ -3,7 +3,6 @@ services:
   app:
     image: ghcr.io/pocket-id/pocket-id:v0.53
     restart: unless-stopped
-    env_file: .env
     ports:
       - 3000:80
     volumes:
