@@ -37,13 +37,13 @@ services:
       wireguard:
         condition: service_healthy
         restart: true
-    env_file:
-      - secrets.env
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Stockholm
       - DOCKER_MODS=jordanpotter/docker-mods:transmission-nat-pmp
+      - USER=${TRANSMISSION_USER}
+      - PASS=${TRANSMISSION_PASS}
     volumes:
       - transmission_data:/config
       - /chungus/media/downloads:/downloads

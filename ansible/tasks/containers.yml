@@ -110,20 +110,14 @@
     public_key: "{{ lookup('community.general.onepassword', 'wg0', field='public_key', vault='prod', service_account_token=service_account_token) }}"
     endpoint: "{{ lookup('community.general.onepassword', 'wg0', field='endpoint', vault='prod', service_account_token=service_account_token) }}"
 
-- name: Add transmission secrets
-  ansible.builtin.template:
-    src: ../../docker/transmission-wireguard/secrets.env.j2
-    dest: /docker/transmission-wireguard/secrets.env
-    mode: "0640"
-  vars:
-    transmission_user: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_user', vault='prod', service_account_token=service_account_token) }}"
-    transmission_pass: "{{ lookup('community.general.onepassword', 'docker-transmission', field='transmission_pass', vault='prod', service_account_token=service_account_token) }}"
-
 - name: Deploy transmission-wireguard
   community.docker.docker_compose_v2:
     project_src: /docker/transmission-wireguard
     pull: always
     state: present
+  environment:
+    TRANSMISSION_USER: "{{ lookup('community.general.onepassword', 'docker-transmission', field='TRANSMISSION_USER', vault='prod', service_account_token=service_account_token) }}"
+    TRANSMISSION_PASS: "{{ lookup('community.general.onepassword', 'docker-transmission', field='TRANSMISSION_PASS', vault='prod', service_account_token=service_account_token) }}"
 
 - name: Deploy Ombi
   community.docker.docker_compose_v2:
