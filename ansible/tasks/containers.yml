@@ -26,6 +26,15 @@
     driver: local
     state: present
 
+- name: Deploy Pocket ID
+  community.docker.docker_compose_v2:
+    project_src: /docker/pocket-id
+    pull: always
+    state: present
+  environment:
+    MAXMIND_LICENSE_KEY: "{{ lookup('community.general.onepassword', 'docker-pocket-id', field='MAXMIND_LICENSE_KEY', vault='prod', service_account_token=service_account_token) }}"
+    PUBLIC_APP_URL: "{{ lookup('community.general.onepassword', 'docker-pocket-id', field='PUBLIC_APP_URL', vault='prod', service_account_token=service_account_token) }}"
+
 - name: Deploy Traefik
   community.docker.docker_compose_v2:
     project_src: /docker/traefik

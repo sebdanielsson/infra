@@ -1,0 +1,24 @@
+---
+services:
+  app:
+    image: ghcr.io/pocket-id/pocket-id:v0.53
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - 3000:80
+    volumes:
+      - data:/app/backend/data
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TRUST_PROXY=true
+      - PUBLIC_APP_URL=${PUBLIC_APP_URL}
+      - MAXMIND_LICENSE_KEY=${MAXMIND_LICENSE_KEY}
+    healthcheck:
+      test: "curl -f http://localhost/healthz"
+      interval: 1m30s
+      timeout: 5s
+      retries: 2
+      start_period: 10s
+volumes:
+  data:
