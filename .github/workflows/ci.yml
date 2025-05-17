@@ -21,3 +21,12 @@ jobs:
           setup_python: "true"
           working_directory: "./ansible"
           requirements_file: "requirements.yml"
+
+      - name: Validate compose files
+        run: |
+          for dir in ./docker/*; do
+            if [ -d "$dir" ] && [ -f "$dir/compose.yaml" ]; then
+              echo "Validating $dir/compose.yaml"
+              docker compose -f "$dir/compose.yaml" config
+            fi
+          done
