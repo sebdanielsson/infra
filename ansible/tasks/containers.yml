@@ -134,6 +134,9 @@
     OLLAMA_BASE_URL: "{{ lookup('community.general.onepassword', 'docker-open-webui', field='OLLAMA_BASE_URL', vault='prod', service_account_token=service_account_token) }}"
     OPENAI_API_BASE_URL: "{{ lookup('community.general.onepassword', 'docker-open-webui', field='OPENAI_API_BASE_URL', vault='prod', service_account_token=service_account_token) }}"
     OPENAI_API_KEY: "{{ lookup('community.general.onepassword', 'docker-open-webui', field='OPENAI_API_KEY', vault='prod', service_account_token=service_account_token) }}"
+    OAUTH_CLIENT_ID: "{{ lookup('community.general.onepassword', 'docker-open-webui', field='OAUTH_CLIENT_ID', vault='prod', service_account_token=service_account_token) }}"
+    OAUTH_CLIENT_SECRET: "{{ lookup('community.general.onepassword', 'docker-open-webui', field='OAUTH_CLIENT_SECRET', vault='prod', service_account_token=service_account_token) }}"
+    OPENID_PROVIDER_URL: "{{ lookup('community.general.onepassword', 'docker-open-webui', field='OPENID_PROVIDER_URL', vault='prod', service_account_token=service_account_token) }}"
 
 - name: Deploy Plausible
   community.docker.docker_compose_v2:
