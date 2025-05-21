@@ -14,6 +14,7 @@ services:
       - OAUTH_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
       - OPENID_PROVIDER_URL=${OPENID_PROVIDER_URL}
       - OAUTH_PROVIDER_NAME=Pocket ID
+      - OAUTH_SCOPES=openid profile email groups
     ports:
       - 8083:8080
     restart: unless-stopped
