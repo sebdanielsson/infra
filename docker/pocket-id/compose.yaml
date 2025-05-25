@@ -4,17 +4,17 @@ services:
     image: ghcr.io/pocket-id/pocket-id:v1.0
     restart: unless-stopped
     ports:
-      - 3000:80
+      - 1411:1411
     volumes:
-      - data:/app/backend/data
+      - data:/app/data
     environment:
       - PUID=1000
       - PGID=1000
       - TRUST_PROXY=true
-      - PUBLIC_APP_URL=${PUBLIC_APP_URL}
+      - APP_URL=${APP_URL}
       - MAXMIND_LICENSE_KEY=${MAXMIND_LICENSE_KEY}
     healthcheck:
-      test: "curl -f http://localhost/healthz"
+      test: "curl -f http://localhost:1411/healthz"
       interval: 1m30s
       timeout: 5s
       retries: 2
