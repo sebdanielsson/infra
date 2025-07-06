@@ -1,7 +1,7 @@
 ---
 services:
   app:
-    image: ghcr.io/pocket-id/pocket-id:v1.5
+    image: ghcr.io/pocket-id/pocket-id:v1.6
     restart: unless-stopped
     ports:
       - 1411:1411
