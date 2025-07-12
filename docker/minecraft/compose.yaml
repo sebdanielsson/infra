@@ -2,7 +2,7 @@
 services:
   minecraft:
     container_name: minecraft
-    image: itzg/minecraft-bedrock-server:2025.6.0
+    image: itzg/minecraft-bedrock-server:2025.7.0
     environment:
       EULA: "TRUE"
       PACKAGE_BACKUP_KEEP: "2"
