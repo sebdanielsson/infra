@@ -1,8 +1,10 @@
 ---
 services:
   prometheus:
-    image: prom/prometheus:v3.5.0
     container_name: prometheus
+    image: prom/prometheus:v3.5.0
+    networks:
+      - prometheus
     ports:
       - 9090:9090
     volumes:
@@ -16,9 +18,11 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:12.0.2
     container_name: grafana
+    image: grafana/grafana:12.0.2
     depends_on:
+      - prometheus
+    networks:
       - prometheus
     ports:
       - 3000:3000
@@ -26,9 +30,15 @@ services:
       - grafana_data:/var/lib/grafana
     restart: unless-stopped
 
+networks:
+  prometheus:
+    name: prometheus-grafana
+
 volumes:
   prometheus_data:
     name: prometheus_data
+    external: true
 
   grafana_data:
     name: grafana_data
+    external: true

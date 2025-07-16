@@ -89,7 +89,6 @@ services:
 networks:
   medianet:
     name: medianet
-    external: true
 
 volumes:
   jellyfin_data:

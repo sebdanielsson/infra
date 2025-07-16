@@ -3,16 +3,28 @@ services:
   tsdproxy:
     container_name: tsdproxy
     image: almeidapaulopt/tsdproxy:2.0.0-beta4
+    networks:
+      - tsdproxy
+    ports:
+      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - data:/data
       - config:/config
-    ports:
-      - "8080:8080"
     labels:
       - tsdproxy.enable=true
       - tsdproxy.name=tsdproxy
     restart: unless-stopped
+
+networks:
+  tsdproxy:
+    name: tsdproxy
+
 volumes:
   data:
+    name: tsdproxy_data
+    external: true
+
   config:
+    name: tsdproxy_config
+    external: true

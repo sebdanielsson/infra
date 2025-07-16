@@ -3,6 +3,8 @@ services:
   portainer:
     container_name: portainer
     image: portainer/portainer-ee:2.31.3-alpine
+    networks:
+      - portainer
     ports:
       - "9443:9443"
       - "8000:8000"
@@ -11,6 +13,11 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
 
+networks:
+  portainer:
+    name: portainer
+
 volumes:
   portainer_data:
     name: portainer_data
+    external: true

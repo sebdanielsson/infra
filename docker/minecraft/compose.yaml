@@ -3,10 +3,12 @@ services:
   minecraft:
     container_name: minecraft
     image: itzg/minecraft-bedrock-server:2025.7.0
+    networks:
+      - minecraft
     environment:
       EULA: "TRUE"
       PACKAGE_BACKUP_KEEP: "2"
-      SERVER_NAME: "P.MADSEN"
+      SERVER_NAME: "Hogwarts"
       SERVER_PORT: "19132"
       SERVER_PORT_V6: "19133"
       GAMEMODE: "survival"
@@ -35,6 +37,12 @@ services:
       - "19132:19132/udp"
       - "19133:19133/udp"
     restart: unless-stopped
+
+networks:
+  minecraft:
+    name: minecraft
+
 volumes:
   minecraft:
     name: minecraft
+    external: true

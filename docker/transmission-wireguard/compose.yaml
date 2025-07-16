@@ -61,3 +61,4 @@ networks:
 volumes:
   transmission_data:
     name: transmission_data
+    external: true

@@ -1,12 +1,14 @@
 ---
 services:
   app:
+    container_name: pocket-id
     image: ghcr.io/pocket-id/pocket-id:v1.6
-    restart: unless-stopped
+    networks:
+      - pocket-id
     ports:
       - 1411:1411
     volumes:
-      - data:/app/data
+      - pocket-id_data:/app/data
     environment:
       - PUID=1000
       - PGID=1000
@@ -19,5 +21,13 @@ services:
       timeout: 5s
       retries: 2
       start_period: 10s
+    restart: unless-stopped
+
+networks:
+  pocket-id:
+    name: pocket-id
+
 volumes:
-  data:
+  pocket-id_data:
+    name: pocket-id_data
+    external: true

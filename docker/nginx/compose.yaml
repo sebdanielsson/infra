@@ -1,11 +1,17 @@
 ---
 services:
   nginx:
-    image: nginx:1.29.0-alpine
     container_name: nginx
+    image: nginx:1.29.0-alpine
+    networks:
+      - nginx
     ports:
       - "8765:80"
     volumes:
       - /opt/election-map:/usr/share/nginx/html:ro
       - ./default.conf:/etc/nginx/conf.d/default.conf:ro
     restart: unless-stopped
+
+networks:
+  nginx:
+    name: nginx

@@ -1,8 +1,13 @@
 services:
   app:
+    container_name: open-webui
     image: ghcr.io/open-webui/open-webui:0.6.16
+    networks:
+      - open-webui
+    ports:
+      - 8083:8080
     volumes:
-      - data:/app/backend/data
+      - open-webui_data:/app/backend/data
     environment:
       - OPENAI_API_BASE_URL=${OPENAI_API_BASE_URL}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
@@ -15,8 +20,6 @@ services:
       - OPENID_PROVIDER_URL=${OPENID_PROVIDER_URL}
       - OAUTH_PROVIDER_NAME=Pocket ID
       - OAUTH_SCOPES=openid profile email groups
-    ports:
-      - 8083:8080
     restart: unless-stopped
 
   pipelines:
@@ -24,13 +27,20 @@ services:
     environment:
       - PIPELINES_URLS="https://raw.githubusercontent.com/open-webui/pipelines/main/examples/pipelines/providers/anthropic_manifold_pipeline.py"
     volumes:
-      - pipelines:/app/pipelines
+      - open-webui_pipelines:/app/pipelines
     ports:
       - 9099:9099
     restart: unless-stopped
 
+networks:
+  open-webui:
+    name: open-webui
+
 volumes:
-  data:
-    driver: local
-  pipelines:
-    driver: local
+  open-webui_data:
+    name: open-webui_data
+    external: true
+
+  open-webui_pipelines:
+    name: open-webui_pipelines
+    external: true

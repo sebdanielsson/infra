@@ -1,9 +1,16 @@
 ---
 services:
   watchtower:
+    container_name: watchtower
     image: containrrr/watchtower:1.7.1
+    networks:
+      - watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       cleanup: true
     restart: unless-stopped
+
+networks:
+  watchtower:
+    name: watchtower
