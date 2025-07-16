@@ -1,6 +1,6 @@
-# Install FlightRadar24 ADSB Feed on Raspberry Pi
+# Install Flightradar24 ADSB Feed on Raspberry Pi
 
-This tutorial will guide you through manually installing the FlightRadar24 ADSB feeder on a Raspberry Pi.
+This tutorial will guide you through manually installing the Flightradar24 ADSB feeder on a Raspberry Pi.
 
 ## Prerequisites
 
@@ -9,7 +9,7 @@ This tutorial will guide you through manually installing the FlightRadar24 ADSB 
 
 ## Installation Steps
 
-### 1. Add the FlightRadar24 repository
+### 1. Add the Flightradar24 repository
 
 ```sh
 wget -O- https://repo-feed.flightradar24.com/flightradar24.pub | sudo gpg --dearmor | sudo tee /etc/apt/keyrings/flightradar24.gpg > /dev/null
@@ -17,36 +17,22 @@ echo "deb [signed-by=/etc/apt/keyrings/flightradar24.gpg] https://repo-feed.flig
 sudo apt update
 ```
 
-### 2. Install FlightRadar24 Feed Software
-
-Update package lists and install the fr24feed package:
-
-```sh
-# sudo apt install -y dump1090-mutability
-sudo apt install -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y fr24feed
-```
-
-### 3. Install Additional Dependencies
+### 3. Install Flightradar24 and dependencies
 
 Ensure you have the necessary dependencies installed:
 
 ```sh
-sudo apt install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" lighttpd librtlsdr0 libusb-1.0-0 dump1090-mutability
+sudo apt install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" fr24feed lighttpd librtlsdr0 libusb-1.0-0 dump1090-mutability
 sudo ln -fs /usr/bin/dump1090-mutability /usr/lib/fr24/dump1090
-sudo lighty-enable-mod dump1090 || true
-sudo service lighttpd force-reload || true
-sudo systemctl enable lighttpd || true
-sudo systemctl start lighttpd || true
+sudo lighty-enable-mod dump1090
+sudo systemctl enable --now lighttpd
 ```
 
-### 4. Start the fr24feed service
+### 3. Start the fr24feed service
 
-#### 4.1 Option 1: Start using existing sharing key
+You can start the fr24feed service in two ways: using an existing sharing key or without one.
 
-```sh
-sudo systemctl stop fr24feed || true
-sudo systemctl stop fr24uat-feed || true
-```
+#### 3.1 Option 1: Start using existing sharing key
 
 ```sh
 export SHARING_KEY="your_sharing_key_here"
@@ -66,7 +52,7 @@ bind-interface="0.0.0.0"
 EOF
 ```
 
-### 4.2 Option 2: Start without sharing key
+### 3.2 Option 2: Start without sharing key
 
 Run the ADSB signup wizard to configure your feeder:
 
@@ -81,16 +67,16 @@ During the signup process, you'll be prompted to:
 - Configure your receiver settings (antenna location, receiver type, etc.)
 - Set data sharing preferences
 
-### 5. Start and Enable Service
+### 4. Start and Enable Service
 
 After configuration, start and enable the service to run automatically:
 
 ```sh
-sudo systemctl start fr24feed
-sudo systemctl enable fr24feed
+sudo systemctl enable --now fr24feed
+sudo systemctl restart fr24feed # Only if /etc/fr24feed.ini was modified recently
 ```
 
-### 6. Verify Installation
+### 5. Verify Installation
 
 Check that the service is running properly:
 
