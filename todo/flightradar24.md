@@ -113,3 +113,29 @@ The Flightradar24 feeder web interface can accessed at: <http://flightradar:8754
 ### dump1090
 
 The dump1090 web interface, which provides a live map of aircraft, can be accessed at: <http://flightradar/dump1090>
+
+## Potential Issues
+
+### Wifi on Raspberry Pi
+
+If you plan on using wifi on your Raspberry Pi *NetworkManager* might enable rfkill (check with `rfkill list`). To get network connectivity back you need to enable wifi through NetworkManager.
+
+Check status and available networks:
+
+```sh
+nmcli device status
+nmcli dev wifi list
+```
+
+Connect to your WiFi network:
+
+```sh
+nmcli dev wifi connect Hogwarts password Horcrux10 ifname wlan0
+```
+
+Check status and connected networks to confirm:
+
+```sh
+nmcli device status
+nmcli dev wifi list
+```
