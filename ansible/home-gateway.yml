@@ -166,4 +166,3 @@
         user: sebastian
         key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"
         state: present
-
