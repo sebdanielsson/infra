@@ -3,11 +3,13 @@
   hosts: flightradar
   become: true
   vars:
+    ansible_python_interpreter: "/usr/bin/python3"
     service_account_token: "{{ lookup('env', 'OP_CREDENTIAL') }}" # Do not use OP_SERVICE_ACCOUNT_TOKEN as variable name since it will reduce access to private secrets on the local machine
     fr24_sharing_key: "{{ lookup('community.general.onepassword', 'fr24_sharing_key', field='credential', vault='prod', service_account_token=service_account_token) }}"
 
   handlers:
-    - import_tasks: handlers/main.yml
+    - name: Import handlers
+      ansible.builtin.import_tasks: handlers/main.yml
 
   roles:
     - name: Install and configure cloudflared
@@ -26,15 +28,75 @@
         tailscale_tags: ["server"]
       state: present
 
+    - name: Install Docker
+      role: geerlingguy.docker
+      vars:
+        docker_edition: ce
+        docker_yum_repo_enable_test: 0
+        docker_yum_repo_enable_nightly: 0
+        docker_packages_state: present
+        docker_install_compose_plugin: true
+        docker_compose_package: docker-compose-plugin
+        docker_compose_package_state: present
+        docker_install_compose: false
+        docker_users:
+          - sebastian
+        docker_service_manage: true
+        docker_service_state: started
+        docker_service_enabled: true
+        docker_restart_handler_state: restarted
+        docker_daemon_options:
+          log-driver: "json-file"
+          log-opts:
+            max-size: "10m"
+            max-file: "3"
+
   tasks:
     - name: Set hostname
       ansible.builtin.hostname:
         name: flightradar
         use: systemd
 
+    - name: Ensure net.ipv4.ip_forward is enabled
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_forward
+        value: "1"
+        sysctl_set: true
+        reload: true
+        sysctl_file: /etc/sysctl.d/99-tailscale.conf
+        state: present
+
+    - name: Ensure net.ipv6.conf.all.forwarding is enabled
+      ansible.posix.sysctl:
+        name: net.ipv6.conf.all.forwarding
+        value: "1"
+        sysctl_set: true
+        reload: true
+        sysctl_file: /etc/sysctl.d/99-tailscale.conf
+        state: present
+
+    - name: User sebastian exists
+      ansible.builtin.user:
+        name: sebastian
+        groups:
+          - adm
+          - sudo
+          - users
+        append: true
+        shell: /bin/bash
+        create_home: true
+        home: /home/sebastian
+        state: present
+
     - name: SSH authorized key for 'root'
       ansible.posix.authorized_key:
         user: root
+        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"
+        state: present
+
+    - name: SSH authorized key for 'sebastian'
+      ansible.posix.authorized_key:
+        user: sebastian
         key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"
         state: present
 
@@ -52,15 +114,43 @@
         line: "PasswordAuthentication no"
         state: present
 
+    - name: Copy sshd hardening config
+      ansible.builtin.copy:
+        src: 49-sshd-hardening.conf
+        dest: /etc/ssh/sshd_config.d/49-sshd-hardening.conf
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Copy ssh hardening config
+      ansible.builtin.copy:
+        src: 49-ssh-hardening.conf
+        dest: /etc/ssh/ssh_config.d/49-ssh-hardening.conf
+        owner: root
+        group: root
+        mode: "0644"
+
     - name: Install packages
       ansible.builtin.apt:
         name:
-          - python3-pip
-          - python3-setuptools
-          - python3-wheel
+          - python3-full
           - tmux
+          - apache2-utils
         update_cache: true
         state: present
 
+    - name: Deploy Portainer
+      community.docker.docker_container:
+        name: portainer
+        image: portainer/portainer-ee:2.31.3-alpine
+        state: started
+        restart_policy: always
+        published_ports:
+          - "9000:9000"
+          - "9443:9443"
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - portainer_data:/data
+
     - name: Install and configure Flightradar24
-      import_tasks: tasks/flightradar24.yml
+      ansible.builtin.import_tasks: tasks/flightradar24.yml

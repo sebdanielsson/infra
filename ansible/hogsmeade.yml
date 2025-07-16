@@ -5,6 +5,10 @@
     ansible_python_interpreter: "/usr/bin/python3"
     service_account_token: "{{ lookup('env', 'OP_CREDENTIAL') }}" # Do not use OP_SERVICE_ACCOUNT_TOKEN as variable name since it will reduce access to private secrets on the local machine
 
+  handlers:
+    - name: Import handlers
+      ansible.builtin.import_tasks: handlers/main.yml
+
   roles:
     - name: Install and configure cloudflared
       role: sebdanielsson.cloudflared
@@ -15,7 +19,7 @@
 
     - name: Install and configure Tailscale
       role: artis3n.tailscale.machine
-      tailscale_args: "--ssh --advertise-routes=192.168.1.0/24"
+      tailscale_args: "--ssh"
       vars:
         tailscale_authkey: "{{ lookup('community.general.onepassword', 'ts-server-oauth', field='credential', vault='prod', service_account_token=service_account_token) }}"
         tailscale_oauth_preauthorized: true
@@ -176,7 +180,6 @@
       ansible.builtin.apt:
         name:
           - python3-full
-          - python3-virtualenv
         state: present
 
     - name: Install required Python packages in the virtual environment
@@ -189,6 +192,7 @@
           - proxmoxer
         state: present
         virtualenv: ~/python_docker/venv
+        virtualenv_command: python3 -m venv
         virtualenv_site_packages: true
 
     - name: Synchronize docker files
@@ -209,12 +213,3 @@
 
     - name: Run all containers
       ansible.builtin.import_tasks: tasks/containers.yml
-
-      # - name: Create Fedora VM
-      #   ansible.builtin.import_tasks: tasks/fedora_vm.yml
-
-  handlers:
-    - name: Restart pveproxy
-      ansible.builtin.service:
-        name: pveproxy
-        state: restarted

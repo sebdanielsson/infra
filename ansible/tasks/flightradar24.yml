@@ -1,12 +1,12 @@
 ---
-- name: Add cloudflared repository
+- name: Add flightradar24 repository
   ansible.builtin.deb822_repository:
     name: flightradar24
     types: deb
-    uris: https://repo-feed.flightradar24.com
-    suites: raspberrypi-stable
-    components: flightradar24
     signed_by: https://repo-feed.flightradar24.com/flightradar24.pub
+    uris: https://repo-feed.flightradar24.com
+    suites: flightradar24
+    components: raspberrypi-stable
     state: present
 
 - name: Install Flightradar24 and dependencies
@@ -30,12 +30,12 @@
 - name: Enable dump1090 module for lighttpd
   ansible.builtin.command: lighty-enable-mod dump1090
   args:
-    creates: "{{ lookup('ansible.builtin.first_found', params={'files': lookup('ansible.builtin.find', paths='/etc/lighttpd/conf-enabled', patterns='*dump1090.conf', recurse=False).files | map(attribute='path') | list, 'skip': True}) }}"
+    creates: /etc/lighttpd/conf-enabled/89-dump1090.conf
 
 - name: Enable and start lighttpd service
   ansible.builtin.systemd:
     name: lighttpd
-    enabled: yes
+    enabled: true
     state: started
 
 - name: Configure fr24feed with sharing key
@@ -43,14 +43,14 @@
     src: fr24feed.ini.j2
     dest: /etc/fr24feed.ini
     mode: "0644"
-    backup: yes
-  notify: restart fr24feed
+    backup: true
+  notify: Restart fr24feed
   when: fr24_sharing_key is defined
 
 - name: Enable and start fr24feed service
   ansible.builtin.systemd:
     name: fr24feed
-    enabled: yes
+    enabled: true
     state: started
 
 - name: Wait for fr24feed service to be ready
@@ -59,7 +59,8 @@
     host: localhost
     delay: 10
     timeout: 60
-  ignore_errors: true
+  register: wait_for_fr24feed
+  failed_when: wait_for_fr24feed is failed and 'Timeout' not in wait_for_fr24feed.msg
 
 - name: Verify fr24feed service status
   ansible.builtin.systemd:

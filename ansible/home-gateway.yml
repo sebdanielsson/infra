@@ -7,6 +7,10 @@
     ansible_python_interpreter: /usr/bin/python3
     service_account_token: "{{ lookup('env', 'OP_SERVICE_ACCOUNT_TOKEN') }}"
 
+  handlers:
+    - name: Import handlers
+      ansible.builtin.import_tasks: handlers/main.yml
+
   tasks:
     - name: Check if python3 is installed
       ansible.builtin.raw: which python3
@@ -35,7 +39,7 @@
         fi
       register: dhcp_lan_ra_slaac
       changed_when: "'Removed ra_slaac from DHCP configuration' in dhcp_lan_ra_slaac.stdout"
-      notify: Commit changes
+      notify: UCI commit changes
 
     - name: Set Dropbear interface to LAN if not set
       ansible.builtin.shell: |
@@ -44,7 +48,7 @@
         fi
       register: dropbear_main_interface
       changed_when: "'Set dropbear interface to LAN' in dropbear_main_interface.stdout"
-      notify: Commit changes
+      notify: UCI commit changes
 
     - name: Set LAN IP address if different
       ansible.builtin.shell: |
@@ -53,7 +57,7 @@
         fi
       register: network_lan_ipaddr
       changed_when: "'Set LAN IP address to 192.168.100.1' in network_lan_ipaddr.stdout"
-      notify: Commit changes
+      notify: UCI commit changes
 
     - name: Set hostname if different
       ansible.builtin.shell: |
@@ -62,7 +66,7 @@
         fi
       register: system_cfg01e48a_hostname
       changed_when: "'Set hostname to bpi-r4' in system_cfg01e48a_hostname.stdout"
-      notify: Commit changes
+      notify: UCI commit changes
 
     - name: Set console log level if different
       ansible.builtin.shell: |
@@ -71,7 +75,7 @@
         fi
       register: system_cfg01e48a_conloglevel
       changed_when: "'Set console log level to 6' in system_cfg01e48a_conloglevel.stdout"
-      notify: Commit changes
+      notify: UCI commit changes
 
     - name: Enable HTTPS redirect in uHTTPd if not set
       ansible.builtin.shell: |
@@ -80,7 +84,7 @@
         fi
       register: uhttpd_main_redirect_https
       changed_when: "'Enabled HTTPS redirect in uHTTPd' in uhttpd_main_redirect_https.stdout"
-      notify: Commit changes
+      notify: UCI commit changes
 
     - name: Install packages
       community.general.opkg:
@@ -163,7 +167,3 @@
         key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"
         state: present
 
-  handlers:
-    - name: Commit changes
-      ansible.builtin.command: uci commit
-      changed_when: true

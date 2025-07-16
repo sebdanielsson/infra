@@ -1,5 +1,14 @@
 ---
-- name: restart fr24feed
+- name: Restart pveproxy
+  ansible.builtin.service:
+    name: pveproxy
+    state: restarted
+
+- name: Restart fr24feed
   ansible.builtin.systemd:
     name: fr24feed
     state: restarted
+
+- name: UCI commit changes
+  ansible.builtin.command: uci commit
+  changed_when: true
