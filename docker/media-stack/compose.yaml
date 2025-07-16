@@ -1,0 +1,102 @@
+---
+services:
+  jellyfin:
+    image: ghcr.io/linuxserver/jellyfin:10.10.7
+    container_name: jellyfin
+    networks:
+      - medianet
+    volumes:
+      - jellyfin_data:/config
+      - /certs/jellyfin:/certs
+      - /chungus/media/tvshows:/data/tvshows
+      - /chungus/media/movies:/data/movies
+    ports:
+      - "8920:8920"
+      - "8096:8096"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    restart: unless-stopped
+
+  ombi:
+    image: linuxserver/ombi:4.49.2-development
+    container_name: ombi
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    networks:
+      - medianet
+    volumes:
+      - ombi_data:/config
+    ports:
+      - "3579:3579"
+    restart: unless-stopped
+
+  radarr:
+    image: ghcr.io/linuxserver/radarr:5.26.2
+    container_name: radarr
+    networks:
+      - medianet
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    volumes:
+      - radarr_data:/config
+      - /chungus/media/movies:/movies
+      - /chungus/media/downloads:/downloads
+    ports:
+      - "7878:7878"
+    labels:
+      tsdproxy.enable: "true"
+      tsdproxy.name: "radarr"
+    restart: unless-stopped
+
+  sonarr:
+    image: ghcr.io/linuxserver/sonarr:4.0.15
+    container_name: sonarr
+    networks:
+      - medianet
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    volumes:
+      - sonarr_data:/config
+      - /chungus/media/tvshows:/tvshows
+      - /chungus/media/downloads:/downloads
+    ports:
+      - "8989:8989"
+    restart: unless-stopped
+
+  prowlarr:
+    image: ghcr.io/linuxserver/prowlarr:1.37.0
+    container_name: prowlarr
+    networks:
+      - medianet
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Stockholm
+    volumes:
+      - prowlarr_data:/config
+    ports:
+      - "9696:9696"
+    restart: unless-stopped
+
+networks:
+  medianet:
+
+volumes:
+  jellyfin_data:
+    name: jellyfin_data
+  ombi_data:
+    name: ombi_data
+  radarr_data:
+    name: radarr_data
+  sonarr_data:
+    name: sonarr_data
+  prowlarr_data:
+    name: prowlarr_data
