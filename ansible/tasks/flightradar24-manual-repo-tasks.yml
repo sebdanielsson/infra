@@ -1,0 +1,28 @@
+- name: Create APT keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Download and add Flightradar24 GPG key
+  ansible.builtin.get_url:
+    url: https://repo-feed.flightradar24.com/flightradar24.pub
+    dest: /tmp/flightradar24.pub
+    mode: "0644"
+
+- name: Import Flightradar24 GPG key
+  ansible.builtin.shell: |
+    gpg --dearmor < /tmp/flightradar24.pub > /etc/apt/keyrings/flightradar24.gpg
+  args:
+    creates: /etc/apt/keyrings/flightradar24.gpg
+
+- name: Clean up temporary GPG key file
+  ansible.builtin.file:
+    path: /tmp/flightradar24.pub
+    state: absent
+
+- name: Add Flightradar24 repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/flightradar24.gpg] https://repo-feed.flightradar24.com flightradar24 raspberrypi-stable"
+    filename: fr24feed
+    state: present

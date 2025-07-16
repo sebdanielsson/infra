@@ -1,0 +1,71 @@
+---
+- name: Add cloudflared repository
+  ansible.builtin.deb822_repository:
+    name: flightradar24
+    types: deb
+    uris: https://repo-feed.flightradar24.com
+    suites: raspberrypi-stable
+    components: flightradar24
+    signed_by: https://repo-feed.flightradar24.com/flightradar24.pub
+    state: present
+
+- name: Install Flightradar24 and dependencies
+  ansible.builtin.apt:
+    name:
+      - fr24feed
+      - lighttpd
+      - librtlsdr0
+      - libusb-1.0-0
+      - dump1090-mutability
+    update_cache: true
+    dpkg_options: "force-confdef,force-confold"
+    state: present
+
+- name: Create symbolic link for dump1090
+  ansible.builtin.file:
+    src: /usr/bin/dump1090-mutability
+    dest: /usr/lib/fr24/dump1090
+    state: link
+
+- name: Enable dump1090 module for lighttpd
+  ansible.builtin.command: lighty-enable-mod dump1090
+  args:
+    creates: "{{ lookup('ansible.builtin.first_found', params={'files': lookup('ansible.builtin.find', paths='/etc/lighttpd/conf-enabled', patterns='*dump1090.conf', recurse=False).files | map(attribute='path') | list, 'skip': True}) }}"
+
+- name: Enable and start lighttpd service
+  ansible.builtin.systemd:
+    name: lighttpd
+    enabled: yes
+    state: started
+
+- name: Configure fr24feed with sharing key
+  ansible.builtin.template:
+    src: fr24feed.ini.j2
+    dest: /etc/fr24feed.ini
+    mode: "0644"
+    backup: yes
+  notify: restart fr24feed
+  when: fr24_sharing_key is defined
+
+- name: Enable and start fr24feed service
+  ansible.builtin.systemd:
+    name: fr24feed
+    enabled: yes
+    state: started
+
+- name: Wait for fr24feed service to be ready
+  ansible.builtin.wait_for:
+    port: 8754
+    host: localhost
+    delay: 10
+    timeout: 60
+  ignore_errors: true
+
+- name: Verify fr24feed service status
+  ansible.builtin.systemd:
+    name: fr24feed
+  register: fr24feed_status
+
+- name: Display fr24feed service status
+  ansible.builtin.debug:
+    msg: "fr24feed service is {{ 'running' if fr24feed_status.status.ActiveState == 'active' else 'not running properly' }}"

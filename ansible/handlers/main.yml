@@ -1,0 +1,5 @@
+---
+- name: restart fr24feed
+  ansible.builtin.systemd:
+    name: fr24feed
+    state: restarted

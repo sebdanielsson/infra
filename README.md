@@ -96,7 +96,7 @@ cd ansible
 op run -- ansible-playbook sebastian-mba.yml --ask-become-pass
 ```
 
-**FlightRadar Host:**
+**Flightradar Host:**
 
 ```sh
 export OP_CREDENTIAL="op://Private/onkb65jhnceyyid7ope2zg5s2m/credential"

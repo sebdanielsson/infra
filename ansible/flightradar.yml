@@ -4,6 +4,10 @@
   become: true
   vars:
     service_account_token: "{{ lookup('env', 'OP_CREDENTIAL') }}" # Do not use OP_SERVICE_ACCOUNT_TOKEN as variable name since it will reduce access to private secrets on the local machine
+    fr24_sharing_key: "{{ lookup('community.general.onepassword', 'fr24_sharing_key', field='credential', vault='prod', service_account_token=service_account_token) }}"
+
+  handlers:
+    - import_tasks: handlers/main.yml
 
   roles:
     - name: Install and configure cloudflared
@@ -55,4 +59,8 @@
           - python3-setuptools
           - python3-wheel
           - tmux
+        update_cache: true
         state: present
+
+    - name: Install and configure Flightradar24
+      import_tasks: tasks/flightradar24.yml
