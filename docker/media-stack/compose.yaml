@@ -88,15 +88,26 @@ services:
 
 networks:
   medianet:
+    name: medianet
+    external: true
 
 volumes:
   jellyfin_data:
     name: jellyfin_data
+    external: true
+
   ombi_data:
     name: ombi_data
+    external: true
+
   radarr_data:
     name: radarr_data
+    external: true
+
   sonarr_data:
     name: sonarr_data
+    external: true
+
   prowlarr_data:
     name: prowlarr_data
+    external: true
