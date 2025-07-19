@@ -1,7 +1,7 @@
 services:
   app:
     container_name: open-webui
-    image: ghcr.io/open-webui/open-webui:0.6.16
+    image: ghcr.io/open-webui/open-webui:v0.6.18
     networks:
       - open-webui
     ports:
