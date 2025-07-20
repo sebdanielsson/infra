@@ -52,11 +52,11 @@
 
     - name: Set LAN IP address if different
       ansible.builtin.shell: |
-        if [ "$(uci get network.lan.ipaddr 2>/dev/null)" != "192.168.100.1" ]; then
-          uci set network.lan.ipaddr='192.168.100.1' && echo "Set LAN IP address to 192.168.100.1"
+        if [ "$(uci get network.lan.ipaddr 2>/dev/null)" != "192.168.1.1" ]; then
+          uci set network.lan.ipaddr='192.168.1.1' && echo "Set LAN IP address to 192.168.1.1"
         fi
       register: network_lan_ipaddr
-      changed_when: "'Set LAN IP address to 192.168.100.1' in network_lan_ipaddr.stdout"
+      changed_when: "'Set LAN IP address to 192.168.1.1' in network_lan_ipaddr.stdout"
       notify: UCI commit changes
 
     - name: Set hostname if different
