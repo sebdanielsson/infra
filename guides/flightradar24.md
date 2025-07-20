@@ -6,6 +6,7 @@ This tutorial will guide you through manually installing the Flightradar24 ADSB 
 
 - Raspberry Pi running a Debian-based OS (Raspberry Pi OS recommended)
 - ADSB receiver hardware (RTL-SDR dongle or similar)
+- Obtained a sharing key from Flightradar24. [Get your sharing key here.](https://www.flightradar24.com/account/data-sharing)
 
 ## Installation Steps
 
@@ -23,25 +24,40 @@ Ensure you have the necessary dependencies installed:
 
 ```sh
 sudo apt install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" fr24feed lighttpd librtlsdr0 libusb-1.0-0 dump1090-mutability
+```
+
+### 3. Start the fr24feed service
+
+You can start the fr24feed service in two ways: using dump1090-mutability or dump1090-fa.
+
+#### 3.1. Using dump1090-mutability
+
+If you're switching from dump1090-fa to dump1090-mutability, you need to disable dump1090-fa first:
+
+```sh
+sudo systemctl stop fr24feed
+sudo systemctl stop lighttpd
+sudo lighty-disable-mod skyaware
+sudo systemctl disable --now dump1090-fa
+```
+
+Then, install the necessary dependencies and dump1090-mutability:
+
+```sh
+sudo apt install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" lighttpd librtlsdr0 libusb-1.0-0 dump1090-mutability
 sudo ln -fs /usr/bin/dump1090-mutability /usr/lib/fr24/dump1090
 sudo lighty-enable-mod dump1090
 sudo systemctl enable --now lighttpd
 ```
 
-### 3. Start the fr24feed service
-
-You can start the fr24feed service in two ways: using an existing sharing key or without one.
-
-#### 3.1 Option 1: Start using existing sharing key
-
 ```sh
 export SHARING_KEY="your_sharing_key_here"
 cat <<EOF | sudo tee /etc/fr24feed.ini > /dev/null
-receiver="dvbt"
 fr24key="$SHARING_KEY"
+receiver="dvbt"
+path="/usr/lib/fr24/dump1090"
 bs="no"
 raw="no"
-path="/usr/lib/fr24/dump1090"
 logmode="1"
 procargs="--gain -10 --net"
 windowmode="0"
@@ -52,20 +68,47 @@ bind-interface="0.0.0.0"
 EOF
 ```
 
-### 3.2 Option 2: Start without sharing key
+#### 3.2. Using dump1090-fa
 
-Run the ADSB signup wizard to configure your feeder:
+If you're switching from dump1090-mutability to dump1090-fa, you need to disable dump1090-mutability first:
 
 ```sh
-sudo fr24feed-signup-adsb
+sudo systemctl stop fr24feed
+sudo systemctl stop lighttpd
+sudo lighty-disable-mod dump1090
 ```
 
-During the signup process, you'll be prompted to:
+Then, install the necessary dependencies and dump1090-fa:
 
-- Enter your email address
-- Provide your sharing key (if you have one) or create a new account
-- Configure your receiver settings (antenna location, receiver type, etc.)
-- Set data sharing preferences
+```sh
+wget https://www.flightaware.com/adsb/piaware/files/packages/pool/piaware/f/flightaware-apt-repository/flightaware-apt-repository_1.1_all.deb
+sudo dpkg -i flightaware-apt-repository_1.1_all.deb
+sudo rm flightaware-apt-repository_1.1_all.deb
+sudo apt update
+sudo apt install -y dump1090-fa
+sudo systemctl enable --now dump1090-fa
+sudo systemctl enable --now lighttpd
+```
+
+Then configure fr24feed to use dump1090-fa:
+
+```sh
+export SHARING_KEY="your_sharing_key_here"
+cat <<EOF | sudo tee /etc/fr24feed.ini > /dev/null
+fr24key="$SHARING_KEY"
+receiver="avr-tcp"
+host="127.0.0.1:30002"
+bs="no"
+raw="no"
+logmode="1"
+procargs="--gain -10 --net"
+windowmode="0"
+mpx="no"
+mlat="yes"
+mlat-without-gps="yes"
+bind-interface="0.0.0.0"
+EOF
+```
 
 ### 4. Start and Enable Service
 
@@ -73,7 +116,7 @@ After configuration, start and enable the service to run automatically:
 
 ```sh
 sudo systemctl enable --now fr24feed
-sudo systemctl restart fr24feed # Only if /etc/fr24feed.ini was modified recently
+sudo systemctl restart fr24feed
 ```
 
 ### 5. Verify Installation
