@@ -1,8 +1,10 @@
-receiver="dvbt"
 fr24key="{{ fr24_sharing_key }}"
+receiver="avr-tcp" # dump1090-fa
+host="127.0.0.1:30002" # dump1090-fa
+# receiver="dvbt" # dump1090-mutability
+# path="/usr/lib/fr24/dump1090" # dump1090-mutability
 bs="no"
 raw="no"
-path="/usr/lib/fr24/dump1090"
 logmode="1"
 procargs="--gain -10 --net"
 windowmode="0"
