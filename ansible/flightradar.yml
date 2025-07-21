@@ -57,6 +57,11 @@
         name: flightradar
         use: systemd
 
+    - name: Generate locale
+      community.general.locale_gen:
+        name: en_US.UTF-8
+        state: present
+
     - name: Ensure net.ipv4.ip_forward is enabled
       ansible.posix.sysctl:
         name: net.ipv4.ip_forward
