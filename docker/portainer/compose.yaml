@@ -2,7 +2,7 @@
 services:
   portainer:
     container_name: portainer
-    image: portainer/portainer-ee:2.31.3-alpine
+    image: portainer/portainer-ee:2.32.0-alpine
     networks:
       - portainer
     ports:
