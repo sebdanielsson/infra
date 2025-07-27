@@ -49,20 +49,18 @@ jobs:
           echo "Host *" >> ~/.ssh/config
           echo "  StrictHostKeyChecking no" >> ~/.ssh/config
 
+      - name: Load secrets from dotenvx
+        id: dotenvx
+        uses: andreijiroh-dev/dotenvx-action@v0.4.0
+        with:
+          path: .env.ci
+          key: ${{ secrets.DOTENVX_KEY }}
+          inject-env-vars: false
+
       - name: Install 1Password CLI
         uses: 1password/install-cli-action@v1
         with:
           version: latest
-
-      - name: Load secret ts-authkey
-        id: op-load-ts-authkey
-        uses: 1password/load-secrets-action@v2
-        with:
-          export-env: false
-        env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          TS_CLIENTID: op://prod/ts-gh-action-oauth/username
-          TS_CLIENTSECRET: op://prod/ts-gh-action-oauth/credential
 
       - name: Get latest Tailscale version
         id: get_latest_ts_version
@@ -73,8 +71,8 @@ jobs:
         uses: tailscale/github-action@v3
         with:
           version: ${{ steps.get_latest_ts_version.outputs.ts_latest }} # or "steps.get_latest_ts_version.outputs.ts_latest" for latest
-          oauth-client-id: ${{ steps.op-load-ts-authkey.outputs.TS_CLIENTID }}
-          oauth-secret: ${{ steps.op-load-ts-authkey.outputs.TS_CLIENTSECRET }}
+          oauth-client-id: ${{ steps.dotenvx.outputs.TS_CLIENTID }}
+          oauth-secret: ${{ steps.dotenvx.outputs.TS_CLIENTSECRET }}
           tags: tag:ci
 
       - name: Check connection

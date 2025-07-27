@@ -39,3 +39,6 @@ terraform.rc
 
 # Ignore .ansible directory
 .ansible/
+
+# dotenvx decryption keys
+.env.keys
