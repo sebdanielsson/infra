@@ -14,8 +14,8 @@
   tasks:
     - name: Remove `ra_slaac` from DHCP configuration if it exists
       ansible.builtin.shell: |
-        if uci get dhcp.lan.ra_slaac >/dev/null 2>&1; then
-          uci del dhcp.lan.ra_slaac && echo "Removed ra_slaac from DHCP configuration"
+        if /sbin/uci get dhcp.lan.ra_slaac >/dev/null 2>&1; then
+          /sbin/uci del dhcp.lan.ra_slaac && echo "Removed ra_slaac from DHCP configuration"
         fi
       register: dhcp_lan_ra_slaac
       changed_when: "'Removed ra_slaac from DHCP configuration' in dhcp_lan_ra_slaac.stdout"
@@ -23,8 +23,8 @@
 
     - name: Set Dropbear interface to LAN if not set
       ansible.builtin.shell: |
-        if [ "$(uci get dropbear.main.Interface 2>/dev/null)" != "lan" ]; then
-          uci set dropbear.main.Interface='lan' && echo "Set Dropbear interface to LAN"
+        if [ "$(/sbin/uci get dropbear.main.Interface 2>/dev/null)" != "lan" ]; then
+          /sbin/uci set dropbear.main.Interface='lan' && echo "Set Dropbear interface to LAN"
         fi
       register: dropbear_main_interface
       changed_when: "'Set dropbear interface to LAN' in dropbear_main_interface.stdout"
@@ -32,8 +32,8 @@
 
     - name: Set LAN IP address if different
       ansible.builtin.shell: |
-        if [ "$(uci get network.lan.ipaddr 2>/dev/null)" != "192.168.1.1" ]; then
-          uci set network.lan.ipaddr='192.168.1.1' && echo "Set LAN IP address to 192.168.1.1"
+        if [ "$(/sbin/uci get network.lan.ipaddr 2>/dev/null)" != "192.168.1.1" ]; then
+          /sbin/uci set network.lan.ipaddr='192.168.1.1' && echo "Set LAN IP address to 192.168.1.1"
         fi
       register: network_lan_ipaddr
       changed_when: "'Set LAN IP address to 192.168.1.1' in network_lan_ipaddr.stdout"
@@ -41,8 +41,8 @@
 
     - name: Set hostname if different
       ansible.builtin.shell: |
-        if [ "$(uci get system.cfg01e48a.hostname 2>/dev/null)" != "bpi-r4" ]; then
-          uci set system.cfg01e48a.hostname='bpi-r4' && echo "Set hostname to bpi-r4"
+        if [ "$(/sbin/uci get system.cfg01e48a.hostname 2>/dev/null)" != "bpi-r4" ]; then
+          /sbin/uci set system.cfg01e48a.hostname='bpi-r4' && echo "Set hostname to bpi-r4"
         fi
       register: system_cfg01e48a_hostname
       changed_when: "'Set hostname to bpi-r4' in system_cfg01e48a_hostname.stdout"
@@ -50,8 +50,8 @@
 
     - name: Set console log level if different
       ansible.builtin.shell: |
-        if [ "$(uci get system.cfg01e48a.conloglevel 2>/dev/null)" != "6" ]; then
-          uci set system.cfg01e48a.conloglevel='6' && echo "Set console log level to 6"
+        if [ "$(/sbin/uci get system.cfg01e48a.conloglevel 2>/dev/null)" != "6" ]; then
+          /sbin/uci set system.cfg01e48a.conloglevel='6' && echo "Set console log level to 6"
         fi
       register: system_cfg01e48a_conloglevel
       changed_when: "'Set console log level to 6' in system_cfg01e48a_conloglevel.stdout"
@@ -59,8 +59,8 @@
 
     - name: Enable HTTPS redirect in uHTTPd if not set
       ansible.builtin.shell: |
-        if [ "$(uci get uhttpd.main.redirect_https 2>/dev/null)" != "1" ]; then
-          uci set uhttpd.main.redirect_https='1' && echo "Enabled HTTPS redirect in uHTTPd"
+        if [ "$(/sbin/uci get uhttpd.main.redirect_https 2>/dev/null)" != "1" ]; then
+          /sbin/uci set uhttpd.main.redirect_https='1' && echo "Enabled HTTPS redirect in uHTTPd"
         fi
       register: uhttpd_main_redirect_https
       changed_when: "'Enabled HTTPS redirect in uHTTPd' in uhttpd_main_redirect_https.stdout"
