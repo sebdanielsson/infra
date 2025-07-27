@@ -110,7 +110,7 @@
 
     - name: Login to Tailscale
       ansible.builtin.command: /usr/sbin/tailscale up --ssh --authkey "{{ lookup('env', 'TAILSCALE_AUTHKEY_ROUTER') }}"
-      when: '"Logged out" or "Tailscale is stopped" in tailscale_status.stdout'
+      when: '"Logged out" in tailscale_status.stdout or "Tailscale is stopped" in tailscale_status.stdout'
       register: tailscale_login
       changed_when: tailscale_login.stdout != ''
 
