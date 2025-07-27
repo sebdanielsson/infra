@@ -77,7 +77,7 @@ dotenvx run -f .env -f .env.flightradar -- ansible-playbook -i ./inventory.yml .
 **Home Gateway (ER-X):**
 
 ```sh
-dotenvx run -f .env -f .env.home-gateway -- ansible-playbook -i ./inventory.yml ./home-gateway.yml
+dotenvx run -f .env -f .env.home_gateway -- ansible-playbook -i ./inventory.yml ./home-gateway.yml
 ```
 
 **MacBook (sebastian-mba):**
