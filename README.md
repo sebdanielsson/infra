@@ -60,48 +60,30 @@ Before running playbooks, ensure you have:
 
 ### Available Playbooks
 
-#### Proxmox Nodes (Group Playbook)
-
-Manages Proxmox virtualization hosts:
-
-```sh
-export OP_CREDENTIAL="op://Private/onkb65jhnceyyid7ope2zg5s2m/credential"
-cd ansible
-op run -- ansible-playbook -i ./inventory.yml ./proxmox_nodes.yml
-```
-
 #### Individual Host Playbooks
 
 **Hogsmeade Host:**
 
 ```sh
-export OP_CREDENTIAL="op://Private/onkb65jhnceyyid7ope2zg5s2m/credential"
-cd ansible
-op run -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml
-```
-
-**Home Gateway (ER-X):**
-
-```sh
-export OP_CREDENTIAL="op://Private/onkb65jhnceyyid7ope2zg5s2m/credential"
-cd ansible
-op run -- ansible-playbook -i ./inventory.yml ./home-gateway.yml
-```
-
-**MacBook (sebastian-mba):**
-
-```sh
-export OP_CREDENTIAL="op://Private/onkb65jhnceyyid7ope2zg5s2m/credential"
-cd ansible
-op run -- ansible-playbook sebastian-mba.yml --ask-become-pass
+dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml
 ```
 
 **Flightradar Host:**
 
 ```sh
-export OP_CREDENTIAL="op://Private/onkb65jhnceyyid7ope2zg5s2m/credential"
-cd ansible
-op run -- ansible-playbook -i ./inventory.yml ./flightradar.yml
+dotenvx run -f .env -f .env.flightradar -- ansible-playbook -i ./inventory.yml ./flightradar.yml
+```
+
+**Home Gateway (ER-X):**
+
+```sh
+dotenvx run -f .env -f .env.home-gateway -- ansible-playbook -i ./inventory.yml ./home-gateway.yml
+```
+
+**MacBook (sebastian-mba):**
+
+```sh
+dotenvx run -f .env -- ansible-playbook sebastian-mba.yml --ask-become-pass
 ```
 
 ### Dry Run (Check Mode)
@@ -109,8 +91,7 @@ op run -- ansible-playbook -i ./inventory.yml ./flightradar.yml
 To test playbooks without making changes, add the `--check` flag:
 
 ```sh
-cd ansible
-op run -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml --check
+dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml --check
 ```
 
 ### Verbose Output
@@ -119,9 +100,9 @@ For detailed execution information, use verbose flags:
 
 ```sh
 cd ansible
-op run -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml -v   # verbose
-op run -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml -vv  # more verbose
-op run -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml -vvv # debug
+dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml -v   # verbose
+dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml -vv  # more verbose
+dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml -vvv # debug
 ```
 
 ## Docker Services
@@ -183,21 +164,6 @@ yamllint .
 2. **Start with a single host** using `--limit hostname`
 3. **Use tags** to run specific tasks: `--tags "docker,security"`
 
-### Example Testing Commands
-
-```sh
-cd ansible
-
-# Test syntax only
-ansible-playbook --syntax-check -i ./inventory.yml ./hogsmeade.yml
-
-# Run against single host
-op run -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml --limit hogsmeade --check
-
-# Run specific tags
-op run -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml --tags "docker"
-```
-
 ## Troubleshooting
 
 ### Common Issues
@@ -206,7 +172,6 @@ op run -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml --tags "docker"
 2. **Missing dependencies:** Re-run `pip install -r ansible/requirements.txt --force-reinstall`
 3. **Ansible collections missing:** Re-run `ansible-galaxy install -r ansible/requirements.yml --force`
 4. **SSH connection issues:** Verify SSH key authentication and host connectivity
-5. **1Password CLI issues:** Ensure you're logged in with `op signin`
 
 ### Debug Commands
 

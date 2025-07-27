@@ -14,6 +14,6 @@ all:
     routers:
       hosts:
         bpi-r4:
-          ansible_user: root
+          ansible_user: sebastian
           # ansible_ssh_pass: "initalbootpassword"
           ansible_host: 192.168.1.1

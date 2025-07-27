@@ -3,25 +3,55 @@
   hosts: hogsmeade
   vars:
     ansible_python_interpreter: "/usr/bin/python3"
-    service_account_token: "{{ lookup('env', 'OP_CREDENTIAL') }}" # Do not use OP_SERVICE_ACCOUNT_TOKEN as variable name since it will reduce access to private secrets on the local machine
 
   handlers:
     - name: Import handlers
       ansible.builtin.import_tasks: handlers/main.yml
 
   roles:
+    - name: Remove PVE subscription nag, enable Dark Theme and manage repos
+      role: simoncaron.pve_addons
+      vars:
+        pve_addons_enable_dark_theme: false
+        pve_addons_remove_subscription_nag: true
+        pve_addons_disable_enterprise_repo: true
+        pve_addons_add_no_subscription_repo: true
+
+    - name: Install Docker
+      role: geerlingguy.docker
+      vars:
+        docker_edition: ce
+        docker_yum_repo_enable_test: 0
+        docker_yum_repo_enable_nightly: 0
+        docker_packages_state: present
+        docker_install_compose_plugin: true
+        docker_compose_package: docker-compose-plugin
+        docker_compose_package_state: present
+        docker_install_compose: false
+        docker_users:
+          - sebastian
+        docker_service_manage: true
+        docker_service_state: started
+        docker_service_enabled: true
+        docker_restart_handler_state: restarted
+        docker_daemon_options:
+          log-driver: "json-file"
+          log-opts:
+            max-size: "10m"
+            max-file: "3"
+
     - name: Install and configure cloudflared
       role: sebdanielsson.cloudflared
       vars:
         cloudflare_tunnel_enable: true
-        cloudflare_tunnel_credential: "{{ lookup('community.general.onepassword', 'cloudflare-tunnel-hogsmeade', field='credential', vault='prod', service_account_token=service_account_token) }}"
+        cloudflare_tunnel_credential: "{{ lookup('env', 'CLOUDFLARE_TUNNEL_HOGSMEADE') }}"
       state: present
 
     - name: Install and configure Tailscale
       role: artis3n.tailscale.machine
       tailscale_args: "--ssh"
       vars:
-        tailscale_authkey: "{{ lookup('community.general.onepassword', 'ts-server-oauth', field='credential', vault='prod', service_account_token=service_account_token) }}"
+        tailscale_authkey: "{{ lookup('env', 'TAILSCALE_SERVER_OAUTH') }}"
         tailscale_oauth_preauthorized: true
         tailscale_tags: ["server"]
       state: present
@@ -29,16 +59,60 @@
     - name: Configure ACME on Proxmox node
       role: simoncaron.pve_acme
       vars:
-        pve_acme_domain: "{{ lookup('community.general.onepassword', 'proxmox-acme', field='pve_acme_domain', vault='prod', service_account_token=service_account_token) }}"
+        pve_acme_domain: "{{ lookup('env', 'PVE_ACME_DOMAIN') }}"
         pve_acme_account_name: default
-        pve_acme_account_email: "{{ lookup('community.general.onepassword', 'proxmox-acme', field='pve_acme_account_email', vault='prod', service_account_token=service_account_token) }}"
+        pve_acme_account_email: "{{ lookup('env', 'PVE_ACME_ACCOUNT_EMAIL') }}"
         pve_acme_account_directory: "https://acme-v02.api.letsencrypt.org/directory"
         pve_acme_validation_delay: "30"
         pve_acme_plugin_name: "cloudflare"
         pve_acme_plugin_api: "cf"
-        pve_acme_plugin_data: "{{ lookup('community.general.onepassword', 'proxmox-acme', field='pve_acme_plugin_data', vault='prod', service_account_token=service_account_token) }}"
+        pve_acme_plugin_data: "{{ lookup('env', 'PVE_ACME_PLUGIN_DATA') }}"
 
   tasks:
+    - name: SSH authorized key for 'root'
+      ansible.posix.authorized_key:
+        user: root
+        key: "{{ lookup('env', 'SEBASTIAN_SSH_PUBLIC_KEY') }}"
+        state: present
+
+    - name: Copy sshd hardening config
+      ansible.builtin.copy:
+        src: 49-sshd-hardening.conf
+        dest: /etc/ssh/sshd_config.d/49-sshd-hardening.conf
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Copy ssh hardening config
+      ansible.builtin.copy:
+        src: 49-ssh-hardening.conf
+        dest: /etc/ssh/ssh_config.d/49-ssh-hardening.conf
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Ensure 'sebastian' user exists
+      ansible.builtin.user:
+        name: sebastian
+        shell: /bin/bash
+        group: sebastian
+        groups: root,docker
+        append: true
+        state: present
+
+    - name: SSH authorized key for 'sebastian'
+      ansible.posix.authorized_key:
+        user: sebastian
+        key: "{{ lookup('env', 'SEBASTIAN_SSH_PUBLIC_KEY') }}"
+        state: present
+
+    - name: Install python3-full
+      ansible.builtin.apt:
+        name:
+          - nfs-kernel-server
+          - python3-full
+        state: present
+
     - name: Ensure net.ipv4.ip_forward is enabled
       ansible.posix.sysctl:
         name: net.ipv4.ip_forward
@@ -97,7 +171,7 @@
       ansible.builtin.lineinfile:
         path: /etc/letsencrypt/cloudflare.ini
         regexp: "^dns_cloudflare_api_token"
-        line: "dns_cloudflare_api_token = {{ lookup('community.general.onepassword', 'cloudflare-certbot-api-token', field='credential', vault='prod', service_account_token=service_account_token) }}"
+        line: "dns_cloudflare_api_token = {{ lookup('env', 'CLOUDFLARE_CERTBOT_API_TOKEN') }}"
         create: true
         mode: "0640"
         state: present
@@ -108,7 +182,7 @@
         block: |
           #!/bin/sh
           mkdir -p /certs/jellyfin
-          openssl pkcs12 -export -password pass:{{ lookup('community.general.onepassword', 'certbot-jellyfin', field='pkcs12_password', vault='prod', service_account_token=service_account_token) }} -out /certs/jellyfin/jellyfin.pfx -inkey /etc/letsencrypt/live/{{ lookup('community.general.onepassword', 'certbot-jellyfin', field='domain', vault='prod', service_account_token=service_account_token) }}/privkey.pem -in /etc/letsencrypt/live/{{ lookup('community.general.onepassword', 'certbot-jellyfin', field='domain', vault='prod', service_account_token=service_account_token) }}/cert.pem
+          openssl pkcs12 -export -password pass:{{ lookup('env', 'CERTBOT_JELLYFIN_PKCS12_PASSWORD') }} -out /certs/jellyfin/jellyfin.pfx -inkey /etc/letsencrypt/live/{{ lookup('env', 'CERTBOT_JELLYFIN_DOMAIN') }}/privkey.pem -in /etc/letsencrypt/live/{{ lookup('env', 'CERTBOT_JELLYFIN_DOMAIN') }}/cert.pem
           chmod 755 /certs/jellyfin/jellyfin.pfx
           chown root:docker /certs/jellyfin/jellyfin.pfx
         create: true
@@ -126,7 +200,7 @@
 
           [Service]
           Type=oneshot
-          ExecStart=/root/python_docker/venv/bin/certbot renew --quiet --cert-name {{ lookup('community.general.onepassword', 'certbot-jellyfin', field='domain', vault='prod', service_account_token=service_account_token) }} --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/jellyfin-pkcs12.sh
+          ExecStart=/root/python_docker/venv/bin/certbot renew --quiet --cert-name {{ lookup('env', 'CERTBOT_JELLYFIN_DOMAIN') }} --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/jellyfin-pkcs12.sh
           PrivateTmp=true
 
     - name: Create certbot-renew-jellyfin.timer
@@ -157,7 +231,7 @@
         ~/python_docker/venv/bin/certbot certonly \
         --dns-cloudflare \
         --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini \
-        --email {{ lookup('community.general.onepassword', 'certbot-jellyfin', field='email', vault='prod', service_account_token=service_account_token) }} \
+        --email {{ lookup('env', 'CERTBOT_JELLYFIN_EMAIL') }} \
         --agree-tos \
         --key-type ecdsa \
         --elliptic-curve secp384r1 \
@@ -165,9 +239,9 @@
         --hsts \
         --uir \
         --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/jellyfin-pkcs12.sh \
-        --domain {{ lookup('community.general.onepassword', 'certbot-jellyfin', field='domain', vault='prod', service_account_token=service_account_token) }}
+        --domain {{ lookup('env', 'CERTBOT_JELLYFIN_DOMAIN') }}
       args:
-        creates: /etc/letsencrypt/live/{{ lookup('community.general.onepassword', 'certbot-jellyfin', field='domain', vault='prod', service_account_token=service_account_token) }}/fullchain.pem
+        creates: /etc/letsencrypt/live/{{ lookup('env', 'CERTBOT_JELLYFIN_DOMAIN') }}/fullchain.pem
 
     - name: Create ZFS filesystem and set sharenfs property
       community.general.zfs:

@@ -1,8 +1,6 @@
 ---
 - name: Configure Sebastian's MacBook Air
   hosts: localhost
-  vars:
-    service_account_token: "{{ lookup('env', 'OP_CREDENTIAL') }}" # Do not use OP_SERVICE_ACCOUNT_TOKEN as variable name since it will reduce access to private secrets on the local machine
 
   tasks:
     - name: Set hostname
@@ -13,7 +11,7 @@
     - name: SSH authorized key for 'sebastian'
       ansible.posix.authorized_key:
         user: sebastian
-        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"
+        key: "{{ lookup('env', 'SEBASTIAN_SSH_PUBLIC_KEY') }}"
         state: present
 
     - name: Copy sshd hardening config
@@ -37,12 +35,10 @@
     - name: Add Homebrew taps
       community.general.homebrew_tap:
         name:
-          - charmbracelet/tap
           - cloudflare/cloudflare
           - dotenvx/brew
           - hashicorp/tap
           - oven-sh/bun
-          - pulumi/tap/pulumi
           - teamookla/speedtest
         state: present
 
@@ -61,7 +57,6 @@
           - bash
           - bat
           - bottom
-          - charmbracelet/tap/mods
           - cloudflare/cloudflare/cf-terraforming
           - coreutils
           - curl
@@ -69,6 +64,7 @@
           - dotenvx/brew/dotenvx
           - fd
           - fio
+          - fnm
           - fx
           - git
           - hashicorp/tap/terraform
@@ -78,10 +74,7 @@
           - mtr
           - nano
           - nmap
-          - node@20
-          - node@22
           - oven-sh/bun/bun
-          - pulumi/tap/pulumi
           - rsync
           - shellcheck
           - ssh-audit
@@ -173,7 +166,6 @@
 - name: Order the dock
   hosts: localhost
   vars:
-    service_account_token: "{{ lookup('env', 'OP_SERVICE_ACCOUNT_TOKEN') }}"
     dockutil_install: false
     # dockitems_remove:  # Need to figure out what the default dock items are first
     dockitems_persist:

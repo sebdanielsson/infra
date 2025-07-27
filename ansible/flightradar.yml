@@ -4,8 +4,6 @@
   become: true
   vars:
     ansible_python_interpreter: "/usr/bin/python3"
-    service_account_token: "{{ lookup('env', 'OP_CREDENTIAL') }}" # Do not use OP_SERVICE_ACCOUNT_TOKEN as variable name since it will reduce access to private secrets on the local machine
-    fr24_sharing_key: "{{ lookup('community.general.onepassword', 'fr24_sharing_key', field='credential', vault='prod', service_account_token=service_account_token) }}"
 
   handlers:
     - name: Import handlers
@@ -16,14 +14,14 @@
       role: sebdanielsson.cloudflared
       vars:
         cloudflare_tunnel_enable: true
-        cloudflare_tunnel_credential: "{{ lookup('community.general.onepassword', 'cloudflare-tunnel-flightradar', field='credential', vault='prod', service_account_token=service_account_token) }}"
+        cloudflare_tunnel_credential: "{{ lookup('env', 'CLOUDFLARE_TUNNEL_FLIGHTRADAR') }}"
       state: present
 
     - name: Install and configure Tailscale
       role: artis3n.tailscale.machine
       tailscale_args: "--ssh"
       vars:
-        tailscale_authkey: "{{ lookup('community.general.onepassword', 'ts-server-oauth', field='credential', vault='prod', service_account_token=service_account_token) }}"
+        tailscale_authkey: "{{ lookup('env', 'TAILSCALE_SERVER_OAUTH') }}"
         tailscale_oauth_preauthorized: true
         tailscale_tags: ["server"]
       state: present
@@ -96,13 +94,13 @@
     - name: SSH authorized key for 'root'
       ansible.posix.authorized_key:
         user: root
-        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"
+        key: "{{ lookup('env', 'SEBASTIAN_SSH_PUBLIC_KEY') }}"
         state: present
 
     - name: SSH authorized key for 'sebastian'
       ansible.posix.authorized_key:
         user: sebastian
-        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"
+        key: "{{ lookup('env', 'SEBASTIAN_SSH_PUBLIC_KEY') }}"
         state: present
 
     - name: Disable root login over SSH

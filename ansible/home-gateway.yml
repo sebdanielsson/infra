@@ -1,7 +1,7 @@
 ---
 - name: Configure home gateway
   hosts: bpi-r4
-  gather_facts: false
+  become: true
 
   vars:
     ansible_python_interpreter: /usr/bin/python3
@@ -12,26 +12,6 @@
       ansible.builtin.import_tasks: handlers/main.yml
 
   tasks:
-    - name: Check if python3 is installed
-      ansible.builtin.raw: which python3
-      changed_when: false
-      failed_when: python_check.rc not in [0, 1]
-      register: python_check
-
-    - name: Install python3
-      ansible.builtin.raw: opkg update && opkg install python3
-      when: python_check.rc != 0
-      register: opkg_install_python3
-      changed_when: '"installed in root is up to date" not in opkg_install_python3.stdout'
-
-    - name: End the play if python3 was not installed previously
-      ansible.builtin.meta: end_host
-      when:
-        - python_check.rc != 0
-
-    - name: Gather facts
-      ansible.builtin.setup:
-
     - name: Remove `ra_slaac` from DHCP configuration if it exists
       ansible.builtin.shell: |
         if uci get dhcp.lan.ra_slaac >/dev/null 2>&1; then
@@ -129,7 +109,7 @@
       failed_when: tailscale_status.rc not in [0, 1]
 
     - name: Login to Tailscale
-      ansible.builtin.command: tailscale up --ssh --authkey "{{ lookup('community.general.onepassword', 'ts-authkey-router', field='credential', vault='prod', service_account_token=service_account_token) }} && tailscale status"
+      ansible.builtin.command: tailscale up --ssh --authkey "{{ lookup('env', 'TAILSCALE_AUTHKEY_ROUTER') }} && tailscale status"
       when: '"Logged out" or "Tailscale is stopped" in tailscale_status.stdout'
       register: tailscale_login
       changed_when: tailscale_login.stdout != ''
@@ -148,21 +128,23 @@
         createhome: true
         state: present
 
-    - name: Add group 'sudo' to sudoers
-      community.general.sudoers:
-        name: sudo-group
-        commands: ALL
-        group: sudo
-        state: present
-
     - name: SSH authorized key for 'root'
       ansible.posix.authorized_key:
         user: root
-        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"
+        key: "{{ lookup('env', 'SEBASTIAN_SSH_PUBLIC_KEY') }}"
+        path: /etc/dropbear/authorized_keys
+        manage_dir: false
         state: present
 
     - name: SSH authorized key for 'sebastian'
       ansible.posix.authorized_key:
         user: sebastian
-        key: "{{ lookup('community.general.onepassword', 'Sebastian SSH Public Key', field='public key', vault='prod', service_account_token=service_account_token) }}"
+        key: "{{ lookup('env', 'SEBASTIAN_SSH_PUBLIC_KEY') }}"
+        state: present
+
+    - name: Add group 'sudo' to sudoers
+      community.general.sudoers:
+        name: sudo-group
+        commands: ALL
+        group: sudo
         state: present

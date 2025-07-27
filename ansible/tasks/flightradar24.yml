@@ -95,7 +95,9 @@
     mode: "0644"
     backup: true
   notify: Restart fr24feed
-  when: fr24_sharing_key is defined
+  vars:
+    fr24_sharing_key: "{{ lookup('env', 'FR24_SHARING_KEY') }}"
+  when: fr24_sharing_key is defined and fr24_sharing_key != ""
 
 - name: Enable and start fr24feed service
   ansible.builtin.systemd:

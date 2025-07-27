@@ -81,5 +81,3 @@ jobs:
       - name: Run playbook
         run: |
           ansible-playbook -i inventory.yml hogsmeade.yml
-        env:
-          OP_CREDENTIAL: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
