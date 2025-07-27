@@ -78,6 +78,11 @@ jobs:
       - name: Check connection
         run: tailscale ping --icmp hogsmeade
 
-      - name: Run playbook
-        run: |
-          ansible-playbook -i inventory.yml hogsmeade.yml
+      # - name: Run playbook hogsmeade
+      #   run: dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml
+
+      - name: Run playbook flightradar
+        run: dotenvx run -f .env -f .env.flightradar -- ansible-playbook -i ./inventory.yml ./flightradar.yml
+
+      - name: Run playbook bpi-r4
+        run: dotenvx run -f .env -f .env.home-gateway -- ansible-playbook -i ./inventory.yml ./home-gateway.yml
