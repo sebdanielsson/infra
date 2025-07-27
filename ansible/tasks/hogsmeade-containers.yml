@@ -1,0 +1,121 @@
+---
+# Decrypt all .env files in docker directories before deployment
+- name: Find all .env files in docker directories
+  ansible.builtin.find:
+    paths: /docker
+    patterns: ".env"
+    file_type: file
+    recurse: true
+    depth: 2
+  register: docker_env_files
+
+- name: Decrypt .env files using dotenvx
+  ansible.builtin.command:
+    cmd: dotenvx decrypt -f {{ item.path }}
+    chdir: "{{ item.path | dirname }}"
+  loop: "{{ docker_env_files.files }}"
+  when: docker_env_files.files | length > 0
+  changed_when: false
+
+# Jinja2 templates
+- name: Add wireguard secrets
+  ansible.builtin.template:
+    src: ../../docker/transmission-wireguard/wg0.conf.j2
+    dest: /docker/transmission-wireguard/wg0.conf
+    mode: "0640"
+  vars:
+    private_key: "{{ lookup('env', 'WG_PRIVATE_KEY') }}"
+    public_key: "{{ lookup('env', 'WG_PUBLIC_KEY') }}"
+    endpoint: "{{ lookup('env', 'WG_ENDPOINT') }}"
+
+# Deployments
+
+## transmission-wireguard
+- name: Deploy transmission-wireguard
+  community.docker.docker_compose_v2:
+    project_src: /docker/transmission-wireguard
+    pull: always
+    state: present
+
+## media services
+- name: Deploy media-stack
+  community.docker.docker_compose_v2:
+    project_src: /docker/media-stack
+    pull: always
+    state: present
+
+## Infrastructure services
+- name: Deploy Pocket ID
+  community.docker.docker_compose_v2:
+    project_src: /docker/pocket-id
+    pull: always
+    state: present
+
+- name: Deploy Traefik
+  community.docker.docker_compose_v2:
+    project_src: /docker/traefik
+    pull: always
+    state: present
+
+- name: Deploy Watchtower
+  community.docker.docker_compose_v2:
+    project_src: /docker/watchtower
+    pull: always
+    state: present
+
+- name: Deploy TSDProxy
+  community.docker.docker_compose_v2:
+    project_src: /docker/tsdproxy
+    pull: always
+    state: present
+
+- name: Deploy Portainer
+  community.docker.docker_compose_v2:
+    project_src: /docker/portainer
+    pull: always
+    state: present
+
+- name: Deploy prometheus-grafana
+  community.docker.docker_compose_v2:
+    project_src: /docker/prometheus-grafana
+    pull: always
+    state: absent
+
+## Apps
+- name: Deploy Plausible
+  community.docker.docker_compose_v2:
+    project_src: /docker/plausible
+    pull: always
+    state: present
+
+- name: Deploy open-webui
+  community.docker.docker_compose_v2:
+    project_src: /docker/open-webui
+    pull: always
+    state: present
+
+## Personal project app backends
+- name: Deploy nginx election-map
+  community.docker.docker_compose_v2:
+    project_src: /docker/nginx
+    pull: always
+    state: present
+
+- name: Deploy minio election-map
+  community.docker.docker_compose_v2:
+    project_src: /docker/minio
+    pull: always
+    state: present
+
+## Game servers
+- name: Deploy etlegacy
+  community.docker.docker_compose_v2:
+    project_src: /docker/etlegacy
+    pull: always
+    state: absent
+
+- name: Deploy Minecraft
+  community.docker.docker_compose_v2:
+    project_src: /docker/minecraft
+    pull: always
+    state: absent

@@ -1,0 +1,52 @@
+---
+# Decrypt all .env files in docker directories before deployment
+- name: Find all .env files in docker directories
+  ansible.builtin.find:
+    paths: /docker
+    patterns: ".env"
+    file_type: file
+    recurse: true
+    depth: 2
+  register: docker_env_files
+
+- name: Decrypt .env files using dotenvx
+  ansible.builtin.command:
+    cmd: dotenvx decrypt -f {{ item.path }}
+    chdir: "{{ item.path | dirname }}"
+  loop: "{{ docker_env_files.files }}"
+  when: docker_env_files.files | length > 0
+  changed_when: false
+
+# Jinja2 templates
+- name: Add wireguard secrets
+  ansible.builtin.template:
+    src: ../../docker/transmission-wireguard/wg0.conf.j2
+    dest: /docker/transmission-wireguard/wg0.conf
+    mode: "0640"
+  vars:
+    private_key: "{{ lookup('env', 'WG_PRIVATE_KEY') }}"
+    public_key: "{{ lookup('env', 'WG_PUBLIC_KEY') }}"
+    endpoint: "{{ lookup('env', 'WG_ENDPOINT') }}"
+
+# Deployments
+
+## transmission-wireguard
+- name: Deploy transmission-wireguard
+  community.docker.docker_compose_v2:
+    project_src: /docker/transmission-wireguard
+    pull: always
+    state: present
+
+## media services
+- name: Deploy media-stack
+  community.docker.docker_compose_v2:
+    project_src: /docker/media-stack
+    pull: always
+    state: present
+
+## Infrastructure services
+- name: Deploy Watchtower
+  community.docker.docker_compose_v2:
+    project_src: /docker/watchtower
+    pull: always
+    state: present

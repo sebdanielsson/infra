@@ -157,3 +157,6 @@
 
     - name: Install and configure Flightradar24
       ansible.builtin.import_tasks: tasks/flightradar24.yml
+
+    - name: Run all containers
+      ansible.builtin.import_tasks: tasks/flightradar-containers.yml
