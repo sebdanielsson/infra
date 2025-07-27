@@ -57,11 +57,6 @@ jobs:
           key: ${{ secrets.DOTENVX_KEY }}
           inject-env-vars: false
 
-      - name: Install 1Password CLI
-        uses: 1password/install-cli-action@v1
-        with:
-          version: latest
-
       - name: Get latest Tailscale version
         id: get_latest_ts_version
         run: |
@@ -75,8 +70,8 @@ jobs:
           oauth-secret: ${{ steps.dotenvx.outputs.TS_CLIENTSECRET }}
           tags: tag:ci
 
-      - name: Check connection
-        run: tailscale ping --icmp hogsmeade
+      # - name: Check connection
+      #   run: tailscale ping --icmp hogsmeade
 
       # - name: Run playbook hogsmeade
       #   run: dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml
