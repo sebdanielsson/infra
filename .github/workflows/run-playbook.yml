@@ -82,14 +82,14 @@ jobs:
       #     DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
       #     DOTENV_PRIVATE_KEY_HOGSMEADE: ${{ secrets.DOTENV_PRIVATE_KEY_HOGSMEADE }}
 
-      - name: Run playbook flightradar
-        run: dotenvx run -f .env -f .env.flightradar -- ansible-playbook -i ./inventory.yml ./flightradar.yml
-        env:
-          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
-          DOTENV_PRIVATE_KEY_FLIGHTRADAR: ${{ secrets.DOTENV_PRIVATE_KEY_FLIGHTRADAR }}
-
       - name: Run playbook bpi-r4
         run: dotenvx run -f .env -f .env.home_gateway -- ansible-playbook -i ./inventory.yml ./home-gateway.yml
         env:
           DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
           DOTENV_PRIVATE_KEY_HOME_GATEWAY: ${{ secrets.DOTENV_PRIVATE_KEY_HOME_GATEWAY }}
+
+      - name: Run playbook flightradar
+        run: dotenvx run -f .env -f .env.flightradar -- ansible-playbook -i ./inventory.yml ./flightradar.yml
+        env:
+          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
+          DOTENV_PRIVATE_KEY_FLIGHTRADAR: ${{ secrets.DOTENV_PRIVATE_KEY_FLIGHTRADAR }}
