@@ -53,7 +53,7 @@ jobs:
         id: dotenvx
         uses: andreijiroh-dev/dotenvx-action@v0.4.0
         with:
-          path: .env.ci
+          path: ${{ github.workspace }}/sebdanielsson.infra/.env.ci
           key: ${{ secrets.DOTENVX_KEY }}
           inject-env-vars: false
 
