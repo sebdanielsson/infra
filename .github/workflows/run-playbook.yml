@@ -29,6 +29,9 @@ jobs:
         with:
           path: "sebdanielsson.infra"
 
+      - name: Setup dotenvx
+        run: curl -sfS https://dotenvx.sh/install.sh | sh
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -54,7 +57,7 @@ jobs:
         uses: andreijiroh-dev/dotenvx-action@v0.4.0
         with:
           path: ${{ github.workspace }}/sebdanielsson.infra/.env.ci
-          key: ${{ secrets.DOTENVX_KEY }}
+          key: ${{ secrets.DOTENV_PRIVATE_KEY_CI }}
           inject-env-vars: false
 
       - name: Get latest Tailscale version
@@ -75,9 +78,18 @@ jobs:
 
       # - name: Run playbook hogsmeade
       #   run: dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml
+      #   env:
+      #     DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
+      #     DOTENV_PRIVATE_KEY_HOGSMEADE: ${{ secrets.DOTENV_PRIVATE_KEY_HOGSMEADE }}
 
       - name: Run playbook flightradar
         run: dotenvx run -f .env -f .env.flightradar -- ansible-playbook -i ./inventory.yml ./flightradar.yml
+        env:
+          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
+          DOTENV_PRIVATE_KEY_FLIGHTRADAR: ${{ secrets.DOTENV_PRIVATE_KEY_FLIGHTRADAR }}
 
       - name: Run playbook bpi-r4
-        run: dotenvx run -f .env -f .env.home-gateway -- ansible-playbook -i ./inventory.yml ./home-gateway.yml
+        run: dotenvx run -f .env -f .env.home_gateway -- ansible-playbook -i ./inventory.yml ./home-gateway.yml
+        env:
+          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
+          DOTENV_PRIVATE_KEY_HOME_GATEWAY: ${{ secrets.DOTENV_PRIVATE_KEY_HOME_GATEWAY }}
