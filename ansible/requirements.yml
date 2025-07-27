@@ -14,8 +14,10 @@ collections:
 
   # - name: artis3n.tailscale
   #   version: 1.0.1
-  - name: https://github.com/sebdanielsson/ansible-collection-tailscale
+  - name: https://github.com/sebdanielsson/ansible-collection-tailscale.git
+    type: git
     version: main
+
 roles:
   - name: simoncaron.pve_addons
     src: https://github.com/simoncaron/ansible-role-pve_addons.git
