@@ -51,6 +51,21 @@
             max-file: "3"
 
   tasks:
+    - name: Download dotenvx install script
+      ansible.builtin.get_url:
+        url: https://dotenvx.sh/install.sh
+        dest: /tmp/dotenvx_install.sh
+        mode: "0755"
+      become: true
+
+    - name: Install dotenvx for environment file decryption
+      ansible.builtin.shell: |
+        sh /tmp/dotenvx_install.sh
+      args:
+        creates: /usr/local/bin/dotenvx
+        executable: /bin/sh
+      become: true
+
     - name: Set hostname
       ansible.builtin.hostname:
         name: flightradar
@@ -142,19 +157,6 @@
           - apache2-utils
         update_cache: true
         state: present
-
-    - name: Deploy Portainer
-      community.docker.docker_container:
-        name: portainer
-        image: portainer/portainer-ee:2.31.3-alpine
-        state: started
-        restart_policy: always
-        published_ports:
-          - "9000:9000"
-          - "9443:9443"
-        volumes:
-          - /var/run/docker.sock:/var/run/docker.sock
-          - portainer_data:/data
 
     - name: Install and configure Flightradar24
       ansible.builtin.import_tasks: tasks/flightradar24.yml

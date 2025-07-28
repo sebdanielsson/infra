@@ -27,9 +27,13 @@ roles:
     src: https://github.com/simoncaron/ansible-role-pve_acme
     version: 1.4.1
 
+  # - name: geerlingguy.docker
+  #   src: https://github.com/geerlingguy/ansible-role-docker.git
+  #   version: 7.4.7
+
   - name: geerlingguy.docker
-    src: https://github.com/geerlingguy/ansible-role-docker.git
-    version: 7.4.7
+    src: https://github.com/sebdanielsson/ansible-role-docker.git
+    version: deb822_repository
 
   - name: sebdanielsson.cloudflared
     src: https://github.com/sebdanielsson/ansible-role-cloudflared.git

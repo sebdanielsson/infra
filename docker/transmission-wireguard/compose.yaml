@@ -21,11 +21,11 @@ services:
       - /lib/modules:/lib/modules
       - ./wg0.conf:/config/wg_confs/wg0.conf
     healthcheck:
-      test: ["CMD-SHELL", "wg show | grep -q 'latest handshake:'"]
-      interval: 1m
-      timeout: 5s
-      retries: 3
-      start_period: 30s
+      test: ["CMD-SHELL", "wg show | grep -q handshake"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
     restart: unless-stopped
     labels:
       - com.centurylinklabs.watchtower.monitor-only=true
