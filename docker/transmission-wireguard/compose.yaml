@@ -46,7 +46,6 @@ services:
       - PASS=${TRANSMISSION_PASS}
     volumes:
       - transmission_data:/config
-      # - /chungus/media/downloads:/downloads # hogsmeade location
       - /mnt/lacie/media/downloads:/downloads
     restart: unless-stopped
 
