@@ -51,6 +51,21 @@
             max-file: "3"
 
   tasks:
+    - name: Download dotenvx install script
+      ansible.builtin.get_url:
+        url: https://dotenvx.sh/install.sh
+        dest: /tmp/dotenvx_install.sh
+        mode: "0755"
+      become: true
+
+    - name: Install dotenvx for environment file decryption
+      ansible.builtin.shell: |
+        sh /tmp/dotenvx_install.sh
+      args:
+        creates: /usr/local/bin/dotenvx
+        executable: /bin/sh
+      become: true
+
     - name: Set hostname
       ansible.builtin.hostname:
         name: flightradar
