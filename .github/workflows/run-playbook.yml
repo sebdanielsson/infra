@@ -68,7 +68,7 @@ jobs:
       - name: Setup Tailscale
         uses: tailscale/github-action@v3
         with:
-          version: ${{ steps.get_latest_ts_version.outputs.ts_latest }} # or "steps.get_latest_ts_version.outputs.ts_latest" for latest
+          version: "1.84.3" # or "steps.get_latest_ts_version.outputs.ts_latest" for latest
           oauth-client-id: ${{ steps.dotenvx.outputs.TS_CLIENTID }}
           oauth-secret: ${{ steps.dotenvx.outputs.TS_CLIENTSECRET }}
           tags: tag:ci
