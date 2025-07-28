@@ -3,8 +3,12 @@ collections:
   - name: community.general
     version: 11.1.0
 
-  - name: community.docker
-    version: 4.6.2
+  # - name: community.docker
+  #   version: 4.6.2
+
+  - name: https://github.com/sebdanielsson/ansible-role-docker.git
+    type: git
+    version: deb822_repository
 
   - name: ansible.posix
     version: 2.1.0
