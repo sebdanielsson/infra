@@ -73,7 +73,7 @@ jobs:
           oauth-secret: ${{ steps.dotenvx.outputs.TS_CLIENTSECRET }}
           tags: tag:ci
 
-      # - name: Check connection
+      # - name: Check hogsmeade connection
       #   run: tailscale ping --icmp hogsmeade
 
       # - name: Run playbook hogsmeade
@@ -87,6 +87,9 @@ jobs:
       #   env:
       #     DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
       #     DOTENV_PRIVATE_KEY_HOME_GATEWAY: ${{ secrets.DOTENV_PRIVATE_KEY_HOME_GATEWAY }}
+
+      - name: Check flightradar connection
+        run: tailscale ping --icmp flightradar
 
       - name: Run playbook flightradar
         run: dotenvx run -f .env -f .env.flightradar -- ansible-playbook -i ./inventory.yml ./flightradar.yml
