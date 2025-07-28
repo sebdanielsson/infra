@@ -11,7 +11,7 @@
 
 - name: Decrypt .env files using dotenvx
   ansible.builtin.command:
-    cmd: dotenvx decrypt -f {{ item.path }}
+    cmd: dotenvx decrypt -f {{ item.path }} -fk /docker/.env.keys
     chdir: "{{ item.path | dirname }}"
   loop: "{{ docker_env_files.files }}"
   when: docker_env_files.files | length > 0

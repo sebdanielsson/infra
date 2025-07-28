@@ -4,6 +4,7 @@
   become: true
   vars:
     ansible_python_interpreter: "/usr/bin/python3"
+    docker_env_decryption_key: "{{ lookup('env', 'DOCKER_ENV_DECRYPTION_KEY') }}"
 
   handlers:
     - name: Import handlers
@@ -157,6 +158,31 @@
 
     - name: Install and configure Flightradar24
       ansible.builtin.import_tasks: tasks/flightradar24.yml
+
+    - name: Synchronize docker files
+      ansible.posix.synchronize:
+        src: ../docker/
+        dest: /docker/
+        archive: true
+        delete: true
+        owner: false
+        group: false
+        mode: push
+        rsync_opts:
+          - "--exclude=.DS_Store"
+
+    - name: Docker System Prune
+      ansible.builtin.command: docker system prune --all -f
+      changed_when: true
+
+    - name: Create docker .env.keys file for decryption
+      ansible.builtin.copy:
+        content: |
+          DOTENV_PRIVATE_KEY="{{ docker_env_decryption_key }}"
+        dest: /docker/.env.keys
+        mode: "0600"
+        owner: root
+        group: root
 
     - name: Run all containers
       ansible.builtin.import_tasks: tasks/flightradar-containers.yml
