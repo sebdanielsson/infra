@@ -51,19 +51,13 @@
             max-file: "3"
 
   tasks:
-    - name: Download dotenvx install script
-      ansible.builtin.get_url:
-        url: https://dotenvx.sh/install.sh
-        dest: /tmp/dotenvx_install.sh
-        mode: "0755"
-      become: true
-
     - name: Install dotenvx for environment file decryption
       ansible.builtin.shell: |
-        sh /tmp/dotenvx_install.sh
+        set -o pipefail
+        curl -L "https://github.com/dotenvx/dotenvx/releases/download/v1.48.3/dotenvx-1.48.3-linux-$(uname -m).tar.gz" | sudo tar xzf -
       args:
         creates: /usr/local/bin/dotenvx
-        executable: /bin/sh
+        executable: /bin/bash
       become: true
 
     - name: Set hostname
