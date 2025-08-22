@@ -14,7 +14,7 @@ collections:
 
   # - name: artis3n.tailscale
   #   version: 1.0.1
-  - name: https://github.com/sebdanielsson/ansible-collection-tailscale.git
+  - name: https://github.com/artis3n/ansible-collection-tailscale.git
     type: git
     version: main
 
@@ -27,13 +27,9 @@ roles:
     src: https://github.com/simoncaron/ansible-role-pve_acme
     version: 1.5.0
 
-  # - name: geerlingguy.docker
-  #   src: https://github.com/geerlingguy/ansible-role-docker.git
-  #   version: 7.4.7
-
   - name: geerlingguy.docker
-    src: https://github.com/sebdanielsson/ansible-role-docker.git
-    version: deb822_repository
+    src: https://github.com/geerlingguy/ansible-role-docker.git
+    version: 7.5.0
 
   - name: sebdanielsson.cloudflared
     src: https://github.com/sebdanielsson/ansible-role-cloudflared.git
