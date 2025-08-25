@@ -20,7 +20,7 @@ services:
     restart: unless-stopped
 
   ombi:
-    image: ghcr.io/linuxserver/ombi:4.49.5-development
+    image: ghcr.io/linuxserver/ombi:4.49.6-development
     container_name: ombi
     environment:
       - PUID=1000
