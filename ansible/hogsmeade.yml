@@ -72,6 +72,7 @@
     - name: Install dotenvx for environment file decryption
       ansible.builtin.shell: |
         set -o pipefail
+        cd /usr/local/bin/
         curl -L "https://github.com/dotenvx/dotenvx/releases/download/v1.49.0/dotenvx-1.49.0-linux-$(uname -m).tar.gz" | sudo tar xzf -
       args:
         creates: /usr/local/bin/dotenvx
