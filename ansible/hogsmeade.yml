@@ -49,7 +49,7 @@
 
     - name: Install and configure Tailscale
       role: artis3n.tailscale.machine
-      tailscale_args: "--ssh"
+      tailscale_args: "--reset --ssh"
       vars:
         tailscale_authkey: "{{ lookup('env', 'TAILSCALE_SERVER_OAUTH') }}"
         tailscale_oauth_preauthorized: true
