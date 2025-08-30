@@ -73,20 +73,20 @@ jobs:
           oauth-secret: ${{ steps.dotenvx.outputs.TS_CLIENTSECRET }}
           tags: tag:ci
 
-      # - name: Check hogsmeade connection
-      #   run: tailscale ping --icmp hogsmeade
+      - name: Check hogsmeade connection
+        run: tailscale ping --icmp hogsmeade
 
-      # - name: Run playbook hogsmeade
-      #   run: dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml
-      #   env:
-      #     DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
-      #     DOTENV_PRIVATE_KEY_HOGSMEADE: ${{ secrets.DOTENV_PRIVATE_KEY_HOGSMEADE }}
+      - name: Run playbook hogsmeade
+        run: dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml
+        env:
+          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
+          DOTENV_PRIVATE_KEY_HOGSMEADE: ${{ secrets.DOTENV_PRIVATE_KEY_HOGSMEADE }}
 
-      # - name: Run playbook bpi-r4
-      #   run: dotenvx run -f .env -f .env.home_gateway -- ansible-playbook -i ./inventory.yml ./home-gateway.yml
-      #   env:
-      #     DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
-      #     DOTENV_PRIVATE_KEY_HOME_GATEWAY: ${{ secrets.DOTENV_PRIVATE_KEY_HOME_GATEWAY }}
+      - name: Run playbook bpi-r4
+        run: dotenvx run -f .env -f .env.home_gateway -- ansible-playbook -i ./inventory.yml ./home-gateway.yml
+        env:
+          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
+          DOTENV_PRIVATE_KEY_HOME_GATEWAY: ${{ secrets.DOTENV_PRIVATE_KEY_HOME_GATEWAY }}
 
       - name: Check flightradar connection
         run: tailscale ping --icmp flightradar
