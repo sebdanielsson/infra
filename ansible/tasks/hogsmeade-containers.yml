@@ -6,7 +6,7 @@
     patterns: ".env"
     file_type: file
     recurse: true
-    depth: 2
+    hidden: true
   register: docker_env_files
 
 - name: Decrypt .env files using dotenvx
