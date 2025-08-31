@@ -3,6 +3,7 @@
   hosts: hogsmeade
   vars:
     ansible_python_interpreter: "/usr/bin/python3"
+    docker_env_decryption_key: "{{ lookup('env', 'DOCKER_ENV_DECRYPTION_KEY') }}"
 
   handlers:
     - name: Import handlers
@@ -260,12 +261,6 @@
           sharenfs: crossmnt,no_root_squash,rw=192.168.1.0/24
         state: present
 
-    - name: Install python3-full
-      ansible.builtin.apt:
-        name:
-          - python3-full
-        state: present
-
     - name: Install required Python packages in the virtual environment
       ansible.builtin.pip:
         name:
@@ -294,6 +289,15 @@
     - name: Docker System Prune
       ansible.builtin.command: docker system prune --all -f
       changed_when: true
+
+    - name: Create docker .env.keys file for decryption
+      ansible.builtin.copy:
+        content: |
+          DOTENV_PRIVATE_KEY="{{ docker_env_decryption_key }}"
+        dest: /docker/.env.keys
+        mode: "0600"
+        owner: root
+        group: root
 
     - name: Run all containers
       ansible.builtin.import_tasks: tasks/hogsmeade-containers.yml
