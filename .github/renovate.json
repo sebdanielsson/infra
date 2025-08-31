@@ -5,13 +5,19 @@
   ],
   "packageRules": [
     {
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "matchCurrentVersion": "!/^0/",
       "automerge": true
     },
     {
       "groupName": "portainer",
-      "packagePatterns": ["^portainer\/portainer-ee$", "^portainer\/agent$"]
+      "matchPackageNames": [
+        "/^portainer/portainer-ee$/",
+        "/^portainer/agent$/"
+      ]
     }
   ]
 }
