@@ -4,7 +4,6 @@ services:
     container_name: pocket-id
     image: ghcr.io/pocket-id/pocket-id:v1.10
     networks:
-      - pocket-id
       - proxy
     ports:
       - 1411:1411
@@ -15,6 +14,7 @@ services:
       - PGID=1000
       - TRUST_PROXY=true
       - APP_URL=${APP_URL}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - MAXMIND_LICENSE_KEY=${MAXMIND_LICENSE_KEY}
     healthcheck:
       test: "curl -f http://localhost:1411/healthz"
@@ -26,15 +26,13 @@ services:
       - traefik.enable=true
       - traefik.http.routers.auth.rule=Host(`auth.hogwarts.zone`)
       - traefik.http.routers.auth.tls.certresolver=cloudflare
-      - traefik.http.routers.auth.service=auth
       - traefik.http.services.auth.loadbalancer.server.port=1411
     restart: unless-stopped
 
 networks:
-  pocket-id:
-    name: pocket-id
   proxy:
     name: proxy
+    external: true
 
 volumes:
   pocket-id_data:
