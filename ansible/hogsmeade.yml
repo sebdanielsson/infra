@@ -80,6 +80,22 @@
         executable: /bin/bash
       become: true
 
+    - name: Install ddclient
+      ansible.builtin.include_role:
+        name: maxhoesel.ddclient
+      vars:
+        ddclient_version: v4.0.0
+        ddclient_executable_path: /usr/local/bin/ddclient
+        ddclient_entries:
+          - options:
+              protocol: cloudflare
+              zone: hogwarts.zone
+              ttl: 1 # automatic
+              login: token
+              password: "{{ lookup('env', 'CF_TOKEN_DDCLIENT') }}"
+            domains:
+              - auth.hogwarts.zone
+
     - name: SSH authorized key for 'root'
       ansible.posix.authorized_key:
         user: root
