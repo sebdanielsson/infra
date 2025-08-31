@@ -96,9 +96,9 @@
             domains:
               - auth.hogwarts.zone
         ddclient_strategy_usev4: webv4
-        ddclient_strategy_webv4: dyndns
-        ddclient_strategy_usev6: webv6
-        ddclient_strategy_ifv6: dyndns
+        ddclient_strategy_webv4: ipify-ipv4
+        # ddclient_strategy_usev6: webv6
+        # ddclient_strategy_ifv6: ipify-ipv6
 
     - name: SSH authorized key for 'root'
       ansible.posix.authorized_key:
