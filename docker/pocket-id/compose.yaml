@@ -21,6 +21,12 @@ services:
       timeout: 5s
       retries: 2
       start_period: 10s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.auth.rule=Host(`auth.hogwarts.zone`)
+      - traefik.http.routers.auth.tls.certresolver=cloudflare
+      - traefik.http.routers.auth.service=auth
+      - traefik.http.services.auth.loadbalancer.server.port=1411
     restart: unless-stopped
 
 networks:
