@@ -15,7 +15,8 @@ services:
       - --providers.docker.exposedbydefault=false
       - --providers.docker.endpoint=unix:///var/run/docker.sock
       - --certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare
-      - --certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.cloudflare.acme.dnschallenge.resolvers=1.1.1.1
+      - --certificatesresolvers.cloudflare.acme.storage=/etc/traefik/cf-acme.json
       - --certificatesresolvers.tailscale.tailscale=true
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entryPoint.to=websecure

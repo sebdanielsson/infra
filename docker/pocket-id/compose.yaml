@@ -5,6 +5,7 @@ services:
     image: ghcr.io/pocket-id/pocket-id:v1.10
     networks:
       - pocket-id
+      - proxy
     ports:
       - 1411:1411
     volumes:
@@ -32,6 +33,8 @@ services:
 networks:
   pocket-id:
     name: pocket-id
+  proxy:
+    name: proxy
 
 volumes:
   pocket-id_data:
