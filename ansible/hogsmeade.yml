@@ -95,6 +95,7 @@
               password: "{{ lookup('env', 'CF_TOKEN_DDCLIENT') }}"
             domains:
               - auth.hogwarts.zone
+              - jellyfin.hogwarts.zone
         ddclient_strategy_usev4: webv4
         ddclient_strategy_webv4: ipify-ipv4
         # ddclient_strategy_usev6: webv6
