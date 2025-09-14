@@ -54,7 +54,7 @@ jobs:
 
       - name: Load secrets from dotenvx
         id: dotenvx
-        uses: andreijiroh-dev/dotenvx-action@v0.4.0
+        uses: andreijiroh-dev/dotenvx-action@v0.5.1
         with:
           path: ${{ github.workspace }}/sebdanielsson.infra/.env.ci
           key: ${{ secrets.DOTENV_PRIVATE_KEY_CI }}
