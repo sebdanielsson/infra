@@ -46,7 +46,7 @@ services:
       - PASS=${TRANSMISSION_PASS}
     volumes:
       - transmission_data:/config
-      - /mnt/lacie/media/downloads:/downloads
+      - /chungus/media/downloads:/downloads
     restart: unless-stopped
 
 networks:
