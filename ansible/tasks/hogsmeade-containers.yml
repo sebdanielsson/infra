@@ -125,4 +125,4 @@
   community.docker.docker_compose_v2:
     project_src: /docker/backstage
     pull: always
-    state: absent
+    state: present
