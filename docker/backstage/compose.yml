@@ -4,9 +4,9 @@ services:
     container_name: backstage-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-backstage}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-backstage}
-      POSTGRES_DB: ${POSTGRES_DB:-backstage}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     ports:
@@ -14,7 +14,7 @@ services:
     networks:
       - backstage
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-backstage}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,8 +29,16 @@ services:
       NODE_ENV: production
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
-    env_file:
-      - .env
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      BACKEND_SECRET: ${BACKEND_SECRET}
+      AUTH_SESSION_SECRET: ${AUTH_SESSION_SECRET}
+      AUTH_CLIENT_ID: ${AUTH_CLIENT_ID}
+      AUTH_CLIENT_SECRET: ${AUTH_CLIENT_SECRET}
+      AUTH_METADATA_URL: ${AUTH_METADATA_URL}
+      AUTH_AUTHORIZATION_URL: ${AUTH_AUTHORIZATION_URL}
+      AUTH_TOKEN_URL: ${AUTH_TOKEN_URL}
     volumes:
       - ./app-config.production.yaml:/app/app-config.production.yaml:ro
       - ./app-config.yaml:/app/app-config.yaml:ro
