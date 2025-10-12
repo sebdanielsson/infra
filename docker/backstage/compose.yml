@@ -40,8 +40,8 @@ services:
       AUTH_AUTHORIZATION_URL: ${AUTH_AUTHORIZATION_URL}
       AUTH_TOKEN_URL: ${AUTH_TOKEN_URL}
     volumes:
-      - ./app-config.production.yaml:/app/app-config.production.yaml:ro
-      - ./app-config.yaml:/app/app-config.yaml:ro
+      - ./app-config.production.yaml:/app/app-config.production.yaml
+      - ./app-config.yaml:/app/app-config.yaml
     networks:
       - backstage
     depends_on:
