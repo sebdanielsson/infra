@@ -1,8 +1,6 @@
 app:
   title: Scaffolded Backstage App
   baseUrl: http://localhost:3000
-  # Enable redirect flow for authentication instead of popups
-  enableExperimentalRedirectFlow: true
 
 organization:
   name: Hogwarts
@@ -58,6 +56,9 @@ techdocs:
     runIn: 'docker' # Alternatives - 'local'
   publisher:
     type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
+
+# Enable redirect flow for authentication instead of popups
+enableExperimentalRedirectFlow: true
 
 auth:
   environment: development

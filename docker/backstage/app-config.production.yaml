@@ -1,8 +1,6 @@
 app:
   # Should be the same as backend.baseUrl when using the `app-backend` plugin.
   baseUrl: https://backstage.hogwarts.zone
-  # Enable redirect flow for authentication instead of popups
-  enableExperimentalRedirectFlow: true
 
 backend:
   # Note that the baseUrl should be the URL that the browser and other clients
@@ -29,6 +27,9 @@ backend:
       # ssl:
       #   ca: # if you have a CA file and want to verify it you can uncomment this section
       #     $file: <file-path>/ca/server.crt
+
+# Enable redirect flow for authentication instead of popups
+enableExperimentalRedirectFlow: true
 
 auth:
   environment: production
