@@ -86,7 +86,7 @@ jobs:
           ping: ${{ matrix.server.name }}
 
       - name: Run playbook ${{ matrix.server.name }}
-        run: dotenvx run -f .env -f .env.${{ matrix.server.name }} -- ansible-playbook -i ./inventory.yml ./${{ matrix.server.name }}.yml
-        env:
-          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
-          DOTENV_PRIVATE_KEY_SERVER: ${{ secrets[format('DOTENV_PRIVATE_KEY_{0}', matrix.server.name_upper)] }}
+        run: |
+          export DOTENV_PRIVATE_KEY="${{ secrets.DOTENV_PRIVATE_KEY }}"
+          export DOTENV_PRIVATE_KEY_${{ matrix.server.name_upper }}="${{ secrets[format('DOTENV_PRIVATE_KEY_{0}', matrix.server.name_upper)] }}"
+          dotenvx run -f .env -f .env.${{ matrix.server.name }} -- ansible-playbook -i ./inventory.yml ./${{ matrix.server.name }}.yml
