@@ -28,8 +28,8 @@ jobs:
           - name: hogsmeade
             name_upper: HOGSMEADE
 
-          - name: home-gateway
-            name_upper: HOME_GATEWAY
+          - name: bpi-r4
+            name_upper: BPI_R4
 
           - name: flightradar
             name_upper: FLIGHTRADAR
