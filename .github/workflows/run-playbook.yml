@@ -26,13 +26,8 @@ jobs:
       matrix:
         server:
           - name: hogsmeade
-            name_upper: HOGSMEADE
-
           - name: bpi-r4
-            name_upper: BPI_R4
-
           - name: flightradar
-            name_upper: FLIGHTRADAR
     concurrency:
       group: ${{ github.workflow }}-${{ matrix.server.name }}
     steps:
@@ -80,14 +75,13 @@ jobs:
       - name: Setup Tailscale
         uses: tailscale/github-action@v4
         with:
-          version: "1.84.0" # or "steps.get_latest_ts_version.outputs.ts_latest" for latest
+          version: "1.88.3" # or "steps.get_latest_ts_version.outputs.ts_latest" for latest
           oauth-client-id: ${{ steps.dotenvx.outputs.TS_CLIENTID }}
           oauth-secret: ${{ steps.dotenvx.outputs.TS_CLIENTSECRET }}
           tags: tag:ci
           ping: ${{ matrix.server.name }}
 
       - name: Run playbook ${{ matrix.server.name }}
-        run: |
-          export DOTENV_PRIVATE_KEY="${{ secrets.DOTENV_PRIVATE_KEY }}"
-          export DOTENV_PRIVATE_KEY_${{ matrix.server.name_upper }}="${{ secrets[format('DOTENV_PRIVATE_KEY_{0}', matrix.server.name_upper)] }}"
-          dotenvx run -f .env -f .env.${{ matrix.server.name }} -- ansible-playbook -i ./inventory.yml ./${{ matrix.server.name }}.yml
+        run: dotenvx run -f .env -f .env.${{ matrix.server.name }} -- ansible-playbook -i ./inventory.yml ./${{ matrix.server.name }}.yml
+        env:
+          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
