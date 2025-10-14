@@ -19,10 +19,21 @@ defaults:
 
 jobs:
   run-playbook:
-    name: Run playbook
+    name: Run playbook - ${{ matrix.server.name }}
     runs-on: ubuntu-24.04-arm
+    strategy:
+      matrix:
+        server:
+          - name: hogsmeade
+            name_upper: HOGSMEADE
+
+          - name: home-gateway
+            name_upper: HOME_GATEWAY
+
+          - name: flightradar
+            name_upper: FLIGHTRADAR
     concurrency:
-      group: ${{ github.workflow }}
+      group: ${{ github.workflow }}-${{ matrix.server.name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -72,22 +83,10 @@ jobs:
           oauth-client-id: ${{ steps.dotenvx.outputs.TS_CLIENTID }}
           oauth-secret: ${{ steps.dotenvx.outputs.TS_CLIENTSECRET }}
           tags: tag:ci
-          ping: hogsmeade,flightradar
+          ping: ${{ matrix.server.name }}
 
-      - name: Run playbook hogsmeade
-        run: dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml
+      - name: Run playbook ${{ matrix.server.name }}
+        run: dotenvx run -f .env -f .env.${{ matrix.server.name }} -- ansible-playbook -i ./inventory.yml ./${{ matrix.server.name }}.yml
         env:
           DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
-          DOTENV_PRIVATE_KEY_HOGSMEADE: ${{ secrets.DOTENV_PRIVATE_KEY_HOGSMEADE }}
-
-      - name: Run playbook bpi-r4
-        run: dotenvx run -f .env -f .env.home_gateway -- ansible-playbook -i ./inventory.yml ./home-gateway.yml
-        env:
-          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
-          DOTENV_PRIVATE_KEY_HOME_GATEWAY: ${{ secrets.DOTENV_PRIVATE_KEY_HOME_GATEWAY }}
-
-      - name: Run playbook flightradar
-        run: dotenvx run -f .env -f .env.flightradar -- ansible-playbook -i ./inventory.yml ./flightradar.yml
-        env:
-          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
-          DOTENV_PRIVATE_KEY_FLIGHTRADAR: ${{ secrets.DOTENV_PRIVATE_KEY_FLIGHTRADAR }}
+          DOTENV_PRIVATE_KEY_SERVER: ${{ secrets[format('DOTENV_PRIVATE_KEY_{0}', matrix.server.name_upper)] }}
