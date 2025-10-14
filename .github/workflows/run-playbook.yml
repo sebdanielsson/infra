@@ -66,15 +66,13 @@ jobs:
           echo "ts_latest=$(curl --silent https://api.github.com/repos/tailscale/tailscale/releases/latest | grep '\"tag_name\":' | sed -E 's/.*\"([^"]+)\".*/\1/' | sed 's/^v\(.*\)/\1/')" >> $GITHUB_OUTPUT
 
       - name: Setup Tailscale
-        uses: tailscale/github-action@v3
+        uses: tailscale/github-action@v4
         with:
           version: "1.84.0" # or "steps.get_latest_ts_version.outputs.ts_latest" for latest
           oauth-client-id: ${{ steps.dotenvx.outputs.TS_CLIENTID }}
           oauth-secret: ${{ steps.dotenvx.outputs.TS_CLIENTSECRET }}
           tags: tag:ci
-
-      - name: Check hogsmeade connection
-        run: tailscale ping --icmp hogsmeade
+          ping: hogsmeade,flightradar
 
       - name: Run playbook hogsmeade
         run: dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml
@@ -87,9 +85,6 @@ jobs:
         env:
           DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
           DOTENV_PRIVATE_KEY_HOME_GATEWAY: ${{ secrets.DOTENV_PRIVATE_KEY_HOME_GATEWAY }}
-
-      - name: Check flightradar connection
-        run: tailscale ping --icmp flightradar
 
       - name: Run playbook flightradar
         run: dotenvx run -f .env -f .env.flightradar -- ansible-playbook -i ./inventory.yml ./flightradar.yml
