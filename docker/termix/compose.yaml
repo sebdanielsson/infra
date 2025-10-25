@@ -1,6 +1,6 @@
 services:
   termix:
-    image: ghcr.io/lukegus/termix:latest
+    image: ghcr.io/lukegus/termix:release-1.7.3
     container_name: termix
     restart: unless-stopped
     ports:
