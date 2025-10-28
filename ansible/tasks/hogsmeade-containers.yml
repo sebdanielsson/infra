@@ -57,6 +57,12 @@
     pull: always
     state: present
 
+- name: Deploy Dependency-Track
+  community.docker.docker_compose_v2:
+    project_src: /docker/dependencytrack
+    pull: always
+    state: present
+
 - name: Deploy Termix
   community.docker.docker_compose_v2:
     project_src: /docker/termix
