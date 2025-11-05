@@ -65,6 +65,7 @@
           - fio
           - fnm
           - fx
+          - gh
           - git
           - hashicorp/tap/terraform
           - httpie
