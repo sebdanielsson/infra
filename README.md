@@ -20,23 +20,20 @@ cd infra
 ### 2. Create and Activate Virtual Environment
 
 ```sh
-python3 -m venv venv
-source venv/bin/activate
+uv venv
+source .venv/bin/activate
 ```
 
 ### 3. Install Python Dependencies
 
 ```sh
-pip install --upgrade pip
-pip install -r ansible/requirements.txt --force-reinstall
+uv pip install -r ansible/requirements.txt --force-reinstall
 ```
 
 ### 4. Install Ansible Collections and Roles
 
 ```sh
-cd ansible
-ansible-galaxy install -r requirements.yml --force
-cd ..
+ansible-galaxy install -r ansible/requirements.yml --force
 ```
 
 ### 5. Verify Installation
