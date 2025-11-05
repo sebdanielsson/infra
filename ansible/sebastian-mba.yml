@@ -53,6 +53,7 @@
         name:
           - ansible
           - asciinema
+          - atuin-desktop
           - bash
           - bat
           - bottom
@@ -72,8 +73,10 @@
           - iperf3
           - mas
           - mtr
+          - msedit
           - nano
           - nmap
+          - nvim
           - rsync
           - shellcheck
           - ssh-audit
