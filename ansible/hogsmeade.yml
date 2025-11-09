@@ -36,6 +36,7 @@
         docker_service_enabled: true
         docker_restart_handler_state: restarted
         docker_daemon_options:
+          data-root: "/mnt/dockerdata"
           log-driver: "json-file"
           log-opts:
             max-size: "10m"
