@@ -28,6 +28,12 @@
     public_key: "{{ lookup('env', 'WG_PUBLIC_KEY') }}"
     endpoint: "{{ lookup('env', 'WG_ENDPOINT') }}"
 
+# Networks
+- name: Create proxy network
+  community.docker.docker_network:
+    name: proxy
+    state: present
+
 # Deployments
 
 ## transmission-wireguard
