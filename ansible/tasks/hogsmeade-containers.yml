@@ -133,8 +133,8 @@
     state: absent
 
 ## Test apps
-- name: Deploy Backstage
-  community.docker.docker_compose_v2:
-    project_src: /docker/backstage
-    pull: always
-    state: present
+# - name: Deploy Backstage
+#   community.docker.docker_compose_v2:
+#     project_src: /docker/backstage
+#     pull: always
+#     state: present
