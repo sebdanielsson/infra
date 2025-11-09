@@ -49,9 +49,6 @@ services:
       - /chungus/media/downloads:/downloads
     ports:
       - "7878:7878"
-    labels:
-      tsdproxy.enable: "true"
-      tsdproxy.name: "radarr"
     restart: unless-stopped
 
   sonarr:

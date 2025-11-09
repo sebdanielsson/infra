@@ -81,12 +81,6 @@
     pull: always
     state: present
 
-- name: Deploy TSDProxy
-  community.docker.docker_compose_v2:
-    project_src: /docker/tsdproxy
-    pull: always
-    state: present
-
 - name: Deploy Portainer
   community.docker.docker_compose_v2:
     project_src: /docker/portainer
