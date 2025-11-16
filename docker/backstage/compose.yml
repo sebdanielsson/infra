@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:18.0-trixie
+    image: postgres:18.1-trixie
     container_name: backstage-postgres
     restart: unless-stopped
     environment:
