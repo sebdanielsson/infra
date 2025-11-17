@@ -1,7 +1,7 @@
 ---
 services:
   jellyfin:
-    image: ghcr.io/linuxserver/jellyfin:10.11.2
+    image: ghcr.io/linuxserver/jellyfin:10.11.3
     container_name: jellyfin
     networks:
       - medianet
