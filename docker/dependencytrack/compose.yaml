@@ -1,6 +1,6 @@
 services:
   apiserver:
-    image: dependencytrack/apiserver:4.13.5
+    image: dependencytrack/apiserver:4.13.6
     depends_on:
       postgres:
         condition: service_healthy
