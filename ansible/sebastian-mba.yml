@@ -68,6 +68,7 @@
           - fx
           - gh
           - git
+          - gnupg
           - hashicorp/tap/terraform
           - httpie
           - iperf3
@@ -79,6 +80,7 @@
           - nvim
           - rsync
           - shellcheck
+          - sops
           - ssh-audit
           - tmux
           - wget
