@@ -192,7 +192,7 @@
           - certbot
           - certbot-dns-cloudflare
         state: present
-        virtualenv: ~/python_docker/venv
+        virtualenv: ~/python_certbot/venv
         virtualenv_site_packages: true
 
     - name: Add cloudflare_api_key for certbot plugin
@@ -228,7 +228,7 @@
 
           [Service]
           Type=oneshot
-          ExecStart=/root/python_docker/venv/bin/certbot renew --quiet --cert-name {{ lookup('env', 'CERTBOT_JELLYFIN_DOMAIN') }} --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/jellyfin-pkcs12.sh
+          ExecStart=/root/python_certbot/venv/bin/certbot renew --quiet --cert-name {{ lookup('env', 'CERTBOT_JELLYFIN_DOMAIN') }} --deploy-hook /etc/letsencrypt/renewal-hooks/deploy/jellyfin-pkcs12.sh
           PrivateTmp=true
 
     - name: Create certbot-renew-jellyfin.timer
@@ -256,7 +256,7 @@
 
     - name: Obtain cert for Jellyfin
       ansible.builtin.shell: |
-        ~/python_docker/venv/bin/certbot certonly \
+        ~/python_certbot/venv/bin/certbot certonly \
         --dns-cloudflare \
         --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini \
         --email {{ lookup('env', 'CERTBOT_JELLYFIN_EMAIL') }} \
@@ -282,10 +282,8 @@
       ansible.builtin.pip:
         name:
           - pyyaml
-          - jsondiff
           - docker
           - docker-compose
-          - proxmoxer
         state: present
         virtualenv: ~/python_docker/venv
         virtualenv_command: python3 -m venv
