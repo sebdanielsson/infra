@@ -10,14 +10,6 @@
       ansible.builtin.import_tasks: handlers/main.yml
 
   roles:
-    - name: Remove PVE subscription nag
-      role: simoncaron.pve_addons
-      vars:
-        pve_addons_enable_dark_theme: false
-        pve_addons_remove_subscription_nag: true
-        pve_addons_disable_enterprise_repo: false
-        pve_addons_add_no_subscription_repo: false
-
     - name: Install Docker
       role: geerlingguy.docker
       vars:

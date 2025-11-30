@@ -23,11 +23,6 @@ collections:
     version: v1.1.0
 
 roles:
-  - name: simoncaron.pve_addons
-    scm: git
-    src: https://github.com/simoncaron/ansible-role-pve_addons.git
-    version: 2.0.0
-
   - name: simoncaron.pve_acme
     scm: git
     src: https://github.com/simoncaron/ansible-role-pve_acme
