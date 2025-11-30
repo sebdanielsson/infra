@@ -281,6 +281,7 @@
     - name: Install required Python packages in the virtual environment
       ansible.builtin.pip:
         name:
+          - pip
           - pyyaml
           - jsondiff
           - docker
