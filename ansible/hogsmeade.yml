@@ -284,7 +284,6 @@
         name:
           - pyyaml
           - docker
-          - docker-compose
         state: present
         virtualenv: ~/python_docker/venv
         virtualenv_command: python3 -m venv
