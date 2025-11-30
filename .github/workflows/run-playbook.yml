@@ -47,11 +47,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install --no-cache-dir -r requirements.txt
 
       - name: Install Ansible dependencies
         run: |
-          ansible-galaxy install -r requirements.yml
+          ansible-galaxy install -r requirements.yml --force
 
       - name: Disable host key checking
         run: |
