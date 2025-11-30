@@ -36,7 +36,7 @@ roles:
   - name: sebdanielsson.cloudflared
     scm: git
     src: https://github.com/sebdanielsson/ansible-role-cloudflared.git
-    version: 2.5.1
+    version: main
 
   - name: maxhoesel.ddclient
     scm: git
