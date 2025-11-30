@@ -1,21 +1,22 @@
 ---
-- name: Disable pve-enterprise repo
-  ansible.builtin.replace:
-    path: /etc/apt/sources.list.d/pve-enterprise.list
-    regexp: "^deb "
-    replace: '# \g<0>'
+# The following needs updating after the switch to deb822 format for apt repos in Proxmox VE 9+/Debian 13
+# - name: Disable pve-enterprise repo
+#   ansible.builtin.replace:
+#     path: /etc/apt/sources.list.d/pve-enterprise.list
+#     regexp: "^deb "
+#     replace: '# \g<0>'
 
-- name: Add pve-no-subscription repo
-  ansible.builtin.apt_repository:
-    filename: pve-no-subscription
-    repo: "deb http://download.proxmox.com/debian/pve {{ ansible_distribution_release }} pve-no-subscription"
-    mode: "0644"
-    state: present
+# - name: Add pve-no-subscription repo
+#   ansible.builtin.apt_repository:
+#     filename: pve-no-subscription
+#     repo: "deb http://download.proxmox.com/debian/pve {{ ansible_distribution_release }} pve-no-subscription"
+#     mode: "0644"
+#     state: present
 
-- name: Disable Proxmox subscription nag message
-  ansible.builtin.replace:
-    path: /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
-    regexp: 'res[\s\n]*\.data\.status\.toLowerCase\(\) !== .active.'
-    replace: false
-    backup: true
-  notify: restart pveproxy
+# - name: Disable Proxmox subscription nag message
+#   ansible.builtin.replace:
+#     path: /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+#     regexp: 'res[\s\n]*\.data\.status\.toLowerCase\(\) !== .active.'
+#     replace: false
+#     backup: true
+#   notify: restart pveproxy
