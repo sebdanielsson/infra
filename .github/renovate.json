@@ -18,6 +18,11 @@
         "/^portainer/portainer-ee$/",
         "/^portainer/agent$/"
       ]
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["postgres"],
+      "groupName": null
     }
   ]
 }
