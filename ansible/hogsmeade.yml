@@ -71,6 +71,10 @@
         pve_acme_plugin_data: "{{ lookup('env', 'PVE_ACME_PLUGIN_DATA') }}"
 
   tasks:
+    - name: Proxmox repo tasks
+      ansible.builtin.import_tasks: tasks/proxmox-tasks.yml
+      become: true
+
     - name: Install dotenvx for environment file decryption
       ansible.builtin.shell: |
         set -o pipefail
