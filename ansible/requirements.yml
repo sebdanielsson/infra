@@ -1,38 +1,49 @@
 ---
 collections:
   - name: community.general
+    type: galaxy
     version: 12.0.1
 
   - name: community.docker
+    type: galaxy
     version: 5.0.3
 
   - name: ansible.posix
+    type: galaxy
     version: 2.1.0
 
   - name: geerlingguy.mac
+    source: https://github.com/geerlingguy/ansible-collection-mac.git
+    type: git
     version: 4.2.0
 
-  # - name: artis3n.tailscale
-  #   version: 1.0.1
-  - name: https://github.com/artis3n/ansible-collection-tailscale.git
+  - name: ansible-collection-tailscale
+    source: https://github.com/artis3n/ansible-collection-tailscale.git
     type: git
-    version: main
+    version: 1.1.0
 
 roles:
   - name: simoncaron.pve_addons
+    scm: git
     src: https://github.com/simoncaron/ansible-role-pve_addons.git
     version: 2.0.0
 
   - name: simoncaron.pve_acme
+    scm: git
     src: https://github.com/simoncaron/ansible-role-pve_acme
     version: 1.5.0
 
   - name: geerlingguy.docker
+    scm: git
     src: https://github.com/geerlingguy/ansible-role-docker.git
     version: 7.8.0
 
   - name: sebdanielsson.cloudflared
+    scm: git
     src: https://github.com/sebdanielsson/ansible-role-cloudflared.git
     version: 2.5.1
 
   - name: maxhoesel.ddclient
+    scm: git
+    src: https://github.com/maxhoesel-ansible/ansible-role-ddclient.git
+    version: main
