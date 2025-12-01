@@ -2,7 +2,7 @@
 collections:
   - name: community.general
     type: galaxy
-    version: 12.0.1
+    version: 12.1.0
 
   - name: community.docker
     type: galaxy
