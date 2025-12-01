@@ -31,7 +31,7 @@ roles:
   - name: geerlingguy.docker
     scm: git
     src: https://github.com/geerlingguy/ansible-role-docker.git
-    version: 7.8.0
+    version: 7.9.0
 
   - name: sebdanielsson.cloudflared
     scm: git
