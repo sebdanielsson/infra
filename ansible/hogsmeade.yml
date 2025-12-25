@@ -13,7 +13,7 @@
 
   roles:
     - name: Install and configure Caddy
-      role: sebdanielsson.xcaddy
+      role: xcaddy
       vars:
         xcaddy_modules:
           - github.com/caddy-dns/cloudflare
