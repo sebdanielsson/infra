@@ -61,7 +61,7 @@
   community.docker.docker_compose_v2:
     project_src: /docker/traefik
     pull: always
-    state: present
+    state: absent
 
 # - name: Deploy Dependency-Track
 #   community.docker.docker_compose_v2:
