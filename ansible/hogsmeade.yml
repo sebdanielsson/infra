@@ -71,11 +71,13 @@
         caddy_config_mode: Caddyfile
         # caddy_json_config: {}
         caddy_caddyfile: |
-          {{ jellyfin_hostname }}:8920
-          reverse_proxy 127.0.0.1:8096
+          {{ jellyfin_hostname }}:8920 {
+              reverse_proxy 127.0.0.1:8096
+          }
 
-          {{ idp_hostname }}:443
-          reverse_proxy 127.0.0.1:1411
+          {{ idp_hostname }} {
+              reverse_proxy 127.0.0.1:1411
+          }
 
   tasks:
     - name: Proxmox repo tasks
