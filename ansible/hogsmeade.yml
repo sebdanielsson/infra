@@ -12,6 +12,25 @@
       ansible.builtin.import_tasks: handlers/main.yml
 
   roles:
+    - name: Install and configure Caddy
+      role: sebdanielsson.xcaddy
+      vars:
+        xcaddy_modules:
+          - github.com/caddy-dns/cloudflare
+        xcaddy_caddyfile_content: |
+          {
+              email {{ lookup('env', 'CERTBOT_JELLYFIN_EMAIL') }}
+              acme_dns cloudflare {{ lookup('env', 'CLOUDFLARE_CERTBOT_API_TOKEN') }}
+          }
+
+          {{ jellyfin_hostname }}:8920 {
+              reverse_proxy 127.0.0.1:8096
+          }
+
+          {{ idp_hostname }} {
+              reverse_proxy 127.0.0.1:1411
+          }
+
     - name: Install Docker
       role: geerlingguy.docker
       vars:
@@ -64,25 +83,25 @@
         pve_acme_plugin_api: 'cf'
         pve_acme_plugin_data: "{{ lookup('env', 'PVE_ACME_PLUGIN_DATA') }}"
 
-    - name: Configure Caddy on Proxmox node
-      role: maxhoesel.caddy.caddy_server
-      vars:
-        caddy_apply_config: true
-        caddy_config_mode: Caddyfile
-        # caddy_json_config: {}
-        caddy_caddyfile: |
-          {
-              email {{ lookup('env', 'CERTBOT_JELLYFIN_EMAIL') }}
-              acme_dns cloudflare {{ lookup('env', 'CLOUDFLARE_CERTBOT_API_TOKEN') }}
-          }
+    # - name: Configure Caddy on Proxmox node
+    #   role: maxhoesel.caddy.caddy_server
+    #   vars:
+    #     caddy_apply_config: true
+    #     caddy_config_mode: Caddyfile
+    #     # caddy_json_config: {}
+    #     caddy_caddyfile: |
+    #       {
+    #           email {{ lookup('env', 'CERTBOT_JELLYFIN_EMAIL') }}
+    #           acme_dns cloudflare {{ lookup('env', 'CLOUDFLARE_CERTBOT_API_TOKEN') }}
+    #       }
 
-          {{ jellyfin_hostname }}:8920 {
-              reverse_proxy 127.0.0.1:8096
-          }
+    #       {{ jellyfin_hostname }}:8920 {
+    #           reverse_proxy 127.0.0.1:8096
+    #       }
 
-          {{ idp_hostname }} {
-              reverse_proxy 127.0.0.1:1411
-          }
+    #       {{ idp_hostname }} {
+    #           reverse_proxy 127.0.0.1:1411
+    #       }
 
   tasks:
     - name: Proxmox repo tasks

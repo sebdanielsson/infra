@@ -40,6 +40,11 @@ roles:
     src: https://github.com/sebdanielsson/ansible-role-cloudflared.git
     version: main
 
+  - name: sebdanielsson.xcaddy
+    scm: git
+    src: https://github.com/sebdanielsson/ansible-role-xcaddy.git
+    version: main
+
   - name: maxhoesel.ddclient
     scm: git
     src: https://github.com/maxhoesel-ansible/ansible-role-ddclient.git
