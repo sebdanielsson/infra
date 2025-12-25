@@ -2,7 +2,7 @@
 - name: Hogsmeade Proxmox
   hosts: hogsmeade
   vars:
-    ansible_python_interpreter: "/usr/bin/python3"
+    ansible_python_interpreter: '/usr/bin/python3'
     docker_env_decryption_key: "{{ lookup('env', 'DOCKER_ENV_DECRYPTION_KEY') }}"
     jellyfin_hostname: "{{ lookup('env', 'JELLYFIN_HOSTNAME') }}"
     idp_hostname: "{{ lookup('env', 'IDP_HOSTNAME') }}"
@@ -30,11 +30,11 @@
         docker_service_enabled: true
         docker_restart_handler_state: restarted
         docker_daemon_options:
-          data-root: "/mnt/dockerdata"
-          log-driver: "json-file"
+          data-root: '/mnt/dockerdata'
+          log-driver: 'json-file'
           log-opts:
-            max-size: "10m"
-            max-file: "3"
+            max-size: '10m'
+            max-file: '3'
 
     - name: Install and configure cloudflared
       role: sebdanielsson.cloudflared
@@ -45,11 +45,11 @@
 
     - name: Install and configure Tailscale
       role: artis3n.tailscale.machine
-      tailscale_args: "--reset --ssh"
+      tailscale_args: '--reset --ssh'
       vars:
         tailscale_authkey: "{{ lookup('env', 'TAILSCALE_SERVER_OAUTH') }}"
         tailscale_oauth_preauthorized: true
-        tailscale_tags: ["server"]
+        tailscale_tags: ['server']
       state: present
 
     - name: Configure ACME on Proxmox node
@@ -58,17 +58,17 @@
         pve_acme_domain: "{{ lookup('env', 'PVE_ACME_DOMAIN') }}"
         pve_acme_account_name: default
         pve_acme_account_email: "{{ lookup('env', 'PVE_ACME_ACCOUNT_EMAIL') }}"
-        pve_acme_account_directory: "https://acme-v02.api.letsencrypt.org/directory"
-        pve_acme_validation_delay: "30"
-        pve_acme_plugin_name: "cloudflare"
-        pve_acme_plugin_api: "cf"
+        pve_acme_account_directory: 'https://acme-v02.api.letsencrypt.org/directory'
+        pve_acme_validation_delay: '30'
+        pve_acme_plugin_name: 'cloudflare'
+        pve_acme_plugin_api: 'cf'
         pve_acme_plugin_data: "{{ lookup('env', 'PVE_ACME_PLUGIN_DATA') }}"
 
     - name: Configure Caddy on Proxmox node
       role: maxhoesel.caddy.caddy_server
       vars:
         caddy_apply_config: true
-        caddy_config_mode: json
+        caddy_config_mode: Caddyfile
         # caddy_json_config: {}
         caddy_caddyfile: |
           {{ jellyfin_hostname }}:8920
@@ -124,7 +124,7 @@
         dest: /etc/ssh/sshd_config.d/49-sshd-hardening.conf
         owner: root
         group: root
-        mode: "0644"
+        mode: '0644'
 
     - name: Copy ssh hardening config
       ansible.builtin.copy:
@@ -132,7 +132,7 @@
         dest: /etc/ssh/ssh_config.d/49-ssh-hardening.conf
         owner: root
         group: root
-        mode: "0644"
+        mode: '0644'
 
     - name: Ensure 'sebastian' user exists
       ansible.builtin.user:
@@ -159,7 +159,7 @@
     - name: Ensure net.ipv4.ip_forward is enabled
       ansible.posix.sysctl:
         name: net.ipv4.ip_forward
-        value: "1"
+        value: '1'
         sysctl_set: true
         reload: true
         sysctl_file: /etc/sysctl.d/99-tailscale.conf
@@ -168,7 +168,7 @@
     - name: Ensure net.ipv6.conf.all.forwarding is enabled
       ansible.posix.sysctl:
         name: net.ipv6.conf.all.forwarding
-        value: "1"
+        value: '1'
         sysctl_set: true
         reload: true
         sysctl_file: /etc/sysctl.d/99-tailscale.conf
@@ -190,10 +190,10 @@
     - name: Let sudoers group use sudo
       ansible.builtin.lineinfile:
         path: /etc/sudoers
-        regexp: "^%sudo"
-        line: "%sudo ALL=(ALL:ALL) NOPASSWD:ALL"
+        regexp: '^%sudo'
+        line: '%sudo ALL=(ALL:ALL) NOPASSWD:ALL'
         create: true
-        mode: "0440"
+        mode: '0440'
         state: present
 
     - name: Set hostname
@@ -214,10 +214,10 @@
     - name: Add cloudflare_api_key for certbot plugin
       ansible.builtin.lineinfile:
         path: /etc/letsencrypt/cloudflare.ini
-        regexp: "^dns_cloudflare_api_token"
+        regexp: '^dns_cloudflare_api_token'
         line: "dns_cloudflare_api_token = {{ lookup('env', 'CLOUDFLARE_CERTBOT_API_TOKEN') }}"
         create: true
-        mode: "0640"
+        mode: '0640'
         state: present
 
     - name: Add renew hook for Jellyfin cert
@@ -230,12 +230,12 @@
           chmod 755 /certs/jellyfin/jellyfin.pfx
           chown root:docker /certs/jellyfin/jellyfin.pfx
         create: true
-        mode: "0750"
+        mode: '0750'
         state: present
 
     - name: Create certbot-renew-jellyfin service
       ansible.builtin.copy:
-        mode: "0644"
+        mode: '0644'
         dest: /etc/systemd/system/certbot-renew-jellyfin.service
         content: |
           [Unit]
@@ -249,7 +249,7 @@
 
     - name: Create certbot-renew-jellyfin.timer
       ansible.builtin.copy:
-        mode: "0644"
+        mode: '0644'
         dest: /etc/systemd/system/certbot-renew-jellyfin.timer
         content: |
           [Unit]
@@ -314,7 +314,7 @@
         group: false
         mode: push
         rsync_opts:
-          - "--exclude=.DS_Store"
+          - '--exclude=.DS_Store'
 
     - name: Docker System Prune
       ansible.builtin.command: docker system prune --all -f
@@ -325,7 +325,7 @@
         content: |
           DOTENV_PRIVATE_KEY="{{ docker_env_decryption_key }}"
         dest: /docker/.env.keys
-        mode: "0600"
+        mode: '0600'
         owner: root
         group: root
 
