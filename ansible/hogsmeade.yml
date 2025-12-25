@@ -71,6 +71,11 @@
         caddy_config_mode: Caddyfile
         # caddy_json_config: {}
         caddy_caddyfile: |
+          {
+              email {{ lookup('env', 'CERTBOT_JELLYFIN_EMAIL') }}
+              acme_dns cloudflare {{ lookup('env', 'CLOUDFLARE_CERTBOT_API_TOKEN') }}
+          }
+
           {{ jellyfin_hostname }}:8920 {
               reverse_proxy 127.0.0.1:8096
           }
