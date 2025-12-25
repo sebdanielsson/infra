@@ -11,7 +11,7 @@ services:
       - /chungus/media/tvshows:/data/tvshows
       - /chungus/media/movies:/data/movies
     ports:
-      - "8920:8920"
+      # - "8920:8920"
       - "8096:8096"
     environment:
       - PUID=1000
