@@ -17,7 +17,7 @@ collections:
     type: git
     version: 4.2.0
 
-  - name: ansible-collection-tailscale
+  - name: artis3n.tailscale
     source: https://github.com/artis3n/ansible-collection-tailscale.git
     type: git
     version: main
