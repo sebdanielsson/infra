@@ -12,18 +12,15 @@ collections:
     type: galaxy
     version: 2.1.0
 
-  - name: geerlingguy.mac
-    source: https://github.com/geerlingguy/ansible-collection-mac.git
+  - name: https://github.com/geerlingguy/ansible-collection-mac.git
     type: git
     version: 4.2.0
 
-  - name: artis3n.tailscale
-    source: https://github.com/artis3n/ansible-collection-tailscale.git
+  - name: https://github.com/artis3n/ansible-collection-tailscale.git
     type: git
     version: main
 
-  - name: maxhoesel.caddy
-    source: https://github.com/maxhoesel-ansible/ansible-collection-caddy.git
+  - name: https://github.com/maxhoesel-ansible/ansible-collection-caddy.git
     type: git
     version: main
 
