@@ -67,15 +67,10 @@ jobs:
           key: ${{ secrets.DOTENV_PRIVATE_KEY_CI }}
           inject-env-vars: false
 
-      - name: Get latest Tailscale version
-        id: get_latest_ts_version
-        run: |
-          echo "ts_latest=$(curl --silent https://api.github.com/repos/tailscale/tailscale/releases/latest | grep '\"tag_name\":' | sed -E 's/.*\"([^"]+)\".*/\1/' | sed 's/^v\(.*\)/\1/')" >> $GITHUB_OUTPUT
-
       - name: Setup Tailscale
         uses: tailscale/github-action@v4
         with:
-          version: "steps.get_latest_ts_version.outputs.ts_latest" # or "steps.get_latest_ts_version.outputs.ts_latest" for latest
+          version: "latest"
           oauth-client-id: ${{ steps.dotenvx.outputs.TS_CLIENTID }}
           oauth-secret: ${{ steps.dotenvx.outputs.TS_CLIENTSECRET }}
           tags: tag:ci
