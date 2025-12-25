@@ -22,6 +22,11 @@ collections:
     type: git
     version: main
 
+  - name: maxhoesel.caddy
+    source: https://github.com/maxhoesel-ansible/ansible-collection-caddy.git
+    type: git
+    version: main
+
 roles:
   - name: simoncaron.pve_acme
     scm: git
