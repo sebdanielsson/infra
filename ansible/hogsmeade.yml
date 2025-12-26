@@ -13,10 +13,10 @@
 
   roles:
     - name: Install and configure Caddy
-      role: xcaddy
+      role: sebdanielsson.xcaddy
       vars:
         xcaddy_modules:
-          - github.com/caddy-dns/cloudflare
+          - github.com/caddy-dns/cloudflare@v0.2.2
         xcaddy_caddyfile_content: |
           {
               email {{ lookup('env', 'CERTBOT_JELLYFIN_EMAIL') }}
