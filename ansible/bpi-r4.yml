@@ -69,22 +69,11 @@
     - name: Install packages
       community.general.opkg:
         name:
-          - shadow-useradd
-          - shadow-usermod
-          - shadow-groupadd
-          - shadow-groupmod
-          - sudo
-          - coreutils-comm
-          - coreutils-od
-          - coreutils-sort
-          - coreutils-stty
           - bash
-          - openssh-sftp-server
           - luci-app-https-dns-proxy
           - luci-app-acme
           - luci-proto-wireguard
           - tailscale
-          - iptables-nft
           - curl
         update_cache: true
         state: present
@@ -114,37 +103,10 @@
       register: tailscale_login
       changed_when: tailscale_login.stdout != ''
 
-    - name: Create group 'sudo'
-      ansible.builtin.group:
-        name: sudo
-        state: present
-
-    - name: Ensure user 'sebastian' exists
-      ansible.builtin.user:
-        name: sebastian
-        groups:
-          - sudo
-        shell: /bin/bash
-        createhome: true
-        state: present
-
     - name: SSH authorized key for 'root'
       ansible.posix.authorized_key:
         user: root
         key: "{{ lookup('env', 'SEBASTIAN_SSH_PUBLIC_KEY') }}"
         path: /etc/dropbear/authorized_keys
         manage_dir: false
-        state: present
-
-    - name: SSH authorized key for 'sebastian'
-      ansible.posix.authorized_key:
-        user: sebastian
-        key: "{{ lookup('env', 'SEBASTIAN_SSH_PUBLIC_KEY') }}"
-        state: present
-
-    - name: Add group 'sudo' to sudoers
-      community.general.sudoers:
-        name: sudo-group
-        commands: ALL
-        group: sudo
         state: present
