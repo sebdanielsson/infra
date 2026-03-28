@@ -3,7 +3,7 @@
   ansible.builtin.deb822_repository:
     name: flightradar24
     types: deb
-    signed_by: https://repo-feed.flightradar24.com/flightradar24.pub
+    signed_by: https://repo-feed.flightradar24.com/flightradar24.2026.pub
     uris: https://repo-feed.flightradar24.com
     suites: flightradar24
     components: raspberrypi-stable
