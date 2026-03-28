@@ -70,9 +70,10 @@
       community.general.apk:
         name:
           - bash
+          - luci-proto-wireguard
           - luci-app-https-dns-proxy
           - luci-app-acme
-          - luci-proto-wireguard
+          - acme-acmesh-dnsapi
           - tailscale
           - curl
         update_cache: true
