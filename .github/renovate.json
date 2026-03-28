@@ -3,6 +3,7 @@
   "extends": [
     "config:recommended"
   ],
+  "ignorePaths": ["docker/plausible/"],
   "packageRules": [
     {
       "matchUpdateTypes": [
@@ -18,9 +19,6 @@
         "/^portainer/portainer-ee$/",
         "/^portainer/agent$/"
       ]
-    },
-    {
-      "ignorePaths": ["docker/plausible/"]
     }
   ]
 }
