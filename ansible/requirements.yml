@@ -14,7 +14,7 @@ collections:
 
   - name: https://github.com/geerlingguy/ansible-collection-mac.git
     type: git
-    version: 4.2.0
+    version: 5.0.0
 
   - name: https://github.com/artis3n/ansible-collection-tailscale.git
     type: git
