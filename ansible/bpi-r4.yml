@@ -67,7 +67,7 @@
       notify: UCI commit changes
 
     - name: Install packages
-      community.general.opkg:
+      community.general.apk:
         name:
           - bash
           - luci-app-https-dns-proxy
@@ -76,7 +76,7 @@
           - tailscale
           - curl
         update_cache: true
-        state: present
+        state: latest
 
     - name: Enable and start service https-dns-proxy
       community.general.openwrt_init:
