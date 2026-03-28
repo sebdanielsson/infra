@@ -179,6 +179,3 @@
         mode: "0600"
         owner: root
         group: root
-
-    - name: Run all containers
-      ansible.builtin.import_tasks: tasks/flightradar-containers.yml
