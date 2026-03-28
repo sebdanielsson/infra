@@ -17,6 +17,7 @@
       vars:
         xcaddy_caddy_version: latest
         xcaddy_go_version: latest
+        xcaddy_state: latest
         xcaddy_modules:
           - github.com/caddy-dns/cloudflare@v0.2.2
         xcaddy_caddyfile_content: |
