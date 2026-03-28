@@ -113,7 +113,6 @@ The `docker/` directory contains Docker Compose configurations for various servi
 - **Applications:** Open-WebUI, Plausible, Pocket-ID, Ombi
 - **Gaming:** Minecraft, ET: Legacy
 - **Storage:** MinIO
-- **Monitoring:** Watchtower
 
 ### Running Docker Services
 

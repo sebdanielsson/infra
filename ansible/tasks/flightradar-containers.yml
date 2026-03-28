@@ -43,10 +43,3 @@
 #     project_src: /docker/media-stack
 #     pull: always
 #     state: present
-
-## Infrastructure services
-- name: Deploy Watchtower
-  community.docker.docker_compose_v2:
-    project_src: /docker/watchtower
-    pull: always
-    state: present

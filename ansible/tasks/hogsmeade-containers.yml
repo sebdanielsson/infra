@@ -75,12 +75,6 @@
     pull: always
     state: present
 
-- name: Deploy Watchtower
-  community.docker.docker_compose_v2:
-    project_src: /docker/watchtower
-    pull: always
-    state: present
-
 - name: Deploy Portainer
   community.docker.docker_compose_v2:
     project_src: /docker/portainer
