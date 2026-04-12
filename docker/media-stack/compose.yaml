@@ -7,7 +7,6 @@ services:
       - medianet
     volumes:
       - jellyfin_data:/config
-      - /certs/jellyfin:/certs
       - /chungus/media/tvshows:/data/tvshows
       - /chungus/media/movies:/data/movies
     ports:
@@ -17,21 +16,6 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Stockholm
-    restart: unless-stopped
-
-  ombi:
-    image: ghcr.io/linuxserver/ombi:4.58.3-development
-    container_name: ombi
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Stockholm
-    networks:
-      - medianet
-    volumes:
-      - ombi_data:/config
-    ports:
-      - "3579:3579"
     restart: unless-stopped
 
   radarr:
@@ -112,10 +96,6 @@ networks:
 volumes:
   jellyfin_data:
     name: jellyfin_data
-    external: true
-
-  ombi_data:
-    name: ombi_data
     external: true
 
   radarr_data:
