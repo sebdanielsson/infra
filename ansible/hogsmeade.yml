@@ -185,6 +185,22 @@
           - python3-full
         state: present
 
+    - name: Add GitHub CLI apt repository
+      ansible.builtin.deb822_repository:
+        name: github-cli
+        types: deb
+        uris: https://cli.github.com/packages
+        suites: stable
+        components: main
+        signed_by: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+        state: present
+
+    - name: Install GitHub CLI
+      ansible.builtin.apt:
+        name: gh
+        state: present
+        update_cache: true
+
     - name: Ensure net.ipv4.ip_forward is enabled
       ansible.posix.sysctl:
         name: net.ipv4.ip_forward
