@@ -108,9 +108,9 @@ The `docker/` directory contains Docker Compose configurations for various servi
 
 ### Available Services
 
-- **Media Services:** Jellyfin, Sonarr, Radarr, Prowlarr, Transmission
+- **Media Services:** Jellyfin, Sonarr, Radarr, Prowlarr, Seerr, Transmission
 - **Infrastructure:** Traefik, Portainer, Prometheus/Grafana, Nginx
-- **Applications:** Open-WebUI, Plausible, Pocket-ID, Ombi
+- **Applications:** Open-WebUI, Plausible, Pocket-ID
 - **Gaming:** Minecraft, ET: Legacy
 - **Storage:** MinIO
 

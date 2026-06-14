@@ -65,40 +65,6 @@ resource "cloudflare_zero_trust_access_application" "terraform_managed_resource_
   }]
 }
 
-resource "cloudflare_zero_trust_access_application" "terraform_managed_resource_8fe2db29-2bd2-4069-a4ea-aac0683f316d_2" {
-  allowed_idps               = []
-  app_launcher_visible       = true
-  auto_redirect_to_identity  = false
-  domain                     = "ombi.hogwarts.zone"
-  enable_binding_cookie      = false
-  http_only_cookie_attribute = true
-  name                       = "Ombi"
-  options_preflight_bypass   = false
-  session_duration           = "730h"
-  tags                       = []
-  type                       = "self_hosted"
-  zone_id                    = "ca58567bdcaebb2f5502f8522849fb0b"
-  destinations = [{
-    type = "public"
-    uri  = "ombi.hogwarts.zone"
-  }]
-  policies = [{
-    decision   = "allow"
-    exclude    = []
-    id         = "a0e7ccae-9578-4d71-a21f-6f88139ac704"
-    include = [{
-      group = {
-        id = "729f3c14-5f8e-4050-b3af-6a4f06c4162f"
-      }
-    }]
-    name       = "Default"
-    precedence = 2
-    require    = []
-    reusable   = false
-    uid        = "a0e7ccae-9578-4d71-a21f-6f88139ac704"
-  }]
-}
-
 resource "cloudflare_zero_trust_access_application" "terraform_managed_resource_c600b60c-7c0a-4a77-af98-3c7109a6b78b_3" {
   allowed_idps               = []
   app_launcher_visible       = false

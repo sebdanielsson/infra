@@ -92,7 +92,7 @@
   community.docker.docker_compose_v2:
     project_src: /docker/plausible
     pull: always
-    state: present
+    state: stopped
 
 - name: Deploy open-webui
   community.docker.docker_compose_v2:
