@@ -24,7 +24,7 @@ roles:
   - name: simoncaron.pve_acme
     scm: git
     src: https://github.com/simoncaron/ansible-role-pve_acme
-    version: 1.5.0
+    version: 2.0.0
 
   - name: geerlingguy.docker
     scm: git
