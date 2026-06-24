@@ -36,7 +36,7 @@ services:
     restart: unless-stopped
 
   sonarr:
-    image: ghcr.io/linuxserver/sonarr:4.0.17
+    image: ghcr.io/linuxserver/sonarr:4.0.18
     container_name: sonarr
     networks:
       - medianet
