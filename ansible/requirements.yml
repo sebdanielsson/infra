@@ -10,7 +10,7 @@ collections:
 
   - name: ansible.posix
     type: galaxy
-    version: 2.2.0
+    version: 2.2.1
 
   - name: https://github.com/geerlingguy/ansible-collection-mac.git
     type: git
