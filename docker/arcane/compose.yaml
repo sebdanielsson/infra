@@ -1,0 +1,39 @@
+---
+services:
+  app:
+    container_name: arcane
+    image: ghcr.io/getarcaneapp/manager:v2.3.2
+    ports:
+      - 3552:3552
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - arcane_data:/app/data
+      - /docker:/docker
+    environment:
+      - TZ=Europe/Stockholm
+      - APP_URL=https://arcane.hogwarts.zone
+      - PROJECTS_DIRECTORY=/docker
+      - TRUSTED_PROXIES=172.16.0.0/12
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - OIDC_ENABLED=true
+      - OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
+      - OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
+      - OIDC_ISSUER_URL=https://auth.hogwarts.zone
+      - OIDC_SCOPES=openid email profile groups
+      - OIDC_GROUPS_CLAIM=groups
+      - 'OIDC_ROLE_MAPPINGS=[{"claimValue":"admin","roleId":"role_admin"}]'
+    # Use host cgroup namespace so Arcane can detect its own container
+    cgroup: host
+    healthcheck:
+      test: ['CMD', './arcane', 'health', '--timeout', '2s']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+volumes:
+  arcane_data:
+    name: arcane_data
+    external: true
