@@ -34,6 +34,10 @@
               reverse_proxy 127.0.0.1:1411
           }
 
+          arcane.hogwarts.zone {
+              reverse_proxy 127.0.0.1:3552
+          }
+
     - name: Install Docker
       role: geerlingguy.docker
       vars:
@@ -349,10 +353,20 @@
         virtualenv_command: python3 -m venv
         virtualenv_site_packages: false
 
-    - name: Synchronize docker files
+    # Docker stacks are managed by Arcane; Ansible only syncs and deploys
+    # the Arcane stack itself.
+    - name: Ensure /docker directory exists
+      ansible.builtin.file:
+        path: /docker
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Synchronize Arcane docker files
       ansible.posix.synchronize:
-        src: ../docker/
-        dest: /docker/
+        src: ../docker/arcane/
+        dest: /docker/arcane/
         archive: true
         delete: true
         owner: false
@@ -374,5 +388,5 @@
         owner: root
         group: root
 
-    - name: Run all containers
+    - name: Deploy Arcane
       ansible.builtin.import_tasks: tasks/hogsmeade-containers.yml
