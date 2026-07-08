@@ -19,7 +19,7 @@ services:
       - 9091:9091
     volumes:
       - /lib/modules:/lib/modules
-      - ./wg0.conf:/config/wg_confs/wg0.conf
+      - wireguard_confs:/config/wg_confs
     healthcheck:
       test: ["CMD-SHELL", "wg show | grep -q handshake"]
       interval: 30s
@@ -59,4 +59,9 @@ networks:
 volumes:
   transmission_data:
     name: transmission_data
+    external: true
+
+  # wg0.conf is rendered into this volume by pre-deploy.sh on every sync
+  wireguard_confs:
+    name: wireguard_confs
     external: true
