@@ -355,13 +355,34 @@
 
     # Docker stacks are managed by Arcane; Ansible only syncs and deploys
     # the Arcane stack itself.
+    # Arcane's app worker runs as uid 65532 (distroless nonroot) and needs to
+    # create git-sync staging dirs and project workspaces here. Stack dirs it
+    # manages are chowned to 65532 at cutover; /docker/arcane and
+    # /docker/secrets stay root-owned.
     - name: Ensure /docker directory exists
       ansible.builtin.file:
         path: /docker
         state: directory
-        owner: root
-        group: root
+        owner: '65532'
+        group: '65532'
         mode: '0755'
+
+    - name: Ensure Arcane-managed project dirs are owned by the Arcane worker
+      ansible.builtin.file:
+        path: "/docker/{{ item }}"
+        state: directory
+        owner: '65532'
+        group: '65532'
+        recurse: true
+      loop:
+        - nginx
+        - media-stack
+        - termix
+        - portainer
+        - minio
+        - open-webui
+        - pocket-id
+        - transmission-wireguard
 
     - name: Synchronize Arcane docker files
       ansible.posix.synchronize:
