@@ -23,7 +23,8 @@ jobs:
 
       - name: Read sops version from Dockerfile
         id: ver
-        run: echo "tag=$(grep -oE 'sops:v[0-9]+\.[0-9]+\.[0-9]+' docker/sops-runner/Dockerfile | cut -d: -f2)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "tag=$(grep -oE 'sops:v[0-9]+\.[0-9]+\.[0-9]+' docker/sops-runner/Dockerfile | cut -d: -f2)" >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
