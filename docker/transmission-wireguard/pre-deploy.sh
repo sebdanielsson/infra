@@ -6,6 +6,7 @@
 # Extra mounts: /docker/secrets/age.key:/run/secrets/age.key:ro
 #               wireguard_confs:/out:rw
 set -eu
+umask 077
 sops --input-type dotenv --output-type dotenv --decrypt .env.sops > .env
 . ./.env
 
@@ -22,4 +23,4 @@ PublicKey = ${WG_PUBLIC_KEY}
 AllowedIPs = 0.0.0.0/0
 Endpoint = ${WG_ENDPOINT}
 EOF
-chmod 640 /out/wg0.conf
+chmod 600 /out/wg0.conf

@@ -118,6 +118,7 @@
     - name: Install sops for environment file decryption
       ansible.builtin.get_url:
         url: "https://github.com/getsops/sops/releases/download/v3.13.2/sops-v3.13.2.linux.{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+        checksum: "sha256:https://github.com/getsops/sops/releases/download/v3.13.2/sops-v3.13.2.checksums.txt"
         dest: /usr/local/bin/sops
         owner: root
         group: root
@@ -385,6 +386,13 @@
         owner: root
         group: root
         mode: '0700'
+
+    - name: Assert age key is present in the environment
+      ansible.builtin.assert:
+        that:
+          - sops_age_key | length > 0
+        fail_msg: SOPS_AGE_KEY is not set; refusing to write an empty age key
+        quiet: true
 
     # Used by Ansible to decrypt the Arcane stack's .env.sops, and by
     # Arcane's GitOps pre-deploy hooks to decrypt every other stack's secrets.
