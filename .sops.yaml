@@ -8,4 +8,4 @@
 # Encrypt:  sops --input-type dotenv --output-type dotenv -e plain.env > docker/<stack>/.env.sops
 # Edit:     SOPS_AGE_KEY_FILE=<key> sops edit --input-type dotenv --output-type dotenv docker/<stack>/.env.sops
 creation_rules:
-  - age: AGE_RECIPIENT_PLACEHOLDER
+  - age: age1p5auerjzvhvtjmfjnqf6hulfmwcjqdnu7j6wzy8uwl3g64780yxsqkvwsz
