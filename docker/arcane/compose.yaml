@@ -2,7 +2,7 @@
 services:
   app:
     container_name: arcane
-    image: ghcr.io/getarcaneapp/manager:v2.3.2
+    image: ghcr.io/getarcaneapp/manager:v2.4.0
     ports:
       - 3552:3552
     volumes:
