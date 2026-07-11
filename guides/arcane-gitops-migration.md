@@ -118,10 +118,21 @@ the same compose project name (data volumes persist).
 Verify during the pilot (docs don't pin these down):
 
 - Git-sync workspaces must materialize under `PROJECTS_DIRECTORY` (`/docker`)
-  so relative bind mounts resolve on the host.
+  so relative bind mounts resolve on the host. *(Confirmed during the pilot:
+  staging dirs are created directly under `/docker`.)*
 - Hook working directory should be the workspace root (`pre-deploy.sh` and
   `.env.sops` paths assume it).
 - Extra mounts must accept a named volume source (`wireguard_confs:/out:rw`).
+
+Found during the pilot: Arcane's app worker runs as uid 65532 (distroless
+nonroot), so `/docker` and every managed project dir must be writable by it
+or syncs fail with `permission denied` on the staging dir. The hogsmeade
+playbook enforces this with `/tmp` semantics — `/docker` is `root:65532`
+mode `1775` (group write + sticky bit), so the worker can create staging
+dirs and workspaces but cannot remove or replace the root-owned
+`/docker/arcane` and `/docker/secrets`; each managed project dir is owned
+by `65532`. The worker has no business reading the age key — hook runner
+containers get it from the docker daemon instead.
 
 ## Phase 5 — cleanup
 

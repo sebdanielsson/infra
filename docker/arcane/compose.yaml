@@ -11,6 +11,10 @@ services:
       - /docker:/docker
     environment:
       - TZ=Europe/Stockholm
+      # Pin the runtime identity Arcane drops to (upstream default is also
+      # 65532); must match the /docker ownership set by the hogsmeade playbook.
+      - PUID=65532
+      - PGID=65532
       - APP_URL=https://arcane.hogwarts.zone
       - PROJECTS_DIRECTORY=/docker
       - TRUSTED_PROXIES=172.16.0.0/12
