@@ -31,6 +31,18 @@
     name: arcane_data
     state: present
 
+- name: Create wireguard_confs volume
+  community.docker.docker_volume:
+    name: wireguard_confs
+    state: present
+
+# The transmission-wireguard pre-deploy hook (uid 65532) renders wg0.conf
+# into this volume; fresh volumes are root-owned.
+- name: Ensure wireguard_confs is writable by the hook runner
+  ansible.builtin.command:
+    cmd: docker run --rm -v wireguard_confs:/out alpine:3.22 chown 65532:65532 /out
+  changed_when: false
+
 # Deployments
 - name: Deploy Arcane
   community.docker.docker_compose_v2:

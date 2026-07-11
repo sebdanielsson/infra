@@ -92,7 +92,7 @@ writes `/docker/secrets/age.key`, and redeploys Arcane from `.env.sops`.
    | Setting      | Value                                          |
    | ------------ | ---------------------------------------------- |
    | Script path  | `pre-deploy.sh`                                |
-   | Runner image | `ghcr.io/getsops/sops:v3.13.2-alpine`          |
+   | Runner image | `ghcr.io/sebdanielsson/sops-runner:v3.13.2`    |
    | Network      | `none`                                         |
    | Environment  | `SOPS_AGE_KEY_FILE=/run/secrets/age.key`       |
    | Extra mounts | `/docker/secrets/age.key:/run/secrets/age.key:ro` |
@@ -139,6 +139,16 @@ capability-less root is subject to normal permission checks. Managed
 project dirs are therefore `65532:0` mode `0775` (worker owns, root-group
 gets dir write), and the hook scripts `rm -f .env` before decrypting since
 a worker-owned `.env` can be unlinked but not truncated by the runner.
+
+The stock `getsops/sops` image runs as root, and a root-written `.env`
+(0600) then breaks the *next* sync — the worker can't read it while
+promoting the staged directory. The runner must match the worker's uid:
+`ghcr.io/sebdanielsson/sops-runner` (built from `docker/sops-runner/` by
+the `build-sops-runner` workflow) is upstream sops with `USER 65532`. The
+GHCR package must be set to **public** visibility once after the first
+push so the docker daemon can pull it unauthenticated. The
+`wireguard_confs` volume is chowned to 65532 by the playbook for the same
+reason.
 
 ## Phase 5 — cleanup
 
