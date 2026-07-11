@@ -54,6 +54,7 @@ Before running playbooks, ensure you have:
 2. **SSH access** to target hosts configured
 3. **Inventory file** (`ansible/inventory.yml`) updated with your hosts
 4. **Group variables** in `ansible/group_vars/` configured for your environment
+5. **age key** available to sops (`SOPS_AGE_KEY` or `SOPS_AGE_KEY_FILE`) for the encrypted `.env.*.sops` files
 
 ### Available Playbooks
 
@@ -62,25 +63,25 @@ Before running playbooks, ensure you have:
 **Hogsmeade Host:**
 
 ```sh
-dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml
+../scripts/sops-run.sh .env.sops .env.hogsmeade.sops -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml
 ```
 
 **Flightradar Host:**
 
 ```sh
-dotenvx run -f .env -f .env.flightradar -- ansible-playbook -i ./inventory.yml ./flightradar.yml
+../scripts/sops-run.sh .env.sops .env.flightradar.sops -- ansible-playbook -i ./inventory.yml ./flightradar.yml
 ```
 
 **Home Gateway (ER-X):**
 
 ```sh
-dotenvx run -f .env -f .env.bpi-r4 -- ansible-playbook -i ./inventory.yml ./bpi-r4.yml
+../scripts/sops-run.sh .env.sops .env.bpi_r4.sops -- ansible-playbook -i ./inventory.yml ./bpi-r4.yml
 ```
 
 **MacBook (sebastian-mba):**
 
 ```sh
-dotenvx run -f .env -- ansible-playbook sebastian-mba.yml --ask-become-pass
+../scripts/sops-run.sh .env.sops -- ansible-playbook sebastian-mba.yml --ask-become-pass
 ```
 
 ### Dry Run (Check Mode)
@@ -88,7 +89,7 @@ dotenvx run -f .env -- ansible-playbook sebastian-mba.yml --ask-become-pass
 To test playbooks without making changes, add the `--check` flag:
 
 ```sh
-dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml --check
+../scripts/sops-run.sh .env.sops .env.hogsmeade.sops -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml --check
 ```
 
 ### Verbose Output
@@ -97,9 +98,9 @@ For detailed execution information, use verbose flags:
 
 ```sh
 cd ansible
-dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml -v   # verbose
-dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml -vv  # more verbose
-dotenvx run -f .env -f .env.hogsmeade -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml -vvv # debug
+../scripts/sops-run.sh .env.sops .env.hogsmeade.sops -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml -v   # verbose
+../scripts/sops-run.sh .env.sops .env.hogsmeade.sops -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml -vv  # more verbose
+../scripts/sops-run.sh .env.sops .env.hogsmeade.sops -- ansible-playbook -i ./inventory.yml ./hogsmeade.yml -vvv # debug
 ```
 
 ## Docker Services

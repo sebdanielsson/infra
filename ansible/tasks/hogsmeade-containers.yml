@@ -1,21 +1,23 @@
 ---
-# Docker stacks are managed by Arcane (https://arcane.hogwarts.zone).
-# Ansible only decrypts and deploys the Arcane stack itself.
-- name: Find .env files in the Arcane docker directory
-  ansible.builtin.find:
-    paths: /docker/arcane
-    patterns: ".env"
-    file_type: file
-    hidden: true
-  register: arcane_env_files
-
-- name: Decrypt .env files using dotenvx
+# Docker stacks are managed by Arcane (https://arcane.hogwarts.zone) via
+# GitOps sync. Ansible only decrypts and deploys the Arcane stack itself.
+- name: Decrypt Arcane .env using sops
   ansible.builtin.command:
-    cmd: dotenvx decrypt -f {{ item.path }} -fk /docker/.env.keys
-    chdir: "{{ item.path | dirname }}"
-  loop: "{{ arcane_env_files.files }}"
-  when: arcane_env_files.files | length > 0
+    cmd: sops --input-type dotenv --output-type dotenv --decrypt /docker/arcane/.env.sops
+  environment:
+    SOPS_AGE_KEY_FILE: /docker/secrets/age.key
+  register: arcane_env
   changed_when: false
+  no_log: true
+
+- name: Write decrypted Arcane .env
+  ansible.builtin.copy:
+    content: "{{ arcane_env.stdout }}\n"
+    dest: /docker/arcane/.env
+    owner: root
+    group: root
+    mode: '0600'
+  no_log: true
 
 # Networks
 - name: Create proxy network

@@ -42,3 +42,18 @@ terraform.rc
 
 # dotenvx decryption keys
 .env.keys
+
+# Decrypted stack env files (rendered at deploy time by Arcane pre-deploy
+# hooks or Ansible; only the encrypted .env.sops belongs in git)
+docker/*/.env
+
+# Decrypted dotenv plaintexts (only the .sops variants belong in git)
+/.env.ci
+ansible/.env
+ansible/.env.*
+!ansible/.env.*.sops
+!ansible/.env.sops
+
+# age private keys
+*.agekey
+age.key

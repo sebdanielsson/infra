@@ -1,0 +1,74 @@
+[
+  {
+    "syncName": "media-stack",
+    "gitRepo": "sebdanielsson/infra",
+    "branch": "main",
+    "dockerComposePath": "docker/media-stack/compose.yaml",
+    "autoSync": true,
+    "syncInterval": 5,
+    "syncDirectory": true
+  },
+  {
+    "syncName": "minio",
+    "gitRepo": "sebdanielsson/infra",
+    "branch": "main",
+    "dockerComposePath": "docker/minio/compose.yaml",
+    "autoSync": true,
+    "syncInterval": 5,
+    "syncDirectory": true
+  },
+  {
+    "syncName": "nginx",
+    "gitRepo": "sebdanielsson/infra",
+    "branch": "main",
+    "dockerComposePath": "docker/nginx/compose.yaml",
+    "autoSync": true,
+    "syncInterval": 5,
+    "syncDirectory": true
+  },
+  {
+    "syncName": "open-webui",
+    "gitRepo": "sebdanielsson/infra",
+    "branch": "main",
+    "dockerComposePath": "docker/open-webui/compose.yaml",
+    "autoSync": true,
+    "syncInterval": 5,
+    "syncDirectory": true
+  },
+  {
+    "syncName": "pocket-id",
+    "gitRepo": "sebdanielsson/infra",
+    "branch": "main",
+    "dockerComposePath": "docker/pocket-id/compose.yaml",
+    "autoSync": true,
+    "syncInterval": 5,
+    "syncDirectory": true
+  },
+  {
+    "syncName": "portainer",
+    "gitRepo": "sebdanielsson/infra",
+    "branch": "main",
+    "dockerComposePath": "docker/portainer/compose.yaml",
+    "autoSync": true,
+    "syncInterval": 5,
+    "syncDirectory": true
+  },
+  {
+    "syncName": "termix",
+    "gitRepo": "sebdanielsson/infra",
+    "branch": "main",
+    "dockerComposePath": "docker/termix/compose.yaml",
+    "autoSync": true,
+    "syncInterval": 5,
+    "syncDirectory": true
+  },
+  {
+    "syncName": "transmission-wireguard",
+    "gitRepo": "sebdanielsson/infra",
+    "branch": "main",
+    "dockerComposePath": "docker/transmission-wireguard/compose.yaml",
+    "autoSync": true,
+    "syncInterval": 5,
+    "syncDirectory": true
+  }
+]
