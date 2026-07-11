@@ -125,11 +125,14 @@ Verify during the pilot (docs don't pin these down):
 - Extra mounts must accept a named volume source (`wireguard_confs:/out:rw`).
 
 Found during the pilot: Arcane's app worker runs as uid 65532 (distroless
-nonroot), so `/docker` and every managed project dir must be owned by
-`65532:65532` or syncs fail with `permission denied` on the staging dir. The
-hogsmeade playbook now enforces this; `/docker/arcane` and `/docker/secrets`
-stay root-owned (the worker has no business reading the age key — hook
-runner containers get it from the docker daemon instead).
+nonroot), so `/docker` and every managed project dir must be writable by it
+or syncs fail with `permission denied` on the staging dir. The hogsmeade
+playbook enforces this with `/tmp` semantics — `/docker` is `root:65532`
+mode `1775` (group write + sticky bit), so the worker can create staging
+dirs and workspaces but cannot remove or replace the root-owned
+`/docker/arcane` and `/docker/secrets`; each managed project dir is owned
+by `65532`. The worker has no business reading the age key — hook runner
+containers get it from the docker daemon instead.
 
 ## Phase 5 — cleanup
 
