@@ -367,13 +367,17 @@
         group: '65532'
         mode: '1775'
 
+    # Owner 65532: the Arcane worker syncs workspace files here. Group 0 with
+    # mode 0775: pre-deploy hook runners execute as root with ALL capabilities
+    # dropped (no CAP_DAC_OVERRIDE), so they need explicit group write on the
+    # dir to create the decrypted .env.
     - name: Ensure Arcane-managed project dirs are owned by the Arcane worker
       ansible.builtin.file:
         path: "/docker/{{ item }}"
         state: directory
         owner: '65532'
-        group: '65532'
-        recurse: true
+        group: '0'
+        mode: '0775'
       loop:
         - nginx
         - media-stack
