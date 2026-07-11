@@ -130,9 +130,15 @@ or syncs fail with `permission denied` on the staging dir. The hogsmeade
 playbook enforces this with `/tmp` semantics — `/docker` is `root:65532`
 mode `1775` (group write + sticky bit), so the worker can create staging
 dirs and workspaces but cannot remove or replace the root-owned
-`/docker/arcane` and `/docker/secrets`; each managed project dir is owned
-by `65532`. The worker has no business reading the age key — hook runner
-containers get it from the docker daemon instead.
+`/docker/arcane` and `/docker/secrets`. The worker has no business reading
+the age key — hook runner containers get it from the docker daemon instead.
+
+Also found during the pilot: pre-deploy hook runners execute as root with
+**all capabilities dropped** (`CapDrop: ALL`, so no `CAP_DAC_OVERRIDE`) —
+capability-less root is subject to normal permission checks. Managed
+project dirs are therefore `65532:0` mode `0775` (worker owns, root-group
+gets dir write), and the hook scripts `rm -f .env` before decrypting since
+a worker-owned `.env` can be unlinked but not truncated by the runner.
 
 ## Phase 5 — cleanup
 
