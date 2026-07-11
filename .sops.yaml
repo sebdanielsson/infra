@@ -1,9 +1,9 @@
 ---
 # sops + age encryption for docker stack secrets.
 #
-# The age recipient below is the PUBLIC key. The private key lives in
-# ansible/.env.hogsmeade (AGE_SECRET_KEY) and is provisioned to the host
-# at /docker/secrets/age.key by the hogsmeade playbook.
+# The age recipient below is the PUBLIC key. The private key is the
+# SOPS_AGE_KEY GitHub Actions secret (backed up in the password manager)
+# and is provisioned to hosts at /docker/secrets/age.key by the playbooks.
 #
 # Encrypt:  sops --input-type dotenv --output-type dotenv -e plain.env > docker/<stack>/.env.sops
 # Edit:     SOPS_AGE_KEY_FILE=<key> sops edit --input-type dotenv --output-type dotenv docker/<stack>/.env.sops

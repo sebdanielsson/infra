@@ -36,8 +36,10 @@ jobs:
         with:
           path: "sebdanielsson.infra"
 
-      - name: Setup dotenvx
-        run: curl -sfS https://dotenvx.sh/install.sh | sh
+      - name: Setup sops
+        run: |
+          sudo curl -fsSL -o /usr/local/bin/sops "https://github.com/getsops/sops/releases/download/v3.13.2/sops-v3.13.2.linux.arm64"
+          sudo chmod +x /usr/local/bin/sops
 
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -59,26 +61,29 @@ jobs:
           echo "Host *" >> ~/.ssh/config
           echo "  StrictHostKeyChecking no" >> ~/.ssh/config
 
-      - name: Load secrets from dotenvx
-        id: dotenvx
-        uses: andreijiroh-dev/dotenvx-action@v0.6.0
-        with:
-          path: ${{ github.workspace }}/sebdanielsson.infra/.env.ci
-          key: ${{ secrets.DOTENV_PRIVATE_KEY_CI }}
-          inject-env-vars: false
+      - name: Load Tailscale credentials
+        id: ts
+        run: |
+          clientid=$(sops --input-type dotenv --output-type dotenv --decrypt --extract '["TS_CLIENTID"]' ../.env.ci.sops)
+          clientsecret=$(sops --input-type dotenv --output-type dotenv --decrypt --extract '["TS_CLIENTSECRET"]' ../.env.ci.sops)
+          echo "::add-mask::$clientid"
+          echo "::add-mask::$clientsecret"
+          printf 'clientid=%s\nclientsecret=%s\n' "$clientid" "$clientsecret" >> "$GITHUB_OUTPUT"
+        env:
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
 
       - name: Setup Tailscale
         uses: tailscale/github-action@v4
         with:
           version: "latest"
-          oauth-client-id: ${{ steps.dotenvx.outputs.TS_CLIENTID }}
-          oauth-secret: ${{ steps.dotenvx.outputs.TS_CLIENTSECRET }}
+          oauth-client-id: ${{ steps.ts.outputs.clientid }}
+          oauth-secret: ${{ steps.ts.outputs.clientsecret }}
           tags: tag:ci
           ping: ${{ matrix.server.name }}
 
       - name: Run playbook ${{ matrix.server.name }}
         run: |
           SERVER_NAME_UNDER=$(echo "${{ matrix.server.name }}" | tr '-' '_')
-          dotenvx run -f .env -f .env.${SERVER_NAME_UNDER} -- ansible-playbook -i ./inventory.yml ./${{ matrix.server.name }}.yml
+          ../scripts/sops-run.sh .env.sops .env.${SERVER_NAME_UNDER}.sops -- ansible-playbook -i ./inventory.yml ./${{ matrix.server.name }}.yml
         env:
-          DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY }}
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}

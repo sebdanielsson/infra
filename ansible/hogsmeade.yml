@@ -3,7 +3,7 @@
   hosts: hogsmeade
   vars:
     ansible_python_interpreter: '/usr/bin/python3'
-    age_secret_key: "{{ lookup('env', 'AGE_SECRET_KEY') }}"
+    sops_age_key: "{{ lookup('env', 'SOPS_AGE_KEY') }}"
     jellyfin_hostname: "{{ lookup('env', 'JELLYFIN_HOSTNAME') }}"
     idp_hostname: "{{ lookup('env', 'IDP_HOSTNAME') }}"
 
@@ -117,7 +117,7 @@
 
     - name: Install sops for environment file decryption
       ansible.builtin.get_url:
-        url: "https://github.com/getsops/sops/releases/download/v3.11.0/sops-v3.11.0.linux.{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+        url: "https://github.com/getsops/sops/releases/download/v3.13.2/sops-v3.13.2.linux.{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
         dest: /usr/local/bin/sops
         owner: root
         group: root
@@ -391,12 +391,22 @@
     - name: Write age key for sops decryption
       ansible.builtin.copy:
         content: |
-          {{ age_secret_key }}
+          {{ sops_age_key }}
         dest: /docker/secrets/age.key
         owner: root
         group: root
         mode: '0600'
       no_log: true
+
+    - name: Remove legacy dotenvx binary
+      ansible.builtin.file:
+        path: /usr/local/bin/dotenvx
+        state: absent
+
+    - name: Remove legacy dotenvx key file
+      ansible.builtin.file:
+        path: /docker/.env.keys
+        state: absent
 
     - name: Deploy Arcane
       ansible.builtin.import_tasks: tasks/hogsmeade-containers.yml

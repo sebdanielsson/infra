@@ -1,7 +1,7 @@
 #!/bin/sh
 # Arcane GitOps pre-deploy hook: decrypt this project's secrets and render
 # wg0.conf into the wireguard_confs volume (mounted at /out).
-# Runner image: ghcr.io/getsops/sops:v3.11.0-alpine
+# Runner image: ghcr.io/getsops/sops:v3.13.2-alpine
 # Hook env:     SOPS_AGE_KEY_FILE=/run/secrets/age.key
 # Extra mounts: /docker/secrets/age.key:/run/secrets/age.key:ro
 #               wireguard_confs:/out:rw

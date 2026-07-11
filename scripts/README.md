@@ -1,13 +1,14 @@
 # Scripts
 
-## migrate-env-to-sops.sh
+## sops-run.sh
 
-Converts a docker stack's dotenvx-encrypted `.env` into a sops+age encrypted
-`.env.sops` and removes the old file from git. See
-[guides/arcane-gitops-migration.md](../guides/arcane-gitops-migration.md).
+Runs a command with the values from one or more sops-encrypted dotenv files
+exported into its environment — decrypted values never touch disk. Used by
+the run-playbook workflow and for local playbook runs. Requires `sops` on
+PATH and `SOPS_AGE_KEY` or `SOPS_AGE_KEY_FILE` set.
 
 ```sh
-DOTENV_PRIVATE_KEY=... ./scripts/migrate-env-to-sops.sh docker/<stack>
+./scripts/sops-run.sh ansible/.env.sops ansible/.env.hogsmeade.sops -- env
 ```
 
 ## bootstrap-macos.sh

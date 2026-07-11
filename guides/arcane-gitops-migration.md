@@ -22,31 +22,36 @@ etlegacy, minecraft).
   values into the `wireguard_confs` named volume — no config file in git or
   on the host filesystem.
 - One age keypair: the public key is the recipient in `.sops.yaml`; the
-  private key is stored as `AGE_SECRET_KEY` in `ansible/.env.hogsmeade` and
-  provisioned to `/docker/secrets/age.key` by the playbook.
+  private key is the `SOPS_AGE_KEY` GitHub Actions secret (backed up in the
+  password manager) and is provisioned to `/docker/secrets/age.key` by the
+  playbooks.
 - Renovate keeps updating image tags in git; auto-sync redeploys running
   projects a few minutes after merge.
 
 ## Phase 1 — keys (local machine)
 
-Requires: `age`, `sops`, `dotenvx`, and the dotenvx private key for the
-`docker/` env files (`DOCKER_ENV_DECRYPTION_KEY` value).
+Requires: `age` and `sops`.
 
 ```sh
 age-keygen -o arcane.agekey            # prints the public key (age1...)
 ```
 
 1. Put the **public** key in `.sops.yaml`, replacing `AGE_RECIPIENT_PLACEHOLDER`.
-2. Store the private key in the Ansible env file and your password manager:
+2. Store the private key as a GitHub Actions secret and in your password
+   manager:
 
    ```sh
-   dotenvx set AGE_SECRET_KEY "$(grep AGE-SECRET-KEY arcane.agekey)" -f ansible/.env.hogsmeade
+   grep AGE-SECRET-KEY arcane.agekey | gh secret set SOPS_AGE_KEY
    ```
 
 3. Keep `arcane.agekey` out of git (gitignored) — you need it locally for
    `sops edit`.
 
 ## Phase 2 — convert secrets (before merging this branch)
+
+*(Executed — kept for the record. All dotenvx files, including the ansible
+env files and CI secrets, have since been converted; `migrate-env-to-sops.sh`
+was removed once nothing was left to migrate.)*
 
 ```sh
 export DOTENV_PRIVATE_KEY=<docker env decryption key>
@@ -87,7 +92,7 @@ writes `/docker/secrets/age.key`, and redeploys Arcane from `.env.sops`.
    | Setting      | Value                                          |
    | ------------ | ---------------------------------------------- |
    | Script path  | `pre-deploy.sh`                                |
-   | Runner image | `ghcr.io/getsops/sops:v3.11.0-alpine`          |
+   | Runner image | `ghcr.io/getsops/sops:v3.13.2-alpine`          |
    | Network      | `none`                                         |
    | Environment  | `SOPS_AGE_KEY_FILE=/run/secrets/age.key`       |
    | Extra mounts | `/docker/secrets/age.key:/run/secrets/age.key:ro` |
@@ -120,14 +125,16 @@ Verify during the pilot (docs don't pin these down):
 
 ## Phase 5 — cleanup
 
-- Remove `WG_PRIVATE_KEY`, `WG_PUBLIC_KEY`, `WG_ENDPOINT`, and
-  `DOCKER_ENV_DECRYPTION_KEY` lines from `ansible/.env.hogsmeade`.
-- On the host: delete the orphaned Ansible-era stack dirs
-  (`/docker/<stack>` for everything except `arcane` and Arcane's own
-  workspaces), `/docker/.env.keys`, and `/usr/local/bin/dotenvx`.
-- `docker/traefik/.env` and `docker/plausible/.env` are still
-  dotenvx-encrypted; convert them with the script if those stacks ever come
-  back.
+- On hogsmeade: delete the orphaned Ansible-era stack dirs (`/docker/<stack>`
+  for everything except `arcane` and Arcane's own workspaces). The playbooks
+  remove `/docker/.env.keys` and `/usr/local/bin/dotenvx` automatically.
+- Once the sops-based workflow has run green: delete the
+  `DOTENV_PRIVATE_KEY` and `DOTENV_PRIVATE_KEY_CI` GitHub Actions secrets
+  and the local `.env.keys` / `ansible/.env.keys` files.
+- Rotate the Tailscale OAuth client (`TS_CLIENTID`/`TS_CLIENTSECRET` in
+  `.env.ci.sops`): the retired dotenvx ciphertext remains in git history of
+  a public repo, so treat the old values as exposed once their key leaves
+  the GitHub secret store.
 
 ## Optional follow-up
 
@@ -144,5 +151,6 @@ Rebuild host → restore `/mnt/dockerdata` (Docker data-root, includes
 config in its database; projects re-pull from GitHub and hooks re-decrypt
 secrets from the repo. Log in with the local admin account first if
 pocket-id isn't running yet, and start it from Arcane. The two secrets that
-must survive outside the host: `AGE_SECRET_KEY` and the Arcane DB's
-`ENCRYPTION_KEY` (already in `docker/arcane/.env.sops` in git).
+must survive outside the host: the age private key (`SOPS_AGE_KEY` GitHub
+secret + password manager) and the Arcane DB's `ENCRYPTION_KEY` (already in
+`docker/arcane/.env.sops` in git).
