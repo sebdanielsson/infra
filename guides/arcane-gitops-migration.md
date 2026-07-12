@@ -19,8 +19,8 @@ etlegacy, minecraft).
   container before every deploy. The hook decrypts `.env.sops` to `.env` in
   the workspace, which compose then uses for `${VAR}` interpolation.
 - transmission-wireguard's hook additionally renders `wg0.conf` from env
-  values into the `wireguard_confs` named volume — no config file in git or
-  on the host filesystem.
+  values into the project workspace, where compose bind-mounts it into the
+  wireguard container — no config file in git.
 - One age keypair: the public key is the recipient in `.sops.yaml`; the
   private key is the `SOPS_AGE_KEY` GitHub Actions secret (backed up in the
   password manager) and is provisioned to `/docker/secrets/age.key` by the
@@ -97,9 +97,8 @@ writes `/docker/secrets/age.key`, and redeploys Arcane from `.env.sops`.
    | Environment  | `SOPS_AGE_KEY_FILE=/run/secrets/age.key`       |
    | Extra mounts | `/docker/secrets/age.key:/run/secrets/age.key:ro` |
 
-   transmission-wireguard needs one extra mount on top:
-   `wireguard_confs:/out:rw`, and the volume created once on the host:
-   `docker volume create wireguard_confs`.
+   transmission-wireguard needs no extra configuration: its hook renders
+   `wg0.conf` into the workspace and compose bind-mounts it relatively.
 
 ## Phase 4 — cutover
 
@@ -122,7 +121,9 @@ Verify during the pilot (docs don't pin these down):
   staging dirs are created directly under `/docker`.)*
 - Hook working directory should be the workspace root (`pre-deploy.sh` and
   `.env.sops` paths assume it).
-- Extra mounts must accept a named volume source (`wireguard_confs:/out:rw`).
+- Extra mounts must accept a named volume source. *(Answered: they don't —
+  Arcane requires absolute host paths, so `wg0.conf` is rendered into the
+  workspace instead and the `wireguard_confs` volume was dropped.)*
 
 Found during the pilot: Arcane's app worker runs as uid 65532 (distroless
 nonroot), so `/docker` and every managed project dir must be writable by it
