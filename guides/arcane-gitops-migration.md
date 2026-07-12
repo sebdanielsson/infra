@@ -92,7 +92,7 @@ writes `/docker/secrets/age.key`, and redeploys Arcane from `.env.sops`.
    | Setting      | Value                                          |
    | ------------ | ---------------------------------------------- |
    | Script path  | `pre-deploy.sh`                                |
-   | Runner image | `ghcr.io/sebdanielsson/sops-runner:v3.13.2`    |
+   | Runner image | `ghcr.io/getsops/sops:v3.13.2-alpine`          |
    | Network      | `none`                                         |
    | Environment  | `SOPS_AGE_KEY_FILE=/run/secrets/age.key`       |
    | Extra mounts | `/docker/secrets/age.key:/run/secrets/age.key:ro` |
@@ -125,32 +125,20 @@ Verify during the pilot (docs don't pin these down):
   Arcane requires absolute host paths, so `wg0.conf` is rendered into the
   workspace instead and the `wireguard_confs` volume was dropped.)*
 
-Found during the pilot: Arcane's app worker runs as uid 65532 (distroless
-nonroot), so `/docker` and every managed project dir must be writable by it
-or syncs fail with `permission denied` on the staging dir. The hogsmeade
-playbook enforces this with `/tmp` semantics — `/docker` is `root:65532`
-mode `1775` (group write + sticky bit), so the worker can create staging
-dirs and workspaces but cannot remove or replace the root-owned
-`/docker/arcane` and `/docker/secrets`. The worker has no business reading
-the age key — hook runner containers get it from the docker daemon instead.
-
-Also found during the pilot: pre-deploy hook runners execute as root with
-**all capabilities dropped** (`CapDrop: ALL`, so no `CAP_DAC_OVERRIDE`) —
-capability-less root is subject to normal permission checks. Managed
-project dirs are therefore `65532:0` mode `0775` (worker owns, root-group
-gets dir write), and the hook scripts `rm -f .env` before decrypting since
-a worker-owned `.env` can be unlinked but not truncated by the runner.
-
-The stock `getsops/sops` image runs as root, and a root-written `.env`
-(0600) then breaks the *next* sync — the worker can't read it while
-promoting the staged directory. The runner must match the worker's uid:
-`ghcr.io/sebdanielsson/sops-runner` (built from `docker/sops-runner/` by
-the `build-sops-runner` workflow) is upstream sops with `USER 65532`. The
-GHCR package must be set to **public** visibility once after the first
-push so the docker daemon can pull it unauthenticated. The age key is
-`root:65532` mode `0640` so the nonroot runner can read it through its
-bind mount, while the `0700` root `/docker/secrets` directory still keeps
-the Arcane worker from reaching it by path.
+Found during the pilot, and the reason Arcane runs with `PUID=0`: hook
+runner containers execute as root with **all capabilities dropped**
+(`CapDrop: ALL`, so no `CAP_DAC_OVERRIDE`), while Arcane's app worker
+defaults to uid 65532. Whatever a root hook writes (`.env` at 0600), the
+nonroot worker cannot read back during the next sync's staged-directory
+promote — and a nonroot runner can't read the root-owned age key. Short of
+maintaining a custom uid-matched sops image, the uid mismatch is
+unresolvable, and with the docker socket mounted the nonroot worker is
+root-equivalent anyway. Running the worker as root keeps everything plainly
+root-owned (`/docker` and workspaces `0755`, hook-written `.env` `0600`,
+age key `0600` in the `0700` `/docker/secrets`) with the stock sops image.
+Hooks `rm -f`/`rm -rf` their outputs before writing — capability-less root
+recreates more robustly than it truncates, and docker creates a directory
+at a missing bind-mount source.
 
 ## Phase 5 — cleanup
 

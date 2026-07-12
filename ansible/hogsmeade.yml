@@ -355,29 +355,23 @@
 
     # Docker stacks are managed by Arcane; Ansible only syncs and deploys
     # the Arcane stack itself.
-    # Arcane's app worker (PUID/PGID 65532) creates git-sync staging dirs and
-    # project workspaces here. /tmp semantics: group write + sticky bit let
-    # the worker create entries but not remove or replace root-owned dirs
-    # like /docker/arcane and /docker/secrets.
     - name: Ensure /docker directory exists
       ansible.builtin.file:
         path: /docker
         state: directory
         owner: root
-        group: '65532'
-        mode: '1775'
+        group: root
+        mode: '0755'
 
-    # Owner 65532: the Arcane worker syncs workspace files here. Group 0 with
-    # mode 0775: pre-deploy hook runners execute as root with ALL capabilities
-    # dropped (no CAP_DAC_OVERRIDE), so they need explicit group write on the
-    # dir to create the decrypted .env.
-    - name: Ensure Arcane-managed project dirs are owned by the Arcane worker
+    # Arcane (PUID 0) and its hook runners both run as root; keep the
+    # managed project workspaces plainly root-owned.
+    - name: Ensure Arcane-managed project dirs exist with root ownership
       ansible.builtin.file:
         path: "/docker/{{ item }}"
         state: directory
-        owner: '65532'
-        group: '0'
-        mode: '0775'
+        owner: root
+        group: root
+        mode: '0755'
       loop:
         - nginx
         - media-stack
@@ -421,17 +415,14 @@
 
     # Used by Ansible to decrypt the Arcane stack's .env.sops, and by
     # Arcane's GitOps pre-deploy hooks to decrypt every other stack's secrets.
-    # Group 65532 + 0640 lets the nonroot hook runner read the key via its
-    # bind mount, while the 0700 root directory still blocks the Arcane
-    # worker from reaching it by path.
     - name: Write age key for sops decryption
       ansible.builtin.copy:
         content: |
           {{ sops_age_key }}
         dest: /docker/secrets/age.key
         owner: root
-        group: '65532'
-        mode: '0640'
+        group: root
+        mode: '0600'
       no_log: true
 
     - name: Remove legacy dotenvx binary
