@@ -1,15 +1,14 @@
 #!/bin/sh
 # Arcane GitOps pre-deploy hook: decrypt this project's secrets and render
 # wg0.conf into the wireguard_confs volume (mounted at /out).
-# Runner image: ghcr.io/getsops/sops:v3.13.2-alpine
+# Runner image: ghcr.io/sebdanielsson/sops-runner:v3.13.2 (sops as uid 65532)
 # Hook env:     SOPS_AGE_KEY_FILE=/run/secrets/age.key
 # Extra mounts: /docker/secrets/age.key:/run/secrets/age.key:ro
 #               wireguard_confs:/out:rw
 set -eu
 umask 077
-# The runner is root with all capabilities dropped: it can't truncate a
-# worker-owned .env, but it can unlink it (dir is group-writable) and
-# create a fresh one.
+# Clear any stale .env first (e.g. root-owned from an older runner); the
+# runner matches the workspace owner so unlink+recreate always works.
 rm -f .env
 sops --input-type dotenv --output-type dotenv --decrypt .env.sops > .env
 . ./.env
