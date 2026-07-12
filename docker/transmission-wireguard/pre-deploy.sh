@@ -10,7 +10,8 @@ umask 077
 # Unlink before writing: the runner is root with all capabilities dropped,
 # so recreating is more robust than truncating if ownership ever drifts.
 rm -f .env
-sops --input-type dotenv --output-type dotenv --decrypt .env.sops > .env
+sops --input-type dotenv --output-type dotenv --decrypt .env.sops > .env.tmp
+mv .env.tmp .env
 . ./.env
 
 # The container init may re-own the bind-mounted file, and docker creates
