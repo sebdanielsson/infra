@@ -57,3 +57,7 @@ ansible/.env.*
 # age private keys
 *.agekey
 age.key
+
+# Rendered WireGuard config (generated into the workspace by the
+# transmission-wireguard pre-deploy hook; contains the private key)
+docker/*/wg0.conf

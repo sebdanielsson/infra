@@ -1,10 +1,10 @@
 #!/bin/sh
 # Arcane GitOps pre-deploy hook: decrypt this project's secrets and render
-# wg0.conf into the wireguard_confs volume (mounted at /out).
+# wg0.conf into the workspace, where compose bind-mounts it into the
+# wireguard container (Arcane rejects named volumes as extra-mount sources).
 # Runner image: ghcr.io/sebdanielsson/sops-runner:v3.13.2 (sops as uid 65532)
 # Hook env:     SOPS_AGE_KEY_FILE=/run/secrets/age.key
-# Extra mounts: /docker/secrets/age.key:/run/secrets/age.key:ro
-#               wireguard_confs:/out:rw
+# Extra mount:  /docker/secrets/age.key:/run/secrets/age.key:ro
 set -eu
 umask 077
 # Clear any stale .env first (e.g. root-owned from an older runner); the
@@ -13,7 +13,11 @@ rm -f .env
 sops --input-type dotenv --output-type dotenv --decrypt .env.sops > .env
 . ./.env
 
-cat > /out/wg0.conf <<EOF
+# The container init may re-own the bind-mounted file, and docker creates
+# a directory here if compose ever starts before the file exists;
+# unlink+recreate handles both.
+rm -rf wg0.conf
+cat > wg0.conf <<EOF
 [Interface]
 PrivateKey = ${WG_PRIVATE_KEY}
 Address = 10.2.0.2/32
@@ -26,4 +30,4 @@ PublicKey = ${WG_PUBLIC_KEY}
 AllowedIPs = 0.0.0.0/0
 Endpoint = ${WG_ENDPOINT}
 EOF
-chmod 600 /out/wg0.conf
+chmod 600 wg0.conf
