@@ -40,7 +40,7 @@
 # into this volume; fresh volumes are root-owned.
 - name: Ensure wireguard_confs is writable by the hook runner
   ansible.builtin.command:
-    cmd: docker run --rm -v wireguard_confs:/out alpine:3.22 chown 65532:65532 /out
+    cmd: docker run --rm -v wireguard_confs:/out alpine:3.22 chown -R 65532:65532 /out
   changed_when: false
 
 # Deployments
