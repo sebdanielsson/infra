@@ -147,9 +147,10 @@ promoting the staged directory. The runner must match the worker's uid:
 `ghcr.io/sebdanielsson/sops-runner` (built from `docker/sops-runner/` by
 the `build-sops-runner` workflow) is upstream sops with `USER 65532`. The
 GHCR package must be set to **public** visibility once after the first
-push so the docker daemon can pull it unauthenticated. The
-`wireguard_confs` volume is chowned to 65532 by the playbook for the same
-reason.
+push so the docker daemon can pull it unauthenticated. The age key is
+`root:65532` mode `0640` so the nonroot runner can read it through its
+bind mount, while the `0700` root `/docker/secrets` directory still keeps
+the Arcane worker from reaching it by path.
 
 ## Phase 5 — cleanup
 

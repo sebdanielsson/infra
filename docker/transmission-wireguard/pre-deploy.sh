@@ -13,9 +13,10 @@ rm -f .env
 sops --input-type dotenv --output-type dotenv --decrypt .env.sops > .env
 . ./.env
 
-# The container init may re-own the bind-mounted file; unlink+recreate
-# keeps it writable for this runner regardless.
-rm -f wg0.conf
+# The container init may re-own the bind-mounted file, and docker creates
+# a directory here if compose ever starts before the file exists;
+# unlink+recreate handles both.
+rm -rf wg0.conf
 cat > wg0.conf <<EOF
 [Interface]
 PrivateKey = ${WG_PRIVATE_KEY}
