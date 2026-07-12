@@ -11,10 +11,12 @@ services:
       - /docker:/docker
     environment:
       - TZ=Europe/Stockholm
-      # Pin the runtime identity Arcane drops to (upstream default is also
-      # 65532); must match the /docker ownership set by the hogsmeade playbook.
-      - PUID=65532
-      - PGID=65532
+      # Run the app worker as root instead of upstream's nonroot default:
+      # with the docker socket mounted the worker is root-equivalent anyway,
+      # and this lets git syncs, pre-deploy hook runners (root, CapDrop ALL)
+      # and the worker share workspace files without uid gymnastics.
+      - PUID=0
+      - PGID=0
       - APP_URL=https://arcane.hogwarts.zone
       - PROJECTS_DIRECTORY=/docker
       - TRUSTED_PROXIES=172.16.0.0/12
