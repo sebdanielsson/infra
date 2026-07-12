@@ -421,14 +421,17 @@
 
     # Used by Ansible to decrypt the Arcane stack's .env.sops, and by
     # Arcane's GitOps pre-deploy hooks to decrypt every other stack's secrets.
+    # Group 65532 + 0640 lets the nonroot hook runner read the key via its
+    # bind mount, while the 0700 root directory still blocks the Arcane
+    # worker from reaching it by path.
     - name: Write age key for sops decryption
       ansible.builtin.copy:
         content: |
           {{ sops_age_key }}
         dest: /docker/secrets/age.key
         owner: root
-        group: root
-        mode: '0600'
+        group: '65532'
+        mode: '0640'
       no_log: true
 
     - name: Remove legacy dotenvx binary
