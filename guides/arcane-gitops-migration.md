@@ -7,7 +7,8 @@ decrypting secrets, and replaces dotenvx with sops + age.
 
 Not migrated: `arcane` (deployed by Ansible as bootstrap), `plausible`
 (excluded), and the `state: absent` stacks (traefik, prometheus-grafana,
-etlegacy, minecraft).
+etlegacy, minecraft). `minio` was migrated but decommissioned 2026-07-14 —
+its election-map data moved to Backblaze B2 (`election-map-sweden`).
 
 ## How it fits together
 
@@ -86,8 +87,8 @@ writes `/docker/secrets/age.key`, and redeploys Arcane from `.env.sops`.
    name configured here must match `gitRepo` in the import file.
 2. **Import projects**: Projects → Git Sync → import
    [`arcane-gitops-import.json`](./arcane-gitops-import.json).
-3. **Hooks** for the four secret-bearing projects (pocket-id, open-webui,
-   minio, transmission-wireguard):
+3. **Hooks** for the secret-bearing projects (pocket-id, open-webui,
+   transmission-wireguard; minio until its decommissioning):
 
    | Setting      | Value                                          |
    | ------------ | ---------------------------------------------- |

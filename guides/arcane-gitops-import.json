@@ -9,15 +9,6 @@
     "syncDirectory": true
   },
   {
-    "syncName": "minio",
-    "gitRepo": "sebdanielsson/infra",
-    "branch": "main",
-    "dockerComposePath": "docker/minio/compose.yaml",
-    "autoSync": true,
-    "syncInterval": 5,
-    "syncDirectory": true
-  },
-  {
     "syncName": "nginx",
     "gitRepo": "sebdanielsson/infra",
     "branch": "main",
