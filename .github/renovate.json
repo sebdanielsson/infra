@@ -3,7 +3,7 @@
   "extends": [
     "config:recommended"
   ],
-  "ignorePaths": ["docker/plausible/"],
+  "minimumReleaseAge": "1 days",
   "packageRules": [
     {
       "matchUpdateTypes": [
@@ -12,13 +12,6 @@
       ],
       "matchCurrentVersion": "!/^0/",
       "automerge": true
-    },
-    {
-      "groupName": "portainer",
-      "matchPackageNames": [
-        "/^portainer/portainer-ee$/",
-        "/^portainer/agent$/"
-      ]
     }
   ]
 }
