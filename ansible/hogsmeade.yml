@@ -343,6 +343,42 @@
           sharenfs: crossmnt,no_root_squash,rw=192.168.1.0/24
         state: present
 
+    - name: Limit ZFS ARC size (max 8 GiB, min 4 GiB)
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/modprobe.d/zfs.conf
+        create: true
+        line: "options zfs {{ item.name }}={{ item.value }}"
+        regexp: "^options zfs {{ item.name }}"
+        owner: root
+        group: root
+        mode: '0644'
+      loop:
+        - { name: zfs_arc_max, value: '8589934592' }
+        - { name: zfs_arc_min, value: '4294967296' }
+      loop_control:
+        label: "{{ item.name }}"
+      notify: Update initramfs
+
+    # Applied live so a reboot isn't needed. Max is set before min because
+    # zfs_arc_min cannot be raised above the current zfs_arc_max.
+    - name: Apply ZFS ARC limits at runtime
+      become: true
+      ansible.builtin.shell: |
+        param=/sys/module/zfs/parameters/{{ item.name }}
+        [ "$(cat $param)" = "{{ item.value }}" ] && exit 90
+        echo {{ item.value }} > $param
+      args:
+        executable: /bin/bash
+      register: zfs_arc_runtime
+      changed_when: zfs_arc_runtime.rc == 0
+      failed_when: zfs_arc_runtime.rc not in [0, 90]
+      loop:
+        - { name: zfs_arc_max, value: '8589934592' }
+        - { name: zfs_arc_min, value: '4294967296' }
+      loop_control:
+        label: "{{ item.name }}"
+
     - name: Install Python packages for docker management
       ansible.builtin.pip:
         name:
