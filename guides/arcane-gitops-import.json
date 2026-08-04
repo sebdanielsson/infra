@@ -1,5 +1,14 @@
 [
   {
+    "syncName": "docktail",
+    "gitRepo": "sebdanielsson/infra",
+    "branch": "main",
+    "dockerComposePath": "docker/docktail/compose.yaml",
+    "autoSync": true,
+    "syncInterval": 5,
+    "syncDirectory": true
+  },
+  {
     "syncName": "media-stack",
     "gitRepo": "sebdanielsson/infra",
     "branch": "main",

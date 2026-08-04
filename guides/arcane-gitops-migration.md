@@ -88,7 +88,7 @@ writes `/docker/secrets/age.key`, and redeploys Arcane from `.env.sops`.
 2. **Import projects**: Projects → Git Sync → import
    [`arcane-gitops-import.json`](./arcane-gitops-import.json).
 3. **Hooks** for the secret-bearing projects (pocket-id, open-webui,
-   transmission-wireguard; minio until its decommissioning):
+   transmission-wireguard, docktail; minio until its decommissioning):
 
    | Setting      | Value                                          |
    | ------------ | ---------------------------------------------- |

@@ -1,0 +1,17 @@
+---
+services:
+  docktail:
+    container_name: docktail
+    image: ghcr.io/marvinvr/docktail:1.6.0
+    volumes:
+      # Read-only: DockTail only watches events and inspects containers.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Mount the directory, not tailscaled.sock itself, so the bind survives
+      # tailscaled restarts recreating the socket inode.
+      - /var/run/tailscale:/var/run/tailscale
+    environment:
+      - TZ=Europe/Stockholm
+      - LOG_LEVEL=info
+      - TAILSCALE_OAUTH_CLIENT_ID=${TAILSCALE_OAUTH_CLIENT_ID}
+      - TAILSCALE_OAUTH_CLIENT_SECRET=${TAILSCALE_OAUTH_CLIENT_SECRET}
+    restart: unless-stopped
