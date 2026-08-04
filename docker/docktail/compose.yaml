@@ -12,6 +12,9 @@ services:
     environment:
       - TZ=Europe/Stockholm
       - LOG_LEVEL=info
+      # Services are created by the OAuth client, which carries tag:app —
+      # DockTail's tag:container default is not part of that identity.
+      - DEFAULT_SERVICE_TAGS=tag:app
       - TAILSCALE_OAUTH_CLIENT_ID=${TAILSCALE_OAUTH_CLIENT_ID}
       - TAILSCALE_OAUTH_CLIENT_SECRET=${TAILSCALE_OAUTH_CLIENT_SECRET}
     restart: unless-stopped
