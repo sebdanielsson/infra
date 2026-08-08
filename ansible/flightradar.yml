@@ -53,7 +53,7 @@
   tasks:
     - name: Install sops for environment file decryption
       ansible.builtin.get_url:
-        url: "https://github.com/getsops/sops/releases/download/v3.13.2/sops-v3.13.2.linux.{{ 'arm64' if ansible_facts.ansible_architecture == 'aarch64' else 'amd64' }}"
+        url: "https://github.com/getsops/sops/releases/download/v3.13.2/sops-v3.13.2.linux.{{ 'arm64' if ansible_facts.architecture == 'aarch64' else 'amd64' }}"
         checksum: "sha256:https://github.com/getsops/sops/releases/download/v3.13.2/sops-v3.13.2.checksums.txt"
         dest: /usr/local/bin/sops
         owner: root
