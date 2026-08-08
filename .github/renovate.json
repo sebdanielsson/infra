@@ -6,6 +6,20 @@
   "minimumReleaseAge": "1 day",
   "packageRules": [
     {
+      "description": "Only Docker Hub exposes release timestamps. GHCR/Quay/ECR tags have none, so with the Renovate 42 default (minimumReleaseAgeBehaviour=timestamp-required) their updates stay in 'Pending Status Checks' forever instead of ever getting a PR.",
+      "matchDatasources": [
+        "docker"
+      ],
+      "minimumReleaseAgeBehaviour": "timestamp-optional"
+    },
+    {
+      "description": "The ansible-galaxy manager sets packageName to the full clone URL for git-sourced collections, which the github-tags datasource cannot resolve ('no-result'). Map it back to owner/repo.",
+      "matchDepNames": [
+        "github.com/geerlingguy/ansible-collection-mac"
+      ],
+      "overridePackageName": "geerlingguy/ansible-collection-mac"
+    },
+    {
       "matchUpdateTypes": [
         "minor",
         "patch"
