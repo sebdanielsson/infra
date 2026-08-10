@@ -23,6 +23,16 @@ services:
       - OAUTH_PROVIDER_NAME=Pocket ID
       - OAUTH_SCOPES=openid profile email groups
       - OPENID_REDIRECT_URI=${OPENID_REDIRECT_URI}
+    labels:
+      - docktail.service.enable=true
+      - docktail.service.name=open-webui
+      - docktail.service.description=Open WebUI LLM chat
+      - docktail.service.port=8080
+      - docktail.service.protocol=http
+      - docktail.service.direct=true
+      - docktail.service.network=open-webui
+      - docktail.service.service-port=443
+      - docktail.service.service-protocol=https
     restart: unless-stopped
 
   pipelines:

@@ -15,6 +15,16 @@ services:
       - "--storage.tsdb.path=/prometheus"
       - "--web.console.libraries=/usr/share/prometheus/console_libraries"
       - "--web.console.templates=/usr/share/prometheus/consoles"
+    labels:
+      - docktail.service.enable=true
+      - docktail.service.name=prometheus
+      - docktail.service.description=Prometheus metrics server
+      - docktail.service.port=9090
+      - docktail.service.protocol=http
+      - docktail.service.direct=true
+      - docktail.service.network=prometheus-grafana
+      - docktail.service.service-port=443
+      - docktail.service.service-protocol=https
     restart: unless-stopped
 
   grafana:
@@ -28,6 +38,16 @@ services:
       - 3000:3000
     volumes:
       - grafana_data:/var/lib/grafana
+    labels:
+      - docktail.service.enable=true
+      - docktail.service.name=grafana
+      - docktail.service.description=Grafana dashboards
+      - docktail.service.port=3000
+      - docktail.service.protocol=http
+      - docktail.service.direct=true
+      - docktail.service.network=prometheus-grafana
+      - docktail.service.service-port=443
+      - docktail.service.service-protocol=https
     restart: unless-stopped
 
 networks:

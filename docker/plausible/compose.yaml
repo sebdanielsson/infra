@@ -65,6 +65,16 @@ services:
       - MAILGUN_DOMAIN=${MAILGUN_DOMAIN}
       - MAILER_ADAPTER=Bamboo.MailgunAdapter
       - MAILGUN_BASE_URI=https://api.eu.mailgun.net/v3
+    labels:
+      - docktail.service.enable=true
+      - docktail.service.name=plausible
+      - docktail.service.description=Plausible web analytics
+      - docktail.service.port=8000
+      - docktail.service.protocol=http
+      - docktail.service.direct=true
+      - docktail.service.network=plausible
+      - docktail.service.service-port=443
+      - docktail.service.service-protocol=https
     restart: always
 
 networks:

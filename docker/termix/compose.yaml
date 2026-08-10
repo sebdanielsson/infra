@@ -3,12 +3,28 @@ services:
     image: ghcr.io/lukegus/termix:release-1.7.3
     container_name: termix
     restart: unless-stopped
+    networks:
+      - termix
     ports:
       - "8080:8080"
     volumes:
       - app_data:/app/data
     environment:
       PORT: "8080"
+    labels:
+      - docktail.service.enable=true
+      - docktail.service.name=termix
+      - docktail.service.description=Termix SSH terminal
+      - docktail.service.port=8080
+      - docktail.service.protocol=http
+      - docktail.service.direct=true
+      - docktail.service.network=termix
+      - docktail.service.service-port=443
+      - docktail.service.service-protocol=https
+
+networks:
+  termix:
+    name: termix
 
 volumes:
   app_data:
