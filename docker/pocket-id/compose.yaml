@@ -27,6 +27,15 @@ services:
       - traefik.http.routers.auth.rule=Host(`auth.hogwarts.zone`)
       - traefik.http.routers.auth.tls.certresolver=cloudflare
       - traefik.http.services.auth.loadbalancer.server.port=1411
+      - docktail.service.enable=true
+      - docktail.service.name=pocket-id
+      - docktail.service.description=Pocket ID OIDC provider
+      - docktail.service.port=1411
+      - docktail.service.protocol=http
+      - docktail.service.direct=true
+      - docktail.service.network=proxy
+      - docktail.service.service-port=443
+      - docktail.service.service-protocol=https
     restart: unless-stopped
 
 networks:

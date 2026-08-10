@@ -16,6 +16,16 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Stockholm
+    labels:
+      - docktail.service.enable=true
+      - docktail.service.name=jellyfin
+      - docktail.service.description=Jellyfin media server
+      - docktail.service.port=8096
+      - docktail.service.protocol=http
+      - docktail.service.direct=true
+      - docktail.service.network=medianet
+      - docktail.service.service-port=443
+      - docktail.service.service-protocol=https
     restart: unless-stopped
 
   radarr:
@@ -33,6 +43,16 @@ services:
       - /chungus/media/downloads:/downloads
     ports:
       - "7878:7878"
+    labels:
+      - docktail.service.enable=true
+      - docktail.service.name=radarr
+      - docktail.service.description=Radarr movie manager
+      - docktail.service.port=7878
+      - docktail.service.protocol=http
+      - docktail.service.direct=true
+      - docktail.service.network=medianet
+      - docktail.service.service-port=443
+      - docktail.service.service-protocol=https
     restart: unless-stopped
 
   sonarr:
@@ -50,6 +70,16 @@ services:
       - /chungus/media/downloads:/downloads
     ports:
       - "8989:8989"
+    labels:
+      - docktail.service.enable=true
+      - docktail.service.name=sonarr
+      - docktail.service.description=Sonarr TV manager
+      - docktail.service.port=8989
+      - docktail.service.protocol=http
+      - docktail.service.direct=true
+      - docktail.service.network=medianet
+      - docktail.service.service-port=443
+      - docktail.service.service-protocol=https
     restart: unless-stopped
 
   prowlarr:
@@ -65,6 +95,16 @@ services:
       - prowlarr_data:/config
     ports:
       - "9696:9696"
+    labels:
+      - docktail.service.enable=true
+      - docktail.service.name=prowlarr
+      - docktail.service.description=Prowlarr indexer manager
+      - docktail.service.port=9696
+      - docktail.service.protocol=http
+      - docktail.service.direct=true
+      - docktail.service.network=medianet
+      - docktail.service.service-port=443
+      - docktail.service.service-protocol=https
     restart: unless-stopped
 
   seerr:
@@ -87,6 +127,16 @@ services:
       timeout: 3s
       interval: 15s
       retries: 3
+    labels:
+      - docktail.service.enable=true
+      - docktail.service.name=seerr
+      - docktail.service.description=Seerr media request portal
+      - docktail.service.port=5055
+      - docktail.service.protocol=http
+      - docktail.service.direct=true
+      - docktail.service.network=medianet
+      - docktail.service.service-port=443
+      - docktail.service.service-protocol=https
     restart: unless-stopped
 
 networks:

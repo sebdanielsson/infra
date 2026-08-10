@@ -27,6 +27,19 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s
+    # Transmission runs in this container's network namespace
+    # (network_mode: service:wireguard) and so has no IP of its own — the
+    # DockTail service for its web UI has to be declared here.
+    labels:
+      - docktail.service.enable=true
+      - docktail.service.name=transmission
+      - docktail.service.description=Transmission web UI (via WireGuard)
+      - docktail.service.port=9091
+      - docktail.service.protocol=http
+      - docktail.service.direct=true
+      - docktail.service.network=wgnet
+      - docktail.service.service-port=443
+      - docktail.service.service-protocol=https
     restart: unless-stopped
   transmission:
     image: ghcr.io/linuxserver/transmission:4.1.3
@@ -50,6 +63,7 @@ services:
 
 networks:
   wgnet:
+    name: wgnet
     ipam:
       config:
         - subnet: 172.100.0.0/24

@@ -3,6 +3,8 @@ services:
   app:
     container_name: arcane
     image: ghcr.io/getarcaneapp/manager:v2.7.0
+    networks:
+      - arcane
     ports:
       - 3552:3552
     volumes:
@@ -37,7 +39,21 @@ services:
       timeout: 3s
       retries: 5
       start_period: 15s
+    labels:
+      - docktail.service.enable=true
+      - docktail.service.name=arcane
+      - docktail.service.description=Arcane Docker manager
+      - docktail.service.port=3552
+      - docktail.service.protocol=http
+      - docktail.service.direct=true
+      - docktail.service.network=arcane
+      - docktail.service.service-port=443
+      - docktail.service.service-protocol=https
     restart: unless-stopped
+
+networks:
+  arcane:
+    name: arcane
 
 volumes:
   arcane_data:

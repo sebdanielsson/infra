@@ -10,6 +10,16 @@ services:
     volumes:
       - /opt/election-map:/usr/share/nginx/html:ro
       - ./default.conf:/etc/nginx/conf.d/default.conf:ro
+    labels:
+      - docktail.service.enable=true
+      - docktail.service.name=election-map
+      - docktail.service.description=Election map static site
+      - docktail.service.port=80
+      - docktail.service.protocol=http
+      - docktail.service.direct=true
+      - docktail.service.network=nginx
+      - docktail.service.service-port=443
+      - docktail.service.service-protocol=https
     restart: unless-stopped
 
 networks:

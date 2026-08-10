@@ -54,6 +54,17 @@ services:
       - traefik.http.middlewares.secHeaders.headers.customFrameOptionsValue=SAMEORIGIN
       - traefik.http.middlewares.secHeaders.headers.referrerPolicy=same-origin
       - traefik.http.middlewares.secHeaders.headers.PermissionsPolicy="geolocation=(self), microphone=(), camera=(), fullscreen=*"
+      # Dashboard on the tailnet as traefik.<tailnet>, alongside the existing
+      # Host(`hogsmeade...`)/dashboard router above.
+      - docktail.service.enable=true
+      - docktail.service.name=traefik
+      - docktail.service.description=Traefik dashboard
+      - docktail.service.port=8080
+      - docktail.service.protocol=http
+      - docktail.service.direct=true
+      - docktail.service.network=proxy
+      - docktail.service.service-port=443
+      - docktail.service.service-protocol=https
     restart: unless-stopped
 
 networks:
