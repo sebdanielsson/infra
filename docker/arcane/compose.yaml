@@ -2,7 +2,7 @@
 services:
   app:
     container_name: arcane
-    image: ghcr.io/getarcaneapp/manager:v2.7.0
+    image: ghcr.io/getarcaneapp/manager:v2.8.0
     networks:
       - arcane
     ports:
