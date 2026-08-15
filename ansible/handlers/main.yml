@@ -14,6 +14,11 @@
     name: fr24feed
     state: restarted
 
+- name: Restart dump1090-fa
+  ansible.builtin.systemd:
+    name: dump1090-fa
+    state: restarted
+
 - name: UCI commit changes
   ansible.builtin.command: uci commit
   changed_when: true

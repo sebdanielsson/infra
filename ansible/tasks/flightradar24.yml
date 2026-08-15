@@ -88,6 +88,23 @@
     enabled: true
     state: started
 
+# Without a receiver position dump1090-fa cannot resolve surface positions
+# locally and reports no distance or range statistics at all, which is what
+# the range and coverage panels are built on.
+- name: Configure dump1090-fa receiver position
+  ansible.builtin.lineinfile:
+    path: /etc/default/dump1090-fa
+    regexp: "^{{ item.key }}="
+    line: "{{ item.key }}={{ item.value }}"
+    state: present
+  loop:
+    - { key: RECEIVER_LAT, value: "{{ adsb_lat }}" }
+    - { key: RECEIVER_LON, value: "{{ adsb_lon }}" }
+  loop_control:
+    label: "{{ item.key }}"
+  no_log: true
+  notify: Restart dump1090-fa
+
 - name: Configure fr24feed with sharing key
   ansible.builtin.template:
     src: fr24feed.ini.j2

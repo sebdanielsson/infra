@@ -1,0 +1,77 @@
+---
+# Observability for the ADS-B receiver.
+#
+# dump1090-fa keeps the RTL-SDR and keeps feeding Flightradar24. Ultrafeeder
+# runs readsb in net-only mode off dump1090-fa's Beast output on port 30005
+# and adds the tar1090 map, graphs1090 and a Prometheus endpoint; DockTail
+# publishes the map on the tailnet over HTTPS. Prometheus and Grafana live on
+# hogsmeade (docker/prometheus-grafana, deployed by Arcane).
+- name: Ensure /docker exists
+  ansible.builtin.file:
+    path: /docker
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Ensure stack directories exist
+  ansible.builtin.file:
+    path: "/docker/{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - adsb
+    - docktail
+
+- name: Copy compose files
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../docker/{{ item }}/compose.yaml"
+    dest: "/docker/{{ item }}/compose.yaml"
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - adsb
+    - docktail
+
+# Written straight from the playbook's sops-decrypted environment: unlike
+# hogsmeade there is no Arcane pre-deploy hook here, so nothing needs the age
+# key on the host.
+- name: Write ADS-B stack environment
+  ansible.builtin.copy:
+    content: |
+      ADSB_LAT={{ adsb_lat }}
+      ADSB_LON={{ adsb_lon }}
+      ADSB_ALT_M={{ adsb_alt_m }}
+    dest: /docker/adsb/.env
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
+
+- name: Write DockTail environment
+  ansible.builtin.copy:
+    content: |
+      TAILSCALE_OAUTH_CLIENT_ID={{ tailscale_oauth_client_id }}
+      TAILSCALE_OAUTH_CLIENT_SECRET={{ tailscale_oauth_client_secret }}
+    dest: /docker/docktail/.env
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
+
+- name: Deploy ADS-B stack
+  community.docker.docker_compose_v2:
+    project_src: /docker/adsb
+    # The image tag is pinned, so there is nothing to re-pull on every run —
+    # and a ~600 MB pull is not free on a Pi's SD card.
+    pull: missing
+    state: present
+
+- name: Deploy DockTail
+  community.docker.docker_compose_v2:
+    project_src: /docker/docktail
+    pull: missing
+    state: present

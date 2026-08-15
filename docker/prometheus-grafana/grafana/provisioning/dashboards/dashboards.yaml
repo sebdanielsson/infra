@@ -1,0 +1,16 @@
+---
+apiVersion: 1
+
+providers:
+  - name: adsb
+    orgId: 1
+    folder: ADS-B
+    type: file
+    disableDeletion: false
+    # Dashboards are provisioned from git; edits made in the UI are for
+    # experimenting and get reverted on the next sync.
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false

@@ -20,6 +20,13 @@
       "overridePackageName": "{{{replace 'github\\.com/' '' depName}}}"
     },
     {
+      "description": "sdr-enthusiasts images publish no semver tags; their immutable releases are numbered latest-build-<n>.",
+      "matchPackageNames": [
+        "ghcr.io/sdr-enthusiasts/docker-adsb-ultrafeeder"
+      ],
+      "versioning": "regex:^latest-build-(?<major>\\d+)$"
+    },
+    {
       "matchUpdateTypes": [
         "minor",
         "patch"

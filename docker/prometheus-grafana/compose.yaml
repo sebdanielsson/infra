@@ -1,18 +1,24 @@
 ---
+# Metrics and dashboards for the flightradar ADS-B receiver.
+#
+# Prometheus scrapes readsb's exporter and the Pi's node-exporter over the
+# tailnet; adsb-logger polls readsb's aircraft.json and keeps a per-sighting
+# flight log in SQLite; Grafana reads both.
 services:
   prometheus:
     container_name: prometheus
     image: prom/prometheus:v3.13.2
     networks:
       - prometheus
-    ports:
-      - 9090:9090
+    # No host ports: DockTail publishes this on the tailnet, and hogsmeade's
+    # 9090/9091/9099 are all taken by other services.
     volumes:
       - ./prometheus:/etc/prometheus
       - prometheus_data:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=365d"
       - "--web.console.libraries=/usr/share/prometheus/console_libraries"
       - "--web.console.templates=/usr/share/prometheus/consoles"
     labels:
@@ -34,10 +40,26 @@ services:
       - prometheus
     networks:
       - prometheus
-    ports:
-      - 3000:3000
+    # No host ports: reachable at https://grafana.risk-bee.ts.net via DockTail.
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      # Read-write on purpose: a reader of a WAL database still needs to
+      # write the -shm/-wal sidecars.
+      - adsb_flightlog:/flightlog
+    environment:
+      - TZ=Europe/Stockholm
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_SERVER_ROOT_URL=https://grafana.risk-bee.ts.net
+      - GF_INSTALL_PLUGINS=frser-sqlite-datasource
+      - GF_ANALYTICS_REPORTING_ENABLED=false
+      - GF_ANALYTICS_CHECK_FOR_UPDATES=false
+      - GF_NEWS_NEWS_FEED_ENABLED=false
+      - GF_USERS_DEFAULT_THEME=dark
+      - GF_USERS_HOME_PAGE=/d/adsb-skywatch
+      - GF_DATE_FORMATS_DEFAULT_TIMEZONE=Europe/Stockholm
     labels:
       - docktail.service.enable=true
       - docktail.service.name=grafana
@@ -50,6 +72,29 @@ services:
       - docktail.service.service-protocol=https
     restart: unless-stopped
 
+  # Per-sighting flight log. Stock python image running a stdlib-only script
+  # from the git-synced project directory — no build step, no pip install.
+  adsb-logger:
+    container_name: adsb-logger
+    image: python:3.14-alpine
+    networks:
+      - prometheus
+    command: ["python", "-u", "/app/logger.py"]
+    volumes:
+      - ./adsb-logger:/app:ro
+      - adsb_flightlog:/data
+    environment:
+      - TZ=Europe/Stockholm
+      - ADSB_JSON_URL=http://flightradar.risk-bee.ts.net:8504/data/aircraft.json
+      - ADSB_DB_PATH=/data/adsb.db
+      - ADSB_LAT=${ADSB_LAT}
+      - ADSB_LON=${ADSB_LON}
+      - ADSB_POLL_INTERVAL=5
+      - ADSB_POSITION_INTERVAL=30
+      - ADSB_POSITION_RETENTION_DAYS=30
+      - ADSB_SIGHTING_RETENTION_DAYS=730
+    restart: unless-stopped
+
 networks:
   prometheus:
     name: prometheus-grafana
@@ -57,8 +102,9 @@ networks:
 volumes:
   prometheus_data:
     name: prometheus_data
-    external: true
 
   grafana_data:
     name: grafana_data
-    external: true
+
+  adsb_flightlog:
+    name: adsb_flightlog

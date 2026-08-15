@@ -110,7 +110,8 @@ The `docker/` directory contains Docker Compose configurations for various servi
 ### Available Services
 
 - **Media Services:** Jellyfin, Sonarr, Radarr, Prowlarr, Seerr, Transmission
-- **Infrastructure:** Traefik, Portainer, Prometheus/Grafana, Nginx
+- **Infrastructure:** Traefik, Portainer, Prometheus/Grafana, Nginx, DockTail
+- **ADS-B:** Ultrafeeder (tar1090 + graphs1090) on `flightradar`, dashboards on `hogsmeade` — see [ADS-B observability](guides/adsb-observability.md)
 - **Applications:** Open-WebUI, Plausible, Pocket-ID
 - **Gaming:** Minecraft, ET: Legacy
 - **Storage:** MinIO

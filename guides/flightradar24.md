@@ -135,13 +135,25 @@ sudo journalctl -u fr24feed -f
 
 ## Accessing the Web Interface
 
+The receiver's day-to-day interfaces are documented in
+[ADS-B observability](./adsb-observability.md) — tar1090, graphs1090 and the
+Grafana dashboards, all on the tailnet over HTTPS. What follows is the stock
+FR24/dump1090 setup underneath.
+
 ### Flightradar24
 
-The Flightradar24 feeder web interface can accessed at: <http://flightradar:8754>.
+The Flightradar24 feeder web interface can be accessed at: <http://flightradar:8754>,
+or <https://fr24.risk-bee.ts.net> on the tailnet.
 
 ### dump1090
 
 The dump1090 web interface, which provides a live map of aircraft, can be accessed at: <http://flightradar/dump1090>
+
+### MLAT
+
+FR24's MLAT needs the message timestamps that only the Beast format carries, so
+`fr24feed.ini` uses `receiver="beast-tcp"` against dump1090-fa's port 30005. With
+`receiver="avr-tcp"` on port 30002 the feeder reports `mlat_problem: rx-incompatible`.
 
 ## Potential Issues
 
