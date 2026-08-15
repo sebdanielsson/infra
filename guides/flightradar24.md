@@ -142,7 +142,7 @@ FR24/dump1090 setup underneath.
 
 ### Flightradar24
 
-The Flightradar24 feeder web interface can accessed at: <http://flightradar:8754>,
+The Flightradar24 feeder web interface can be accessed at: <http://flightradar:8754>,
 or <https://fr24.risk-bee.ts.net> on the tailnet.
 
 ### dump1090

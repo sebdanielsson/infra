@@ -32,8 +32,24 @@ JSON_URL = os.environ.get(
     "ADSB_JSON_URL", "http://flightradar.risk-bee.ts.net:8504/data/aircraft.json"
 )
 DB_PATH = os.environ.get("ADSB_DB_PATH", "/data/adsb.db")
-RECEIVER_LAT = float(os.environ.get("ADSB_LAT", "0") or 0)
-RECEIVER_LON = float(os.environ.get("ADSB_LON", "0") or 0)
+
+
+def _env_coord(name: str) -> float | None:
+    raw = os.environ.get(name, "").strip()
+    if not raw:
+        return None
+    try:
+        return float(raw)
+    except ValueError:
+        return None
+
+
+RECEIVER_LAT = _env_coord("ADSB_LAT")
+RECEIVER_LON = _env_coord("ADSB_LON")
+# Both or neither. Half a position is worse than none: pairing one real
+# coordinate with a zero default yields distances that look plausible and are
+# wrong by hundreds of kilometres.
+RECEIVER_SET = RECEIVER_LAT is not None and RECEIVER_LON is not None
 
 POLL_INTERVAL = float(os.environ.get("ADSB_POLL_INTERVAL", "5"))
 # One stored track point per aircraft per this many seconds. At ~40 aircraft
@@ -503,12 +519,12 @@ class Session:
         dist_nm = as_float(ac.get("r_dst"))
         if dist_nm is not None:
             dist_km = dist_nm * NM_TO_KM
-        elif RECEIVER_LAT or RECEIVER_LON:
+        elif RECEIVER_SET:
             dist_km = haversine_km(RECEIVER_LAT, RECEIVER_LON, lat, lon)
         else:
             dist_km = None
         bearing = as_float(ac.get("r_dir"))
-        if bearing is None and (RECEIVER_LAT or RECEIVER_LON):
+        if bearing is None and RECEIVER_SET:
             bearing = bearing_deg(RECEIVER_LAT, RECEIVER_LON, lat, lon)
 
         if dist_km is not None:
@@ -778,6 +794,15 @@ def main() -> None:
         format="%(asctime)s %(levelname)s %(message)s",
     )
     LOG.info("polling %s every %ss -> %s", JSON_URL, POLL_INTERVAL, DB_PATH)
+    if not RECEIVER_SET:
+        # Normally harmless: readsb supplies r_dst/r_dir whenever *its* own
+        # position is set, and this is only the fallback. Worth saying out
+        # loud though, because a half-configured pair silently loses every
+        # distance and bearing for Mode S-only contacts.
+        LOG.warning(
+            "ADSB_LAT/ADSB_LON not both set (lat=%r lon=%r); falling back to "
+            "readsb's r_dst/r_dir only", RECEIVER_LAT, RECEIVER_LON,
+        )
     Logger().run()
 
 

@@ -159,6 +159,26 @@
         update_cache: true
         state: present
 
+    # Checked before anything consumes these, not at the end of the play: the
+    # tasks below write them with no_log, so an empty value would silently
+    # blank RECEIVER_LAT in /etc/default/dump1090-fa (losing every range and
+    # distance statistic) and leave DockTail without credentials.
+    - name: Assert the ADS-B receiver configuration is present
+      ansible.builtin.assert:
+        that:
+          - adsb_lat is match('^-?\d{1,3}(\.\d+)?$')
+          - adsb_lon is match('^-?\d{1,3}(\.\d+)?$')
+          - adsb_lat | float | abs <= 90
+          - adsb_lon | float | abs <= 180
+          - adsb_alt_m is match('^-?\d+$')
+          - tailscale_oauth_client_id | length > 0
+          - tailscale_oauth_client_secret | length > 0
+        fail_msg: >-
+          ADSB_LAT, ADSB_LON, ADSB_ALT_M and the DockTail Tailscale OAuth
+          client must come from ansible/.env.flightradar.sops. Run the
+          playbook through scripts/sops-run.sh.
+        quiet: true
+
     - name: Install and configure Flightradar24
       ansible.builtin.import_tasks: tasks/flightradar24.yml
 
