@@ -155,53 +155,9 @@
     - name: Install and configure Flightradar24
       ansible.builtin.import_tasks: tasks/flightradar24.yml
 
-    - name: Synchronize docker files
-      ansible.posix.synchronize:
-        src: ../docker/
-        dest: /docker/
-        archive: true
-        delete: true
-        owner: false
-        group: false
-        mode: push
-        rsync_opts:
-          - "--exclude=.DS_Store"
-
-    - name: Docker System Prune
-      ansible.builtin.command: docker system prune --all -f
-      changed_when: true
-
-    - name: Create /docker/secrets directory
-      ansible.builtin.file:
-        path: /docker/secrets
-        state: directory
-        owner: root
-        group: root
-        mode: '0700'
-
     - name: Assert age key is present in the environment
       ansible.builtin.assert:
         that:
           - sops_age_key | length > 0
         fail_msg: SOPS_AGE_KEY is not set; refusing to write an empty age key
         quiet: true
-
-    - name: Write age key for sops decryption
-      ansible.builtin.copy:
-        content: |
-          {{ sops_age_key }}
-        dest: /docker/secrets/age.key
-        owner: root
-        group: root
-        mode: '0600'
-      no_log: true
-
-    - name: Remove legacy dotenvx binary
-      ansible.builtin.file:
-        path: /usr/local/bin/dotenvx
-        state: absent
-
-    - name: Remove legacy dotenvx key file
-      ansible.builtin.file:
-        path: /docker/.env.keys
-        state: absent
