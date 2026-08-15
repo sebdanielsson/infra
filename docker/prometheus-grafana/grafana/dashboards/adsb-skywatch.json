@@ -1,0 +1,1758 @@
+{
+  "uid": "adsb-skywatch",
+  "title": "ADS-B · Sky Watch",
+  "description": "What flew over Uppsala, when, and where. Built from readsb's aircraft.json, logged one row per contact into SQLite by the adsb-logger container.",
+  "tags": [
+    "adsb",
+    "flightradar"
+  ],
+  "timezone": "browser",
+  "editable": true,
+  "graphTooltip": 1,
+  "schemaVersion": 41,
+  "version": 1,
+  "refresh": "1m",
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "1h"
+    ],
+    "quick_ranges": [
+      {
+        "display": "Last 6 hours",
+        "from": "now-6h",
+        "to": "now"
+      },
+      {
+        "display": "Today",
+        "from": "now/d",
+        "to": "now/d"
+      },
+      {
+        "display": "Last 24 hours",
+        "from": "now-24h",
+        "to": "now"
+      },
+      {
+        "display": "Last 7 days",
+        "from": "now-7d",
+        "to": "now"
+      },
+      {
+        "display": "Last 30 days",
+        "from": "now-30d",
+        "to": "now"
+      }
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Aircraft seen",
+      "description": "Distinct airframes heard in the selected period.",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT COUNT(DISTINCT hex) AS value FROM sighting WHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000",
+          "rawQueryText": "SELECT COUNT(DISTINCT hex) AS value FROM sighting WHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": null,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3987e5",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "percentChangeColorMode": "standard"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Flights tracked",
+      "description": "One per continuous stretch of contact; an aircraft that comes back after five minutes of silence counts again.",
+      "gridPos": {
+        "x": 4,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT COUNT(*) AS value FROM sighting WHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000",
+          "rawQueryText": "SELECT COUNT(*) AS value FROM sighting WHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": null,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3987e5",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "percentChangeColorMode": "standard"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Aircraft types",
+      "description": "",
+      "gridPos": {
+        "x": 8,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT COUNT(DISTINCT icao_type) AS value FROM sighting WHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND icao_type IS NOT NULL",
+          "rawQueryText": "SELECT COUNT(DISTINCT icao_type) AS value FROM sighting WHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND icao_type IS NOT NULL",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": null,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#199e70",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "percentChangeColorMode": "standard"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Airlines",
+      "description": "",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT COUNT(DISTINCT airline_code) AS value FROM sighting WHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND airline_code IS NOT NULL",
+          "rawQueryText": "SELECT COUNT(DISTINCT airline_code) AS value FROM sighting WHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND airline_code IS NOT NULL",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": null,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#199e70",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "percentChangeColorMode": "standard"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Furthest contact",
+      "description": "Greatest straight-line distance from the antenna.",
+      "gridPos": {
+        "x": 16,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT MAX(dist_max_km) AS value FROM sighting WHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000",
+          "rawQueryText": "SELECT MAX(dist_max_km) AS value FROM sighting WHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "lengthkm",
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#d95926",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "percentChangeColorMode": "standard"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Military",
+      "description": "Airframes flagged military in the tar1090 database.",
+      "gridPos": {
+        "x": 20,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT COUNT(*) AS value FROM sighting WHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND military = 1",
+          "rawQueryText": "SELECT COUNT(*) AS value FROM sighting WHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND military = 1",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": null,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#c98500",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "wideLayout": true,
+        "showPercentChange": false,
+        "percentChangeColorMode": "standard"
+      }
+    },
+    {
+      "type": "geomap",
+      "title": "Coverage — where the traffic actually is",
+      "description": "Every recorded position, binned to ~1 km cells and weighted by how often an aircraft was there. Gaps point at terrain or antenna obstructions.",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 14,
+        "h": 12
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT lat, lon, MIN(1.0, CAST(n AS REAL) / (0.2 * MAX(n) OVER ())) AS weight\nFROM (\n  SELECT ROUND(lat, 2) AS lat, ROUND(lon, 2) AS lon, COUNT(*) AS n\n  FROM position\n  WHERE ts BETWEEN $__from / 1000 AND $__to / 1000\n    AND lat IS NOT NULL AND lon IS NOT NULL\n  GROUP BY 1, 2\n)\nORDER BY weight DESC\nLIMIT 20000",
+          "rawQueryText": "SELECT lat, lon, MIN(1.0, CAST(n AS REAL) / (0.2 * MAX(n) OVER ())) AS weight\nFROM (\n  SELECT ROUND(lat, 2) AS lat, ROUND(lon, 2) AS lon, COUNT(*) AS n\n  FROM position\n  WHERE ts BETWEEN $__from / 1000 AND $__to / 1000\n    AND lat IS NOT NULL AND lon IS NOT NULL\n  GROUP BY 1, 2\n)\nORDER BY weight DESC\nLIMIT 20000",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-blues"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3987e5",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "view": {
+          "id": "fit",
+          "lat": 0,
+          "lon": 0,
+          "zoom": 4,
+          "allLayers": true,
+          "padding": 8
+        },
+        "controls": {
+          "showZoom": true,
+          "mouseWheelZoom": true,
+          "showAttribution": true,
+          "showScale": true,
+          "showMeasure": false,
+          "showDebug": false
+        },
+        "basemap": {
+          "type": "default",
+          "name": "Basemap",
+          "config": {}
+        },
+        "layers": [
+          {
+            "type": "heatmap",
+            "name": "Position density",
+            "location": {
+              "mode": "coords",
+              "latitude": "lat",
+              "longitude": "lon"
+            },
+            "config": {
+              "weight": {
+                "field": "weight",
+                "fixed": 1,
+                "min": 0,
+                "max": 1
+              },
+              "radius": 5,
+              "blur": 8
+            },
+            "tooltip": true
+          }
+        ],
+        "tooltip": {
+          "mode": "details"
+        }
+      }
+    },
+    {
+      "type": "barchart",
+      "title": "Max range by direction",
+      "description": "Furthest contact in each 22.5° sector. A short bar is a blocked horizon, not a quiet sky.",
+      "gridPos": {
+        "x": 14,
+        "y": 4,
+        "w": 10,
+        "h": 12
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "WITH sectors(sector) AS (\n  VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14),(15)\n),\npts AS (\n  SELECT CAST((CAST(bearing + 11.25 AS INT) % 360) / 22.5 AS INT) % 16 AS sector, dist_km\n  FROM position\n  WHERE ts BETWEEN $__from / 1000 AND $__to / 1000\n    AND bearing IS NOT NULL AND dist_km IS NOT NULL\n)\nSELECT CASE s.sector\n      WHEN 0 THEN 'N'  WHEN 1 THEN 'NNE' WHEN 2 THEN 'NE'  WHEN 3 THEN 'ENE'\n      WHEN 4 THEN 'E'  WHEN 5 THEN 'ESE' WHEN 6 THEN 'SE'  WHEN 7 THEN 'SSE'\n      WHEN 8 THEN 'S'  WHEN 9 THEN 'SSW' WHEN 10 THEN 'SW' WHEN 11 THEN 'WSW'\n      WHEN 12 THEN 'W' WHEN 13 THEN 'WNW' WHEN 14 THEN 'NW' ELSE 'NNW'\n    END AS direction,\n       ROUND(COALESCE(MAX(p.dist_km), 0), 0) AS \"Max range\"\nFROM sectors s\nLEFT JOIN pts p ON p.sector = s.sector\nGROUP BY s.sector\nORDER BY s.sector",
+          "rawQueryText": "WITH sectors(sector) AS (\n  VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14),(15)\n),\npts AS (\n  SELECT CAST((CAST(bearing + 11.25 AS INT) % 360) / 22.5 AS INT) % 16 AS sector, dist_km\n  FROM position\n  WHERE ts BETWEEN $__from / 1000 AND $__to / 1000\n    AND bearing IS NOT NULL AND dist_km IS NOT NULL\n)\nSELECT CASE s.sector\n      WHEN 0 THEN 'N'  WHEN 1 THEN 'NNE' WHEN 2 THEN 'NE'  WHEN 3 THEN 'ENE'\n      WHEN 4 THEN 'E'  WHEN 5 THEN 'ESE' WHEN 6 THEN 'SE'  WHEN 7 THEN 'SSE'\n      WHEN 8 THEN 'S'  WHEN 9 THEN 'SSW' WHEN 10 THEN 'SW' WHEN 11 THEN 'WSW'\n      WHEN 12 THEN 'W' WHEN 13 THEN 'WNW' WHEN 14 THEN 'NW' ELSE 'NNW'\n    END AS direction,\n       ROUND(COALESCE(MAX(p.dist_km), 0), 0) AS \"Max range\"\nFROM sectors s\nLEFT JOIN pts p ON p.sector = s.sector\nGROUP BY s.sector\nORDER BY s.sector",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "lengthkm",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#3987e5"
+          },
+          "custom": {
+            "lineWidth": 0,
+            "fillOpacity": 90,
+            "gradientMode": "none",
+            "axisPlacement": "auto",
+            "axisLabel": "",
+            "axisBorderShow": false,
+            "axisGridShow": true,
+            "axisCenteredZero": false,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3987e5",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0,
+        "showValue": "auto",
+        "stacking": "none",
+        "groupWidth": 0.7,
+        "barWidth": 0.8,
+        "barRadius": 0.05,
+        "fullHighlight": false,
+        "xField": "direction",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none",
+          "hideZeros": false
+        },
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Aircraft per hour",
+      "description": "Distinct airframes first heard in each hour.",
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT CAST(first_seen / 3600 AS INT) * 3600 AS time,\n       COUNT(DISTINCT hex) AS \"Aircraft\"\nFROM sighting\nWHERE first_seen BETWEEN $__from / 1000 AND $__to / 1000\nGROUP BY 1\nORDER BY 1",
+          "rawQueryText": "SELECT CAST(first_seen / 3600 AS INT) * 3600 AS time,\n       COUNT(DISTINCT hex) AS \"Aircraft\"\nFROM sighting\nWHERE first_seen BETWEEN $__from / 1000 AND $__to / 1000\nGROUP BY 1\nORDER BY 1",
+          "queryType": "time series",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": null,
+          "min": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "bars",
+            "lineWidth": 2,
+            "fillOpacity": 90,
+            "gradientMode": "none",
+            "barAlignment": 0,
+            "barWidthFactor": 0.85,
+            "showPoints": "never",
+            "pointSize": 8,
+            "spanNulls": false,
+            "lineInterpolation": "linear",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisBorderShow": false,
+            "axisGridShow": true,
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Aircraft"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true,
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc",
+          "hideZeros": false
+        }
+      }
+    },
+    {
+      "type": "bargauge",
+      "title": "Top airlines",
+      "description": "",
+      "gridPos": {
+        "x": 0,
+        "y": 23,
+        "w": 8,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT COALESCE(airline, airline_code) AS Airline, COUNT(*) AS flights\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND airline_code IS NOT NULL\nGROUP BY 1\nORDER BY flights DESC\nLIMIT 12",
+          "rawQueryText": "SELECT COALESCE(airline, airline_code) AS Airline, COUNT(*) AS flights\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND airline_code IS NOT NULL\nGROUP BY 1\nORDER BY flights DESC\nLIMIT 12",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "color": {
+            "mode": "continuous-blues"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3987e5",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "valueMode": "color",
+        "showUnfilled": true,
+        "minVizWidth": 8,
+        "minVizHeight": 14,
+        "maxVizHeight": 22,
+        "namePlacement": "left",
+        "sizing": "auto",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "/^flights$/",
+          "values": true
+        },
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      }
+    },
+    {
+      "type": "bargauge",
+      "title": "Top aircraft types",
+      "description": "",
+      "gridPos": {
+        "x": 8,
+        "y": 23,
+        "w": 8,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT icao_type || COALESCE(' · ' || MIN(aircraft_desc), '') AS Type,\n       COUNT(*) AS flights\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND icao_type IS NOT NULL\nGROUP BY icao_type\nORDER BY flights DESC\nLIMIT 12",
+          "rawQueryText": "SELECT icao_type || COALESCE(' · ' || MIN(aircraft_desc), '') AS Type,\n       COUNT(*) AS flights\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND icao_type IS NOT NULL\nGROUP BY icao_type\nORDER BY flights DESC\nLIMIT 12",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "color": {
+            "mode": "continuous-blues"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3987e5",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "valueMode": "color",
+        "showUnfilled": true,
+        "minVizWidth": 8,
+        "minVizHeight": 14,
+        "maxVizHeight": 22,
+        "namePlacement": "left",
+        "sizing": "auto",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "/^flights$/",
+          "values": true
+        },
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      }
+    },
+    {
+      "type": "bargauge",
+      "title": "Top countries of registration",
+      "description": "",
+      "gridPos": {
+        "x": 16,
+        "y": 23,
+        "w": 8,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT country AS Country, COUNT(DISTINCT hex) AS aircraft\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND country IS NOT NULL\nGROUP BY 1\nORDER BY aircraft DESC\nLIMIT 12",
+          "rawQueryText": "SELECT country AS Country, COUNT(DISTINCT hex) AS aircraft\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND country IS NOT NULL\nGROUP BY 1\nORDER BY aircraft DESC\nLIMIT 12",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "color": {
+            "mode": "continuous-blues"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3987e5",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "valueMode": "color",
+        "showUnfilled": true,
+        "minVizWidth": 8,
+        "minVizHeight": 14,
+        "maxVizHeight": 22,
+        "namePlacement": "left",
+        "sizing": "auto",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "/^aircraft$/",
+          "values": true
+        },
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      }
+    },
+    {
+      "type": "barchart",
+      "title": "Altitude band",
+      "description": "Highest altitude reached during each contact. The tall bar near FL350 is overflying traffic; the low bars are approaches into Arlanda and Ärna.",
+      "gridPos": {
+        "x": 0,
+        "y": 33,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT (CAST(alt_max / 5000 AS INT) * 5) || '–'\n         || (CAST(alt_max / 5000 AS INT) * 5 + 5) || ' kft' AS band,\n       COUNT(*) AS flights\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND alt_max IS NOT NULL\nGROUP BY CAST(alt_max / 5000 AS INT)\nORDER BY CAST(alt_max / 5000 AS INT)",
+          "rawQueryText": "SELECT (CAST(alt_max / 5000 AS INT) * 5) || '–'\n         || (CAST(alt_max / 5000 AS INT) * 5 + 5) || ' kft' AS band,\n       COUNT(*) AS flights\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND alt_max IS NOT NULL\nGROUP BY CAST(alt_max / 5000 AS INT)\nORDER BY CAST(alt_max / 5000 AS INT)",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#3987e5"
+          },
+          "custom": {
+            "lineWidth": 0,
+            "fillOpacity": 90,
+            "gradientMode": "none",
+            "axisPlacement": "auto",
+            "axisLabel": "",
+            "axisBorderShow": false,
+            "axisGridShow": true,
+            "axisCenteredZero": false,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3987e5",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "vertical",
+        "xTickLabelRotation": -40,
+        "xTickLabelSpacing": 0,
+        "showValue": "auto",
+        "stacking": "none",
+        "groupWidth": 0.7,
+        "barWidth": 0.8,
+        "barRadius": 0.05,
+        "fullHighlight": false,
+        "xField": "band",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none",
+          "hideZeros": false
+        },
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      }
+    },
+    {
+      "type": "barchart",
+      "title": "Distance band",
+      "description": "How far away each contact got. The tail on the right is the receiver's real reach.",
+      "gridPos": {
+        "x": 8,
+        "y": 33,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT (CAST(dist_max_km / 25 AS INT) * 25) || '–'\n         || (CAST(dist_max_km / 25 AS INT) * 25 + 25) || ' km' AS band,\n       COUNT(*) AS flights\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND dist_max_km IS NOT NULL\nGROUP BY CAST(dist_max_km / 25 AS INT)\nORDER BY CAST(dist_max_km / 25 AS INT)",
+          "rawQueryText": "SELECT (CAST(dist_max_km / 25 AS INT) * 25) || '–'\n         || (CAST(dist_max_km / 25 AS INT) * 25 + 25) || ' km' AS band,\n       COUNT(*) AS flights\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND dist_max_km IS NOT NULL\nGROUP BY CAST(dist_max_km / 25 AS INT)\nORDER BY CAST(dist_max_km / 25 AS INT)",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#3987e5"
+          },
+          "custom": {
+            "lineWidth": 0,
+            "fillOpacity": 90,
+            "gradientMode": "none",
+            "axisPlacement": "auto",
+            "axisLabel": "",
+            "axisBorderShow": false,
+            "axisGridShow": true,
+            "axisCenteredZero": false,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3987e5",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "vertical",
+        "xTickLabelRotation": -40,
+        "xTickLabelSpacing": 0,
+        "showValue": "auto",
+        "stacking": "none",
+        "groupWidth": 0.7,
+        "barWidth": 0.8,
+        "barRadius": 0.05,
+        "fullHighlight": false,
+        "xField": "band",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none",
+          "hideZeros": false
+        },
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      }
+    },
+    {
+      "type": "barchart",
+      "title": "Busiest hour of day",
+      "description": "Local time. Aggregated across every day in the selected range.",
+      "gridPos": {
+        "x": 16,
+        "y": 33,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT CAST(strftime('%H', first_seen, 'unixepoch', 'localtime') AS INT) || ':00' AS hour,\n       COUNT(*) AS flights\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000\nGROUP BY 1\nORDER BY 1",
+          "rawQueryText": "SELECT CAST(strftime('%H', first_seen, 'unixepoch', 'localtime') AS INT) || ':00' AS hour,\n       COUNT(*) AS flights\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000\nGROUP BY 1\nORDER BY 1",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#3987e5"
+          },
+          "custom": {
+            "lineWidth": 0,
+            "fillOpacity": 90,
+            "gradientMode": "none",
+            "axisPlacement": "auto",
+            "axisLabel": "",
+            "axisBorderShow": false,
+            "axisGridShow": true,
+            "axisCenteredZero": false,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#3987e5",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "vertical",
+        "xTickLabelRotation": -40,
+        "xTickLabelSpacing": 0,
+        "showValue": "auto",
+        "stacking": "none",
+        "groupWidth": 0.7,
+        "barWidth": 0.8,
+        "barRadius": 0.05,
+        "fullHighlight": false,
+        "xField": "hour",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none",
+          "hideZeros": false
+        },
+        "legend": {
+          "showLegend": false,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        }
+      }
+    },
+    {
+      "type": "table",
+      "title": "Recent flights",
+      "description": "Every contact in the window, newest first. The header filters.",
+      "gridPos": {
+        "x": 0,
+        "y": 41,
+        "w": 24,
+        "h": 12
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT last_seen AS \"time\",\n       callsign AS \"Callsign\",\n       COALESCE(airline, airline_code) AS \"Airline\",\n       registration AS \"Reg\",\n       icao_type AS \"Type\",\n       aircraft_desc AS \"Aircraft\",\n       country AS \"Country\",\n       alt_max AS \"Peak alt\",\n       ROUND(dist_min_km, 1) AS \"Closest\",\n       ROUND(dist_max_km, 1) AS \"Furthest\",\n       duration_s AS \"Tracked\",\n       ROUND(rssi_max, 1) AS \"Peak RSSI\"\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000\nORDER BY last_seen DESC\nLIMIT 500",
+          "rawQueryText": "SELECT last_seen AS \"time\",\n       callsign AS \"Callsign\",\n       COALESCE(airline, airline_code) AS \"Airline\",\n       registration AS \"Reg\",\n       icao_type AS \"Type\",\n       aircraft_desc AS \"Aircraft\",\n       country AS \"Country\",\n       alt_max AS \"Peak alt\",\n       ROUND(dist_min_km, 1) AS \"Closest\",\n       ROUND(dist_max_km, 1) AS \"Furthest\",\n       duration_s AS \"Tracked\",\n       ROUND(rssi_max, 1) AS \"Peak RSSI\"\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000\nORDER BY last_seen DESC\nLIMIT 500",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsLocal"
+              },
+              {
+                "id": "custom.width",
+                "value": 170
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Peak alt"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "lengthft"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Closest"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "lengthkm"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Furthest"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "lengthkm"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tracked"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Peak RSSI"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dB"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        },
+        "sortBy": [
+          {
+            "displayName": "time",
+            "desc": true
+          }
+        ]
+      }
+    },
+    {
+      "type": "table",
+      "title": "Furthest contacts",
+      "description": "The record book for this time range.",
+      "gridPos": {
+        "x": 0,
+        "y": 53,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT last_seen AS \"time\",\n       ROUND(dist_max_km, 1) AS \"Distance\",\n       callsign AS \"Callsign\",\n       registration AS \"Reg\",\n       icao_type AS \"Type\",\n       alt_max AS \"Peak alt\",\n       country AS \"Country\"\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND dist_max_km IS NOT NULL\nORDER BY dist_max_km DESC\nLIMIT 25",
+          "rawQueryText": "SELECT last_seen AS \"time\",\n       ROUND(dist_max_km, 1) AS \"Distance\",\n       callsign AS \"Callsign\",\n       registration AS \"Reg\",\n       icao_type AS \"Type\",\n       alt_max AS \"Peak alt\",\n       country AS \"Country\"\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND dist_max_km IS NOT NULL\nORDER BY dist_max_km DESC\nLIMIT 25",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsLocal"
+              },
+              {
+                "id": "custom.width",
+                "value": 160
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Distance"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "lengthkm"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Peak alt"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "lengthft"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        },
+        "sortBy": []
+      }
+    },
+    {
+      "type": "table",
+      "title": "Military and emergency",
+      "description": "Military airframes, plus anything squawking 7500/7600/7700 or setting an emergency status.",
+      "gridPos": {
+        "x": 12,
+        "y": 53,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT last_seen AS \"time\",\n       CASE WHEN military = 1 THEN 'military' ELSE '' END AS \"Flag\",\n       COALESCE(emergency, '') AS \"Emergency\",\n       squawk AS \"Squawk\",\n       callsign AS \"Callsign\",\n       registration AS \"Reg\",\n       icao_type AS \"Type\",\n       aircraft_desc AS \"Aircraft\",\n       country AS \"Country\"\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND (military = 1 OR emergency IS NOT NULL)\nORDER BY last_seen DESC\nLIMIT 200",
+          "rawQueryText": "SELECT last_seen AS \"time\",\n       CASE WHEN military = 1 THEN 'military' ELSE '' END AS \"Flag\",\n       COALESCE(emergency, '') AS \"Emergency\",\n       squawk AS \"Squawk\",\n       callsign AS \"Callsign\",\n       registration AS \"Reg\",\n       icao_type AS \"Type\",\n       aircraft_desc AS \"Aircraft\",\n       country AS \"Country\"\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000 AND (military = 1 OR emergency IS NOT NULL)\nORDER BY last_seen DESC\nLIMIT 200",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsLocal"
+              },
+              {
+                "id": "custom.width",
+                "value": 160
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        },
+        "sortBy": []
+      }
+    },
+    {
+      "type": "table",
+      "title": "First time ever seen",
+      "description": "Airframes that appear in the log for the very first time — new arrivals, not just new to this time range.",
+      "gridPos": {
+        "x": 0,
+        "y": 63,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT s.first_seen AS \"time\",\n       s.callsign AS \"Callsign\",\n       s.registration AS \"Reg\",\n       s.icao_type AS \"Type\",\n       s.aircraft_desc AS \"Aircraft\",\n       s.country AS \"Country\",\n       ROUND(s.dist_max_km, 1) AS \"Furthest\"\nFROM sighting s\nWHERE s.first_seen BETWEEN $__from / 1000 AND $__to / 1000\n  AND s.first_seen = (SELECT MIN(x.first_seen) FROM sighting x WHERE x.hex = s.hex)\nORDER BY s.first_seen DESC\nLIMIT 200",
+          "rawQueryText": "SELECT s.first_seen AS \"time\",\n       s.callsign AS \"Callsign\",\n       s.registration AS \"Reg\",\n       s.icao_type AS \"Type\",\n       s.aircraft_desc AS \"Aircraft\",\n       s.country AS \"Country\",\n       ROUND(s.dist_max_km, 1) AS \"Furthest\"\nFROM sighting s\nWHERE s.first_seen BETWEEN $__from / 1000 AND $__to / 1000\n  AND s.first_seen = (SELECT MIN(x.first_seen) FROM sighting x WHERE x.hex = s.hex)\nORDER BY s.first_seen DESC\nLIMIT 200",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsLocal"
+              },
+              {
+                "id": "custom.width",
+                "value": 160
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Furthest"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "lengthkm"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        },
+        "sortBy": []
+      }
+    },
+    {
+      "type": "table",
+      "title": "Longest tracked",
+      "description": "Contacts held the longest — usually high overflights with a clear line of sight.",
+      "gridPos": {
+        "x": 12,
+        "y": 63,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "frser-sqlite-datasource",
+            "uid": "adsb-flightlog"
+          },
+          "queryText": "SELECT last_seen AS \"time\",\n       duration_s AS \"Tracked\",\n       callsign AS \"Callsign\",\n       registration AS \"Reg\",\n       icao_type AS \"Type\",\n       ROUND(dist_min_km, 1) AS \"Closest\",\n       positions AS \"Fixes\"\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000\nORDER BY duration_s DESC\nLIMIT 25",
+          "rawQueryText": "SELECT last_seen AS \"time\",\n       duration_s AS \"Tracked\",\n       callsign AS \"Callsign\",\n       registration AS \"Reg\",\n       icao_type AS \"Type\",\n       ROUND(dist_min_km, 1) AS \"Closest\",\n       positions AS \"Fixes\"\nFROM sighting\nWHERE last_seen >= $__from / 1000 AND first_seen <= $__to / 1000\nORDER BY duration_s DESC\nLIMIT 25",
+          "queryType": "table",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false,
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsLocal"
+              },
+              {
+                "id": "custom.width",
+                "value": 160
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tracked"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Closest"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "lengthkm"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": [
+            "sum"
+          ],
+          "countRows": false,
+          "fields": ""
+        },
+        "sortBy": []
+      }
+    }
+  ],
+  "preload": false
+}

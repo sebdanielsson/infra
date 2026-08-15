@@ -54,6 +54,15 @@
     "syncDirectory": true
   },
   {
+    "syncName": "prometheus-grafana",
+    "gitRepo": "sebdanielsson/infra",
+    "branch": "main",
+    "dockerComposePath": "docker/prometheus-grafana/compose.yaml",
+    "autoSync": true,
+    "syncInterval": 5,
+    "syncDirectory": true
+  },
+  {
     "syncName": "termix",
     "gitRepo": "sebdanielsson/infra",
     "branch": "main",

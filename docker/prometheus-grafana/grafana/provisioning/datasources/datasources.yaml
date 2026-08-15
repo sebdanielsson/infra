@@ -1,0 +1,21 @@
+---
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: adsb-prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    jsonData:
+      timeInterval: 15s
+      httpMethod: POST
+
+  # Written by the adsb-logger container into the shared adsb_flightlog volume.
+  - name: Flight log
+    uid: adsb-flightlog
+    type: frser-sqlite-datasource
+    access: proxy
+    jsonData:
+      path: /flightlog/adsb.db

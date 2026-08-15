@@ -5,6 +5,13 @@
   vars:
     ansible_python_interpreter: "/usr/bin/python3"
     sops_age_key: "{{ lookup('env', 'SOPS_AGE_KEY') }}"
+    # Antenna position. Kept out of git in ansible/.env.flightradar.sops —
+    # it is the home address in another coordinate system.
+    adsb_lat: "{{ lookup('env', 'ADSB_LAT') }}"
+    adsb_lon: "{{ lookup('env', 'ADSB_LON') }}"
+    adsb_alt_m: "{{ lookup('env', 'ADSB_ALT_M') }}"
+    tailscale_oauth_client_id: "{{ lookup('env', 'TAILSCALE_OAUTH_CLIENT_ID') }}"
+    tailscale_oauth_client_secret: "{{ lookup('env', 'TAILSCALE_OAUTH_CLIENT_SECRET') }}"
 
   handlers:
     - name: Import handlers
@@ -154,6 +161,9 @@
 
     - name: Install and configure Flightradar24
       ansible.builtin.import_tasks: tasks/flightradar24.yml
+
+    - name: Deploy the ADS-B observability stack
+      ansible.builtin.import_tasks: tasks/adsb-stack.yml
 
     - name: Assert age key is present in the environment
       ansible.builtin.assert:

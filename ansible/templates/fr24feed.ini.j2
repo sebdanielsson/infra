@@ -1,6 +1,10 @@
 fr24key="{{ fr24_sharing_key }}"
-receiver="avr-tcp" # dump1090-fa
-host="127.0.0.1:30002" # dump1090-fa
+# Beast rather than AVR: FR24's MLAT needs the message timestamps that only
+# the Beast format carries, and reports "rx-incompatible" without them.
+receiver="beast-tcp" # dump1090-fa
+host="127.0.0.1:30005" # dump1090-fa
+# receiver="avr-tcp" # dump1090-fa, no MLAT
+# host="127.0.0.1:30002" # dump1090-fa, no MLAT
 # receiver="dvbt" # dump1090-mutability
 # path="/usr/lib/fr24/dump1090" # dump1090-mutability
 bs="no"

@@ -6,8 +6,10 @@ projects](https://getarcane.app/docs/features/projects#sync-from-git) with
 decrypting secrets, and replaces dotenvx with sops + age.
 
 Not migrated: `arcane` (deployed by Ansible as bootstrap), `plausible`
-(excluded), and the `state: absent` stacks (traefik, prometheus-grafana,
-etlegacy, minecraft). `minio` was migrated but decommissioned 2026-07-14 —
+(excluded), and the `state: absent` stacks (traefik, etlegacy, minecraft).
+`prometheus-grafana` was revived in 2026-08 for the ADS-B dashboards and is
+now git-synced like the rest — see
+[ADS-B observability](./adsb-observability.md). `minio` was migrated but decommissioned 2026-07-14 —
 its election-map data moved to Backblaze B2 (`election-map-sweden`).
 
 ## How it fits together
