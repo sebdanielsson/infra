@@ -2,7 +2,7 @@
 services:
   docktail:
     container_name: docktail
-    image: ghcr.io/marvinvr/docktail:1.7.5
+    image: ghcr.io/marvinvr/docktail:1.7.6
     volumes:
       # Read-only: DockTail only watches events and inspects containers.
       - /var/run/docker.sock:/var/run/docker.sock:ro
