@@ -11,7 +11,7 @@
 services:
   ultrafeeder:
     container_name: ultrafeeder
-    image: ghcr.io/sdr-enthusiasts/docker-adsb-ultrafeeder:latest-build-953
+    image: ghcr.io/sdr-enthusiasts/docker-adsb-ultrafeeder:latest-build-954
     networks:
       - adsb
     ports:
