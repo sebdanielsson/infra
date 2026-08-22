@@ -7,7 +7,7 @@
 services:
   prometheus:
     container_name: prometheus
-    image: prom/prometheus:v3.13.2
+    image: prom/prometheus:v3.14.0
     networks:
       - prometheus
     # No host ports: DockTail publishes this on the tailnet, and hogsmeade's
