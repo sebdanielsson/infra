@@ -59,6 +59,15 @@ services:
     volumes:
       - transmission_data:/config
       - /chungus/media/downloads:/downloads
+    # Shares the wireguard netns, so the RPC/web listener is on localhost
+    # here too. USER/PASS turn on RPC basic auth, and an unauthenticated
+    # probe then gets 401 forever - so the check must present them.
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null -u \"$$USER:$$PASS\" http://localhost:9091/transmission/web/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     restart: unless-stopped
 
 networks:

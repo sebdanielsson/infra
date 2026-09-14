@@ -99,6 +99,14 @@ services:
       - docktail.service.network=adsb
       - docktail.service.service-port=443
       - docktail.service.service-protocol=https
+    # socat has no protocol of its own to probe; a TCP connect proves the
+    # listener is accepting, which is all this forwarder does.
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8754"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
 
   # Host metrics for the Pi (CPU temperature, load, SD card, network) so the
@@ -115,6 +123,14 @@ services:
       - "--collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|run/docker/.+)($$|/)"
     volumes:
       - /:/host:ro,rslave
+    # node-exporter serves no dedicated health route; /metrics returning 200
+    # is the signal Prometheus itself relies on. Image has wget, not curl.
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:9100/metrics"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
 
 networks:

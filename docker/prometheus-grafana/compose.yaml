@@ -31,6 +31,13 @@ services:
       - docktail.service.network=prometheus-grafana
       - docktail.service.service-port=443
       - docktail.service.service-protocol=https
+    # Prometheus' own readiness route. Image is busybox-based: wget, no curl.
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     restart: unless-stopped
 
   grafana:
@@ -70,6 +77,13 @@ services:
       - docktail.service.network=prometheus-grafana
       - docktail.service.service-port=443
       - docktail.service.service-protocol=https
+    # Grafana's documented health route; reports database state as well.
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     restart: unless-stopped
 
   # Per-sighting flight log. Stock python image running a stdlib-only script
