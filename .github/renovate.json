@@ -28,6 +28,13 @@
       "versioning": "regex:^latest-build-(?<major>\\d+)$"
     },
     {
+      "description": "LinuxServer publishes no plain semver tag for new major releases (Jellyfin 12.0 only ever got 12.0ubu2604-ls48). Renovate's docker versioning only offers candidates whose suffix matches the current tag, so a plain '10.11.11' pin can never cross to them and the dep goes silently stale. Track the floating 'version-<app>ubu<rel>' tag instead, which follows LSIO rebuilds on its own and changes only on a real Jellyfin version bump.",
+      "matchPackageNames": [
+        "ghcr.io/linuxserver/jellyfin"
+      ],
+      "versioning": "regex:^version-(?<major>\\d+)\\.(?<minor>\\d+)(\\.(?<patch>\\d+))?ubu\\d+$"
+    },
+    {
       "matchUpdateTypes": [
         "minor",
         "patch"
