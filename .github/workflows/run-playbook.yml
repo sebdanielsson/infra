@@ -7,6 +7,11 @@ name: Run playbook
       - main
     paths:
       - ansible/**
+      # Arcane is the one stack Ansible deploys itself (hogsmeade.yml
+      # synchronizes docker/arcane/ and runs docker_compose_v2 on it). Every
+      # other stack under docker/ is GitOps-synced by Arcane, so only this
+      # directory needs the playbook.
+      - docker/arcane/**
   workflow_dispatch:
 
 permissions:
