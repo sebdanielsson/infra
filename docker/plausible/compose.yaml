@@ -75,6 +75,14 @@ services:
       - docktail.service.network=plausible
       - docktail.service.service-port=443
       - docktail.service.service-protocol=https
+    # plausible_web/router.ex, scope "/api": /system/health/live is the
+    # liveness route (/api/health is deprecated upstream). wget, no curl.
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8000/api/system/health/live"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
     restart: always
 
 networks:

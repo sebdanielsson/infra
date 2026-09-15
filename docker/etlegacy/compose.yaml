@@ -13,6 +13,15 @@ services:
       - /docker/data/etlegacy/etlegacy/legacy/omni-bot/et/nav:/etlegacy/legacy/omni-bot/et/nav
       - /docker/data/etlegacy/etlegacy/nitmod:/etlegacy/nitmod
       - /docker/data/etlegacy/etlegacy/etmain:/etlegacy/etmain
+    # A Quake3-engine dedicated server speaks only its own UDP protocol and
+    # the image ships no curl/wget/nc, so probe the kernel instead: 27960
+    # appears as hex 6D38 in /proc/net/udp once the server has bound it.
+    healthcheck:
+      test: ["CMD-SHELL", "grep -qi ':6D38' /proc/net/udp"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     restart: unless-stopped
   etlegacy-mirror:
     container_name: etlegacy-mirror
@@ -32,6 +41,13 @@ services:
       - docktail.service.network=etlegacy
       - docktail.service.service-port=443
       - docktail.service.service-protocol=https
+    # Static pk3 mirror: serving its index is the whole job.
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
 networks:
   etlegacy:

@@ -20,6 +20,14 @@ services:
       - docktail.service.network=nginx
       - docktail.service.service-port=443
       - docktail.service.service-protocol=https
+    # Static site: if the document root stops serving an index, the service
+    # is broken, so a strict 2xx check is the right signal here.
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
 
 networks:

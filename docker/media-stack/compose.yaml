@@ -26,6 +26,14 @@ services:
       - docktail.service.network=medianet
       - docktail.service.service-port=443
       - docktail.service.service-protocol=https
+    # Jellyfin.Server/Startup.cs maps ASP.NET health checks at /health; it
+    # resolves the JellyfinDbContext, so this fails if the database is gone.
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8096/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
     restart: unless-stopped
 
   radarr:
@@ -53,6 +61,14 @@ services:
       - docktail.service.network=medianet
       - docktail.service.service-port=443
       - docktail.service.service-protocol=https
+    # Servarr PingController: [AllowAnonymous] GET /ping, 200 only after a
+    # successful config-repository read, 500 otherwise.
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:7878/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
     restart: unless-stopped
 
   sonarr:
@@ -80,6 +96,14 @@ services:
       - docktail.service.network=medianet
       - docktail.service.service-port=443
       - docktail.service.service-protocol=https
+    # Servarr PingController: [AllowAnonymous] GET /ping, 200 only after a
+    # successful config-repository read, 500 otherwise.
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8989/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
     restart: unless-stopped
 
   prowlarr:
@@ -105,6 +129,14 @@ services:
       - docktail.service.network=medianet
       - docktail.service.service-port=443
       - docktail.service.service-protocol=https
+    # Servarr PingController: [AllowAnonymous] GET /ping, 200 only after a
+    # successful config-repository read, 500 otherwise.
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:9696/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
     restart: unless-stopped
 
   seerr:

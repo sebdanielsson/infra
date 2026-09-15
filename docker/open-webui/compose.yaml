@@ -43,6 +43,14 @@ services:
       - open-webui_pipelines:/app/pipelines
     ports:
       - 9099:9099
+    # Pipelines exposes no /health route (only @app.get("/") in main.py),
+    # so the app root is the closest honest liveness signal.
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:9099/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     restart: unless-stopped
 
 networks:

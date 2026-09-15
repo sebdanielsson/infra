@@ -8,6 +8,8 @@ services:
       - --global.sendanonymoususage=false
       - --serverstransport.insecureskipverify
       - --api
+      # Required by `traefik healthcheck`: without it the CLI gets a 404.
+      - --ping=true
       - --api.dashboard=true
       - --api.insecure=true
       - --api.disabledashboardad=true
@@ -65,6 +67,14 @@ services:
       - docktail.service.network=proxy
       - docktail.service.service-port=443
       - docktail.service.service-protocol=https
+    # cmd/healthcheck/healthcheck.go HEADs the ping endpoint and refuses to
+    # run at all unless ping is enabled in the static config (above).
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     restart: unless-stopped
 
 networks:

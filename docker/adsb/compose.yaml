@@ -99,6 +99,17 @@ services:
       - docktail.service.network=adsb
       - docktail.service.service-port=443
       - docktail.service.service-protocol=https
+    # Probe through the forwarder rather than at it: socat keeps its
+    # listener bound whether or not the host's fr24feed is up, so a bare
+    # TCP connect to 8754 reports healthy while the status page this
+    # container exists to expose is unreachable. Fetching through it
+    # fails when the upstream is down, which is the signal we want.
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "-T", "3", "http://localhost:8754/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
 
   # Host metrics for the Pi (CPU temperature, load, SD card, network) so the
@@ -115,6 +126,14 @@ services:
       - "--collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|run/docker/.+)($$|/)"
     volumes:
       - /:/host:ro,rslave
+    # node-exporter serves no dedicated health route; /metrics returning 200
+    # is the signal Prometheus itself relies on. Image has wget, not curl.
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:9100/metrics"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
 
 networks:
