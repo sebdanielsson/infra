@@ -7,6 +7,15 @@ name: Run playbook
       - main
     paths:
       - ansible/**
+      # The stacks Ansible deploys itself, and so the only ones under docker/
+      # that need a playbook run. Everything else is GitOps-synced by Arcane.
+      #   arcane          hogsmeade.yml synchronizes docker/arcane/, then
+      #                   tasks/hogsmeade-containers.yml runs docker_compose_v2.
+      #   adsb, docktail  flightradar.yml imports tasks/adsb-stack.yml, which
+      #                   copies both compose files and brings both stacks up.
+      - docker/arcane/**
+      - docker/adsb/**
+      - docker/docktail/**
   workflow_dispatch:
 
 permissions:
