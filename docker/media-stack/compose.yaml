@@ -107,7 +107,7 @@ services:
     restart: unless-stopped
 
   prowlarr:
-    image: ghcr.io/linuxserver/prowlarr:2.5.2
+    image: ghcr.io/linuxserver/prowlarr:2.6.5
     container_name: prowlarr
     networks:
       - medianet
