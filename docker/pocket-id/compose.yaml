@@ -2,7 +2,7 @@
 services:
   app:
     container_name: pocket-id
-    image: ghcr.io/pocket-id/pocket-id:v2.17
+    image: ghcr.io/pocket-id/pocket-id:v2.18
     networks:
       - proxy
     ports:
