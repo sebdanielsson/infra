@@ -42,7 +42,7 @@ services:
       - docktail.service.service-protocol=https
     restart: unless-stopped
   transmission:
-    image: ghcr.io/linuxserver/transmission:4.1.3
+    image: ghcr.io/linuxserver/transmission:4.1.4
     container_name: transmission
     network_mode: "service:wireguard"
     depends_on:
