@@ -1,19 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "github>sebdanielsson/renovate-config"
   ],
-  "rangeStrategy": "bump",
-  "semanticCommits": "enabled",
-  "minimumReleaseAge": "1 day",
   "packageRules": [
-    {
-      "description": "Only Docker Hub exposes release timestamps. GHCR/Quay/ECR tags have none, so with the Renovate 42 default (minimumReleaseAgeBehaviour=timestamp-required) their updates stay in 'Pending Status Checks' forever instead of ever getting a PR.",
-      "matchDatasources": [
-        "docker"
-      ],
-      "minimumReleaseAgeBehaviour": "timestamp-optional"
-    },
     {
       "description": "The ansible-galaxy manager sets packageName to the full clone URL for git-sourced collections, which the github-tags datasource cannot resolve ('no-result'). depName is already github.com/owner/repo, so strip the host to get the owner/repo that github-tags expects.",
       "matchDepNames": [
@@ -34,14 +24,6 @@
         "ghcr.io/linuxserver/jellyfin"
       ],
       "versioning": "regex:^version-(?<major>\\d+)\\.(?<minor>\\d+)(\\.(?<patch>\\d+))?ubu\\d+$"
-    },
-    {
-      "matchUpdateTypes": [
-        "minor",
-        "patch"
-      ],
-      "matchCurrentVersion": "!/^0/",
-      "automerge": true
     }
   ]
 }
