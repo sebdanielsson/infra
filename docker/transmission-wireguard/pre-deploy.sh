@@ -2,7 +2,7 @@
 # Arcane GitOps pre-deploy hook: decrypt this project's secrets and render
 # wg0.conf into the workspace, where compose bind-mounts it into the
 # wireguard container (Arcane rejects named volumes as extra-mount sources).
-# Runner image: ghcr.io/getsops/sops:v3.13.2-alpine
+# Runner image: Arcane default, ARCANE_LIFECYCLE_DEFAULT_RUNNER_IMAGE in docker/arcane/compose.yaml
 # Hook env:     SOPS_AGE_KEY_FILE=/run/secrets/age.key
 # Extra mount:  /docker/secrets/age.key:/run/secrets/age.key:ro
 set -eu
