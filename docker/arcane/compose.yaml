@@ -19,18 +19,20 @@ services:
       # and the worker share workspace files without uid gymnastics.
       - PUID=0
       - PGID=0
-      - APP_URL=https://arcane.hogwarts.zone
-      - PROJECTS_DIRECTORY=/docker
-      - TRUSTED_PROXIES=172.16.0.0/12
-      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
-      - JWT_SECRET=${JWT_SECRET}
-      - OIDC_ENABLED=true
-      - OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
-      - OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
-      - OIDC_ISSUER_URL=https://auth.hogwarts.zone
-      - OIDC_SCOPES=openid email profile groups
-      - OIDC_GROUPS_CLAIM=groups
-      - 'OIDC_ROLE_MAPPINGS=[{"claimValue":"admin","roleId":"role_admin"}]'
+      # v3 requires the ARCANE_ prefix on every Arcane setting; unprefixed
+      # names abort startup. JWT_SECRET is retired (Arcane manages its own
+      # signing key).
+      - ARCANE_APP_URL=https://arcane.hogwarts.zone
+      - ARCANE_PROJECTS_DIRECTORY=/docker
+      - ARCANE_TRUSTED_PROXIES=172.16.0.0/12
+      - ARCANE_ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - ARCANE_OIDC_ENABLED=true
+      - ARCANE_OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
+      - ARCANE_OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
+      - ARCANE_OIDC_ISSUER_URL=https://auth.hogwarts.zone
+      - ARCANE_OIDC_SCOPES=openid email profile groups
+      - ARCANE_OIDC_GROUPS_CLAIM=groups
+      - 'ARCANE_OIDC_ROLE_MAPPINGS=[{"claimValue":"admin","roleId":"role_admin"}]'
     # Use host cgroup namespace so Arcane can detect its own container
     cgroup: host
     healthcheck:
