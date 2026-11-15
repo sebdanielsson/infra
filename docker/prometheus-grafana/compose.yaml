@@ -10,6 +10,14 @@ services:
     image: prom/prometheus:v3.16.0
     networks:
       - prometheus
+    # Resolve the flightradar targets through Tailscale's MagicDNS directly.
+    # Docker otherwise copies the host's resolvers when a container starts;
+    # at boot that can happen before tailscaled rewrites /etc/resolv.conf,
+    # and the container can't resolve tailnet names until it is recreated
+    # (no flightradar scrapes from 2026-10-27 to 2026-11-15). Queries made
+    # before tailscaled is up fail and the next scrape retries.
+    dns:
+      - 100.100.100.100
     # No host ports: DockTail publishes this on the tailnet, and hogsmeade's
     # 9090/9091/9099 are all taken by other services.
     volumes:
@@ -93,6 +101,9 @@ services:
     image: python:3.15-alpine
     networks:
       - prometheus
+    # Polls flightradar by tailnet name; see the dns note on prometheus.
+    dns:
+      - 100.100.100.100
     command: ["python", "-u", "/app/logger.py"]
     volumes:
       - ./adsb-logger:/app:ro
