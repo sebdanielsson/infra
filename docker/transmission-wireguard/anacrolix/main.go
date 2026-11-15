@@ -29,6 +29,7 @@ import (
 	"text/tabwriter"
 	"time"
 
+	g "github.com/anacrolix/generics"
 	"github.com/anacrolix/torrent"
 	"github.com/anacrolix/torrent/metainfo"
 	"github.com/anacrolix/torrent/storage"
@@ -112,7 +113,7 @@ func main() {
 		log.Fatalf("torrent client: %v", err)
 	}
 
-	d := &daemon{cfg: cfg, cl: cl, port: port, rates: map[metainfo.Hash]rate{}}
+	d := &daemon{cfg: cfg, cl: cl, pc: pc, port: port, rates: map[metainfo.Hash]rate{}}
 	d.loadSaved()
 	go d.watch(ctx)
 	go d.sampleRates(ctx)
@@ -226,6 +227,7 @@ type rate struct{ down, up float64 } // bytes per second of payload
 type daemon struct {
 	cfg  config
 	cl   *torrent.Client
+	pc   storage.PieceCompletion
 	port uint16
 
 	mu    sync.Mutex
@@ -393,6 +395,7 @@ func (d *daemon) routes() http.Handler {
 		d.cl.WriteStatus(w)
 	})))
 	mux.Handle("POST /add", d.auth(http.HandlerFunc(d.handleAdd)))
+	mux.Handle("POST /remove", d.auth(http.HandlerFunc(d.handleRemove)))
 	return mux
 }
 
@@ -430,6 +433,57 @@ func (d *daemon) handleAdd(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "added %s\n", t.InfoHash().HexString())
 }
 
+// handleRemove drops the torrent whose infohash is the request body, and with
+// ?files=delete also deletes its downloaded data:
+//
+//	curl -u user:pass --data-binary <infohash> 'https://anacrolix.<tailnet>/remove?files=delete'
+func (d *daemon) handleRemove(w http.ResponseWriter, r *http.Request) {
+	b, err := io.ReadAll(http.MaxBytesReader(w, r.Body, 1<<10))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	var ih metainfo.Hash
+	if err := ih.FromHexString(strings.TrimSpace(string(b))); err != nil {
+		http.Error(w, "body must be a hex infohash", http.StatusBadRequest)
+		return
+	}
+	t, ok := d.cl.Torrent(ih)
+	if !ok {
+		http.Error(w, "no such torrent", http.StatusNotFound)
+		return
+	}
+	deleteFiles := r.URL.Query().Get("files") == "delete"
+	var dataPath string
+	if deleteFiles && t.Info() != nil {
+		// Payloads live at <download dir>/<torrent name>. Refuse anything that
+		// would resolve somewhere else.
+		dataPath = filepath.Join(d.cfg.downloadDir, t.Name())
+		if base := filepath.Base(dataPath); base == "." || base == ".." ||
+			filepath.Dir(dataPath) != filepath.Clean(d.cfg.downloadDir) {
+			http.Error(w, "refusing to delete files for torrent name "+t.Name(), http.StatusInternalServerError)
+			return
+		}
+	}
+	numPieces := t.NumPieces()
+	t.Drop()
+	for _, kind := range []string{"torrent", "magnet"} {
+		_ = os.Remove(d.savedPath(kind, ih))
+	}
+	if dataPath != "" {
+		if err := os.RemoveAll(dataPath); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		// Forget the stored completion so a re-add verifies instead of
+		// trusting pieces that are gone.
+		for i := range numPieces {
+			_ = d.pc.Set(metainfo.PieceKey{InfoHash: ih, Index: i}, g.None[bool]())
+		}
+	}
+	fmt.Fprintf(w, "removed %s\n", ih.HexString())
+}
+
 func (d *daemon) summary(w http.ResponseWriter, _ *http.Request) {
 	d.mu.Lock()
 	rates, total := d.rates, d.total
@@ -456,7 +510,8 @@ func (d *daemon) summary(w http.ResponseWriter, _ *http.Request) {
 			ts.ActivePeers, ts.TotalPeers, ts.ConnectedSeeders, t.InfoHash().HexString())
 	}
 	tw.Flush()
-	fmt.Fprintln(w, "\nPOST a magnet URI or .torrent file to /add; anacrolix's own status dump is at /status.")
+	fmt.Fprintln(w, "\nPOST a magnet URI or .torrent file to /add, or an infohash to /remove (?files=delete to delete its data).")
+	fmt.Fprintln(w, "anacrolix's own status dump is at /status.")
 }
 
 func human(b float64) string {

@@ -3,6 +3,7 @@ module github.com/sebdanielsson/infra/docker/transmission-wireguard/anacrolix
 go 1.26.0
 
 require (
+	github.com/anacrolix/generics v0.2.0
 	github.com/anacrolix/torrent v1.62.0
 	github.com/jackpal/go-nat-pmp v1.1.0
 	github.com/prometheus/client_golang v1.25.0
@@ -15,7 +16,6 @@ require (
 	github.com/anacrolix/chansync v0.8.0 // indirect
 	github.com/anacrolix/dht/v2 v2.23.1-0.20260525063928-ec3a9bd99456 // indirect
 	github.com/anacrolix/envpprof v1.4.0 // indirect
-	github.com/anacrolix/generics v0.2.0 // indirect
 	github.com/anacrolix/go-libutp v1.5.2-0.20260908013213-836dd42cdde6 // indirect
 	github.com/anacrolix/go-utp v0.0.0-20260908033909-9f1664acf866 // indirect
 	github.com/anacrolix/log v0.17.1-0.20251118025802-918f1157b7bb // indirect

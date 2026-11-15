@@ -23,5 +23,6 @@ curl -u "$USER:$PASS" --data-binary @file.torrent https://anacrolix.risk-bee.ts.
 | `/`        | Torrents with progress, rates and peers                           |
 | `/status`  | anacrolix's own status dump                                       |
 | `/add`     | POST a magnet URI or `.torrent` file                              |
+| `/remove`  | POST an infohash; `?files=delete` also deletes its data           |
 | `/metrics` | Prometheus metrics, including Go runtime CPU and memory (no auth) |
 | `/healthz` | Health check (no auth)                                            |
