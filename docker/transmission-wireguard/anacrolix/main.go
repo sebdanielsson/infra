@@ -471,9 +471,12 @@ func (d *daemon) handleRemove(w http.ResponseWriter, r *http.Request) {
 		_ = os.Remove(d.savedPath(kind, ih))
 	}
 	if dataPath != "" {
-		if err := os.RemoveAll(dataPath); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+		// Incomplete single-file torrents are kept as <name>.part.
+		for _, p := range []string{dataPath, dataPath + ".part"} {
+			if err := os.RemoveAll(p); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
 		}
 		// Forget the stored completion so a re-add verifies instead of
 		// trusting pieces that are gone.

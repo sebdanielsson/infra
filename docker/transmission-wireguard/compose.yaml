@@ -110,6 +110,10 @@ services:
       - GOMODCACHE=/cache/mod
       - NATPMP_GATEWAY=10.2.0.1
       - HTTP_ADDR=:9092
+      # Plain pwrite instead of mmap. Through mmap, every 16 KiB chunk landed
+      # as page writes into 128K records on the chungus RAID-Z1: ~13x write
+      # amplification and ~530 KiB/s. pwrite lets ZFS merge chunks per txg.
+      - DISABLE_MMAP=true
       - HTTP_USER=${TRANSMISSION_USER}
       - HTTP_PASS=${TRANSMISSION_PASS}
     volumes:
