@@ -14,6 +14,14 @@ sops --input-type dotenv --output-type dotenv --decrypt .env.sops > .env.tmp
 mv .env.tmp .env
 . ./.env
 
+# Compose only recreates a container when its config changes, and the
+# bind-mounted anacrolix source isn't part of that config. Pass a hash of it
+# as an environment variable so a code change rebuilds and restarts it.
+if [ -d anacrolix ]; then
+  src_hash=$(find anacrolix -type f | sort | xargs sha256sum | sha256sum | cut -c1-16)
+  echo "ANACROLIX_SRC_HASH=${src_hash}" >> .env
+fi
+
 # The container init may re-own the bind-mounted file, and docker creates
 # a directory here if compose ever starts before the file exists;
 # unlink+recreate handles both.

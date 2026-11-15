@@ -45,6 +45,25 @@
       ],
       "versioning": "regex:^version-(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-r(?<build>\\d+)$",
       "automerge": false
+    },
+    {
+      "description": "Go module in docker/transmission-wireguard/anacrolix: tidy go.sum after bumps, and leave the go directive at the library's minimum so it can't get ahead of the golang image that builds it.",
+      "matchManagers": [
+        "gomod"
+      ],
+      "postUpdateOptions": [
+        "gomodTidy"
+      ]
+    },
+    {
+      "matchManagers": [
+        "gomod"
+      ],
+      "matchDepTypes": [
+        "golang",
+        "toolchain"
+      ],
+      "enabled": false
     }
   ]
 }

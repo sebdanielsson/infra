@@ -40,6 +40,13 @@ services:
       - docktail.service.network=wgnet
       - docktail.service.service-port=443
       - docktail.service.service-protocol=https
+      # anacrolix also lives in this netns; its status page and /add.
+      - docktail.service.1.name=anacrolix
+      - docktail.service.1.description=anacrolix test client (via WireGuard)
+      - docktail.service.1.port=9092
+      - docktail.service.1.protocol=http
+      - docktail.service.1.service-port=443
+      - docktail.service.1.service-protocol=https
     restart: unless-stopped
   transmission:
     image: ghcr.io/linuxserver/transmission:4.1.4
@@ -72,6 +79,58 @@ services:
       retries: 3
       start_period: 30s
     restart: unless-stopped
+    # Off while anacrolix is being tried out: both get the same NAT-PMP port
+    # from the VPN and would fight over it in the shared netns. To switch
+    # back, set this to 1 and anacrolix's to 0.
+    deploy:
+      replicas: 0
+
+  # Headless test client on github.com/anacrolix/torrent; source and docs in
+  # ./anacrolix. Stock Go image, built at container start from the synced
+  # workspace (cached in anacrolix_cache), so there is no image to publish.
+  anacrolix:
+    image: golang:1.27.4-alpine
+    container_name: anacrolix
+    network_mode: "service:wireguard"
+    depends_on:
+      wireguard:
+        condition: service_healthy
+        restart: true
+    working_dir: /src
+    entrypoint: ["/bin/sh", "-c", "mkdir -p /cache/bin && go build -trimpath -o /cache/bin/anacrolix . && exec /cache/bin/anacrolix"]
+    environment:
+      - TZ=Europe/Stockholm
+      # Written by pre-deploy.sh; changes with the source, which makes
+      # compose recreate this container after a code change.
+      - SRC_HASH=${ANACROLIX_SRC_HASH:-}
+      - CGO_ENABLED=0
+      - GOTOOLCHAIN=local
+      - GOFLAGS=-mod=readonly
+      - GOCACHE=/cache/go-build
+      - GOMODCACHE=/cache/mod
+      - NATPMP_GATEWAY=10.2.0.1
+      - HTTP_ADDR=:9092
+      - HTTP_USER=${TRANSMISSION_USER}
+      - HTTP_PASS=${TRANSMISSION_PASS}
+    volumes:
+      - ./anacrolix:/src:ro
+      - anacrolix_cache:/cache
+      # SSD: piece completion DB and the saved .torrent/.magnet files
+      - anacrolix_data:/data
+      # Same pool as Transmission's downloads, so the comparison is fair:
+      # files/ for payloads, watch/ for dropping in .torrent/.magnet files.
+      - /chungus/media/downloads/anacrolix:/downloads
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9092/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      # The first start compiles the module; later starts hit the cache.
+      start_period: 10m
+    stop_grace_period: 30s
+    restart: unless-stopped
+    deploy:
+      replicas: 1
 
 networks:
   wgnet:
@@ -87,3 +146,7 @@ volumes:
   transmission_data:
     name: transmission_data
     external: true
+  anacrolix_data:
+    name: anacrolix_data
+  anacrolix_cache:
+    name: anacrolix_cache
