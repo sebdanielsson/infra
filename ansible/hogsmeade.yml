@@ -411,9 +411,7 @@
       loop:
         - nginx
         - media-stack
-        - termix
         - portainer
-        - open-webui
         - pocket-id
         - transmission-wireguard
 
