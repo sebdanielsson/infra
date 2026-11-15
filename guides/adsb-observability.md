@@ -102,25 +102,31 @@ Grafana's datasources and both dashboards are provisioned from git
 (`grafana/provisioning/`, `grafana/dashboards/`) with `allowUiUpdates: false`.
 Edit a dashboard in the UI to experiment; commit the JSON to keep it.
 
-### One-time Arcane setup
+### Arcane sync
 
-`prometheus-grafana` was deployed by hand into `/docker/prometheus-grafana`
-first so it would come up immediately. To hand it over to GitOps: Projects →
-Git Sync → import the entry, then add the pre-deploy hook —
+`prometheus-grafana` was first deployed by hand into `/docker/prometheus-grafana`
+so it would come up immediately, and was adopted into an Arcane Git sync on
+2026-11-15 (Git Syncs → Add Git Sync with the existing project selected, Sync
+Files on). Its pre-deploy hook —
 
-| Setting      | Value                                             |
-| ------------ | ------------------------------------------------- |
-| Script path  | `pre-deploy.sh`                                   |
-| Runner image | `ghcr.io/getsops/sops:v3.13.2-alpine`             |
-| Network      | `none`                                            |
-| Environment  | `SOPS_AGE_KEY_FILE=/run/secrets/age.key`          |
-| Extra mounts | `/docker/secrets/age.key:/run/secrets/age.key:ro` |
+| Setting      | Value                                                        |
+| ------------ | ------------------------------------------------------------ |
+| Script path  | `pre-deploy.sh`                                              |
+| Runner image | empty: Arcane's default, set in `docker/arcane/compose.yaml` |
+| Network      | `none`                                                       |
+| Environment  | `SOPS_AGE_KEY_FILE=/run/secrets/age.key`                     |
+| Extra mounts | `/docker/secrets/age.key:/run/secrets/age.key:ro`            |
 
-The first sync recreates the containers under the same project name; the named
-volumes (`prometheus_data`, `grafana_data`, `adsb_flightlog`) persist.
+The first sync recreated the containers under the same project name; the named
+volumes (`prometheus_data`, `grafana_data`, `adsb_flightlog`) persisted.
 
 ## Notes and caveats
 
+- **Tailnet DNS is pinned.** `prometheus` and `adsb-logger` use
+  `dns: 100.100.100.100`. Without it, a container started at boot before
+  tailscaled rewrote `/etc/resolv.conf` kept the old resolvers and could not
+  resolve `flightradar.risk-bee.ts.net` until recreated; that cost the
+  flightradar metrics from 2026-10-27 to 2026-11-15.
 - **No host ports on hogsmeade.** 3000, 9090, 9091 and 9099 are all taken
   there, and DockTail proxies straight to the container IP, so neither
   Prometheus nor Grafana publishes a port. To poke at them from a shell:
