@@ -36,7 +36,7 @@ services:
       # Runner for the GitOps pre-deploy hooks (sops decryption). Leave the
       # runner image empty on each sync so this default applies; Renovate
       # bumps it via the custom manager in .github/renovate.json.
-      - ARCANE_LIFECYCLE_DEFAULT_RUNNER_IMAGE=ghcr.io/getsops/sops:v3.13.2-alpine
+      - ARCANE_LIFECYCLE_DEFAULT_RUNNER_IMAGE=ghcr.io/getsops/sops:v3.13.3-alpine
     # Use host cgroup namespace so Arcane can detect its own container
     cgroup: host
     healthcheck:
