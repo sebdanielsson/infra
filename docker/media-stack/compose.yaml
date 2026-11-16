@@ -37,7 +37,7 @@ services:
     restart: unless-stopped
 
   radarr:
-    image: ghcr.io/linuxserver/radarr:6.4.4
+    image: ghcr.io/linuxserver/radarr:7.0.3
     container_name: radarr
     networks:
       - medianet
