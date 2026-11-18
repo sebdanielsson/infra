@@ -17,6 +17,10 @@ services:
       - TZ=Europe/Stockholm
     ports:
       - 9091:9091
+      # piecemeal's qBittorrent API for Radarr and Sonarr, which reach it at
+      # 172.17.0.1:9092 as they reached Transmission. Bound to the docker
+      # bridge only: people use the tailnet name.
+      - 172.17.0.1:9092:9092
     volumes:
       - /lib/modules:/lib/modules
       # Rendered into the workspace by pre-deploy.sh before every deploy
@@ -40,9 +44,9 @@ services:
       - docktail.service.network=wgnet
       - docktail.service.service-port=443
       - docktail.service.service-protocol=https
-      # anacrolix also lives in this netns; its status page and /add.
-      - docktail.service.1.name=anacrolix
-      - docktail.service.1.description=anacrolix test client (via WireGuard)
+      # piecemeal also lives in this netns: its web UI and both APIs.
+      - docktail.service.1.name=piecemeal
+      - docktail.service.1.description=piecemeal BitTorrent client (via WireGuard)
       - docktail.service.1.port=9092
       - docktail.service.1.protocol=http
       - docktail.service.1.service-port=443
@@ -79,58 +83,58 @@ services:
       retries: 3
       start_period: 30s
     restart: unless-stopped
-    # Off while anacrolix is being tried out: both get the same NAT-PMP port
-    # from the VPN and would fight over it in the shared netns. To switch
-    # back, set this to 1 and anacrolix's to 0.
+    # Off while piecemeal is in use: both get the same NAT-PMP port from the
+    # VPN and would fight over it in the shared netns. To switch back, set
+    # this to 1 and piecemeal's to 0.
     deploy:
       replicas: 0
 
-  # Headless test client on github.com/anacrolix/torrent; source and docs in
-  # ./anacrolix. Stock Go image, built at container start from the synced
-  # workspace (cached in anacrolix_cache), so there is no image to publish.
-  anacrolix:
-    image: golang:1.27.4-alpine
-    container_name: anacrolix
+  # github.com/sebdanielsson/piecemeal: a BitTorrent client on
+  # anacrolix/torrent with a qBittorrent-compatible API for Radarr and
+  # Sonarr, a web UI, and NAT-PMP port forwarding through the VPN.
+  piecemeal:
+    image: ghcr.io/sebdanielsson/piecemeal:0.6.0
+    container_name: piecemeal
     network_mode: "service:wireguard"
     depends_on:
       wireguard:
         condition: service_healthy
         restart: true
-    working_dir: /src
-    entrypoint: ["/bin/sh", "-c", "mkdir -p /cache/bin && go build -trimpath -o /cache/bin/anacrolix . && exec /cache/bin/anacrolix"]
+    # The user that owns /chungus/media/downloads, like Transmission's and
+    # the *arrs' PUID, so they can move and delete what it downloads.
+    user: "1000:1000"
     environment:
       - TZ=Europe/Stockholm
-      # Written by pre-deploy.sh; changes with the source, which makes
-      # compose recreate this container after a code change.
-      - SRC_HASH=${ANACROLIX_SRC_HASH:-}
-      - CGO_ENABLED=0
-      - GOTOOLCHAIN=local
-      - GOFLAGS=-mod=readonly
-      - GOCACHE=/cache/go-build
-      - GOMODCACHE=/cache/mod
-      - NATPMP_GATEWAY=10.2.0.1
-      - HTTP_ADDR=:9092
-      # Plain pwrite instead of mmap. Through mmap, every 16 KiB chunk landed
-      # as page writes into 128K records on the chungus RAID-Z1: ~13x write
-      # amplification and ~530 KiB/s. pwrite lets ZFS merge chunks per txg.
-      - DISABLE_MMAP=true
-      - HTTP_USER=${TRANSMISSION_USER}
-      - HTTP_PASS=${TRANSMISSION_PASS}
+      - PIECEMEAL_ADDR=:9092
+      - PIECEMEAL_PUBLIC_URL=https://piecemeal.risk-bee.ts.net
+      - PIECEMEAL_DATA_DIR=/data
+      # Same mount and path as Radarr's and Sonarr's, so the paths it
+      # reports work for them without remote path mappings.
+      - PIECEMEAL_DOWNLOAD_DIR=/downloads
+      # Where Transmission saved, so imported and new torrents sit together.
+      - PIECEMEAL_DEFAULT_SAVE_PATH=/downloads/complete
+      - PIECEMEAL_WATCH_DIR=/downloads/watch
+      # DockTail's tailnet proxy reaches the netns from wgnet's gateway and
+      # sends the tailnet client's address in X-Forwarded-For.
+      - PIECEMEAL_TRUSTED_PROXIES=172.100.0.1/32
+      - PIECEMEAL_NATPMP_GATEWAY=10.2.0.1
+      # The tunnel only carries IPv4 (AllowedIPs = 0.0.0.0/0).
+      - PIECEMEAL_DISABLE_IPV6=true
+      # The local admin, for when Pocket ID is down. The password is
+      # PIECEMEAL_ADMIN_PASSWORD in .env.sops, next to its hash.
+      - PIECEMEAL_ADMIN_PASSWORD_HASH=${PIECEMEAL_ADMIN_PASSWORD_HASH:-}
+      # Pocket ID client "piecemeal", restricted to the admin group, with the
+      # callback https://piecemeal.risk-bee.ts.net/api/piecemeal/v1/auth/oidc/callback.
+      - PIECEMEAL_OIDC_ISSUER=https://auth.hogwarts.zone
+      - PIECEMEAL_OIDC_CLIENT_ID=273c8824-bb8b-4c3c-a370-1389ef1bf24e
+      - PIECEMEAL_OIDC_CLIENT_SECRET=${PIECEMEAL_OIDC_CLIENT_SECRET:-}
+      - PIECEMEAL_OIDC_NAME=Pocket ID
+      - PIECEMEAL_OIDC_ALLOWED_GROUPS=admin
+      - PIECEMEAL_OIDC_ADMIN_GROUPS=admin
     volumes:
-      - ./anacrolix:/src:ro
-      - anacrolix_cache:/cache
-      # SSD: piece completion DB and the saved .torrent/.magnet files
-      - anacrolix_data:/data
-      # Same pool as Transmission's downloads, so the comparison is fair:
-      # files/ for payloads, watch/ for dropping in .torrent/.magnet files.
-      - /chungus/media/downloads/anacrolix:/downloads
-    healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9092/healthz"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      # The first start compiles the module; later starts hit the cache.
-      start_period: 10m
+      # SSD: database and piece completion.
+      - piecemeal_data:/data
+      - /chungus/media/downloads:/downloads
     stop_grace_period: 30s
     restart: unless-stopped
     deploy:
@@ -150,7 +154,5 @@ volumes:
   transmission_data:
     name: transmission_data
     external: true
-  anacrolix_data:
-    name: anacrolix_data
-  anacrolix_cache:
-    name: anacrolix_cache
+  piecemeal_data:
+    name: piecemeal_data
