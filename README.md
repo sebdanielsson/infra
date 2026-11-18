@@ -109,7 +109,7 @@ The `docker/` directory contains Docker Compose configurations for various servi
 
 ### Available Services
 
-- **Media Services:** Jellyfin, Sonarr, Radarr, Prowlarr, Seerr, Transmission
+- **Media Services:** Jellyfin, Sonarr, Radarr, Prowlarr, Seerr, piecemeal
 - **Infrastructure:** Traefik, Portainer, Prometheus/Grafana, Nginx, DockTail
 - **ADS-B:** Ultrafeeder (tar1090 + graphs1090) on `flightradar`, dashboards on `hogsmeade` — see [ADS-B observability](guides/adsb-observability.md)
 - **Applications:** Plausible, Pocket-ID

@@ -16,10 +16,9 @@ services:
       - PGID=1000
       - TZ=Europe/Stockholm
     ports:
-      - 9091:9091
       # piecemeal's qBittorrent API for Radarr and Sonarr, which reach it at
-      # 172.17.0.1:9092 as they reached Transmission. Bound to the docker
-      # bridge only: people use the tailnet name.
+      # 172.17.0.1:9092. Bound to the docker bridge only: people use the
+      # tailnet name.
       - 172.17.0.1:9092:9092
     volumes:
       - /lib/modules:/lib/modules
@@ -31,64 +30,20 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s
-    # Transmission runs in this container's network namespace
-    # (network_mode: service:wireguard) and so has no IP of its own — the
-    # DockTail service for its web UI has to be declared here.
+    # piecemeal runs in this container's network namespace
+    # (network_mode: service:wireguard) and so has no IP of its own: the
+    # DockTail service for its web UI and APIs has to be declared here.
     labels:
       - docktail.service.enable=true
-      - docktail.service.name=transmission
-      - docktail.service.description=Transmission web UI (via WireGuard)
-      - docktail.service.port=9091
+      - docktail.service.name=piecemeal
+      - docktail.service.description=piecemeal BitTorrent client (via WireGuard)
+      - docktail.service.port=9092
       - docktail.service.protocol=http
       - docktail.service.direct=true
       - docktail.service.network=wgnet
       - docktail.service.service-port=443
       - docktail.service.service-protocol=https
-      # piecemeal also lives in this netns: its web UI and both APIs.
-      - docktail.service.1.name=piecemeal
-      - docktail.service.1.description=piecemeal BitTorrent client (via WireGuard)
-      - docktail.service.1.port=9092
-      - docktail.service.1.protocol=http
-      - docktail.service.1.service-port=443
-      - docktail.service.1.service-protocol=https
     restart: unless-stopped
-  transmission:
-    image: ghcr.io/linuxserver/transmission:4.1.4
-    container_name: transmission
-    network_mode: "service:wireguard"
-    depends_on:
-      wireguard:
-        condition: service_healthy
-        restart: true
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Stockholm
-      - DOCKER_MODS=jordanpotter/docker-mods:transmission-nat-pmp
-      - USER=${TRANSMISSION_USER}
-      - PASS=${TRANSMISSION_PASS}
-    volumes:
-      - transmission_data:/config
-      - /chungus/media/downloads:/downloads
-    # Shares the wireguard netns, so the RPC/web listener is on localhost
-    # here too. USER/PASS turn on RPC basic auth, and an unauthenticated
-    # probe then gets 401 forever - so the check must present them.
-    # Transmission serves RPC on the same thread that does its disk I/O, so
-    # while it downloads onto the chungus HDD pool a request can wait 10-20 s
-    # behind a write. 5 s marked it unhealthy whenever it was busy.
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fsS -o /dev/null -u \"$$USER:$$PASS\" http://localhost:9091/transmission/web/"]
-      interval: 30s
-      timeout: 30s
-      retries: 3
-      start_period: 30s
-    restart: unless-stopped
-    # Off while piecemeal is in use: both get the same NAT-PMP port from the
-    # VPN and would fight over it in the shared netns. To switch back, set
-    # this to 1 and piecemeal's to 0.
-    deploy:
-      replicas: 0
-
   # github.com/sebdanielsson/piecemeal: a BitTorrent client on
   # anacrolix/torrent with a qBittorrent-compatible API for Radarr and
   # Sonarr, a web UI, and NAT-PMP port forwarding through the VPN.
@@ -100,8 +55,8 @@ services:
       wireguard:
         condition: service_healthy
         restart: true
-    # The user that owns /chungus/media/downloads, like Transmission's and
-    # the *arrs' PUID, so they can move and delete what it downloads.
+    # The user that owns /chungus/media/downloads, like the *arrs' PUID, so
+    # they can move and delete what it downloads.
     user: "1000:1000"
     environment:
       - TZ=Europe/Stockholm
@@ -111,7 +66,8 @@ services:
       # Same mount and path as Radarr's and Sonarr's, so the paths it
       # reports work for them without remote path mappings.
       - PIECEMEAL_DOWNLOAD_DIR=/downloads
-      # Where Transmission saved, so imported and new torrents sit together.
+      # Where Transmission saved, so the torrents imported from it and new
+      # ones sit together.
       - PIECEMEAL_DEFAULT_SAVE_PATH=/downloads/complete
       - PIECEMEAL_WATCH_DIR=/downloads/watch
       # DockTail's tailnet proxy reaches the netns from wgnet's gateway and
@@ -151,8 +107,5 @@ networks:
     attachable: true
 
 volumes:
-  transmission_data:
-    name: transmission_data
-    external: true
   piecemeal_data:
     name: piecemeal_data
