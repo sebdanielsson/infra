@@ -17,6 +17,10 @@ services:
       - TZ=Europe/Stockholm
     ports:
       - 9091:9091
+      # piecemeal's qBittorrent API for Radarr and Sonarr, which reach it at
+      # 172.17.0.1:9092 as they reached Transmission. Bound to the docker
+      # bridge only: people use the tailnet name.
+      - 172.17.0.1:9092:9092
     volumes:
       - /lib/modules:/lib/modules
       # Rendered into the workspace by pre-deploy.sh before every deploy
@@ -89,7 +93,7 @@ services:
   # anacrolix/torrent with a qBittorrent-compatible API for Radarr and
   # Sonarr, a web UI, and NAT-PMP port forwarding through the VPN.
   piecemeal:
-    image: ghcr.io/sebdanielsson/piecemeal:0.5.0
+    image: ghcr.io/sebdanielsson/piecemeal:0.6.0
     container_name: piecemeal
     network_mode: "service:wireguard"
     depends_on:
@@ -107,19 +111,26 @@ services:
       # Same mount and path as Radarr's and Sonarr's, so the paths it
       # reports work for them without remote path mappings.
       - PIECEMEAL_DOWNLOAD_DIR=/downloads
-      - PIECEMEAL_DEFAULT_SAVE_PATH=/downloads/piecemeal
-      - PIECEMEAL_WATCH_DIR=/downloads/piecemeal/watch
+      # Where Transmission saved, so imported and new torrents sit together.
+      - PIECEMEAL_DEFAULT_SAVE_PATH=/downloads/complete
+      - PIECEMEAL_WATCH_DIR=/downloads/watch
+      # DockTail's tailnet proxy reaches the netns from wgnet's gateway and
+      # sends the tailnet client's address in X-Forwarded-For.
+      - PIECEMEAL_TRUSTED_PROXIES=172.100.0.1/32
       - PIECEMEAL_NATPMP_GATEWAY=10.2.0.1
       # The tunnel only carries IPv4 (AllowedIPs = 0.0.0.0/0).
       - PIECEMEAL_DISABLE_IPV6=true
-      # From .env.sops: `docker run --rm -i ghcr.io/sebdanielsson/piecemeal hash-password`.
+      # The local admin, for when Pocket ID is down. The password is
+      # PIECEMEAL_ADMIN_PASSWORD in .env.sops, next to its hash.
       - PIECEMEAL_ADMIN_PASSWORD_HASH=${PIECEMEAL_ADMIN_PASSWORD_HASH:-}
-      # Pocket ID, once its client exists, with the callback
-      # https://piecemeal.risk-bee.ts.net/api/piecemeal/v1/auth/oidc/callback:
-      # - PIECEMEAL_OIDC_ISSUER=https://pocket-id.risk-bee.ts.net
-      # - PIECEMEAL_OIDC_CLIENT_ID=${PIECEMEAL_OIDC_CLIENT_ID:-}
-      # - PIECEMEAL_OIDC_CLIENT_SECRET=${PIECEMEAL_OIDC_CLIENT_SECRET:-}
-      # - PIECEMEAL_OIDC_NAME=Pocket ID
+      # Pocket ID client "piecemeal", restricted to the admin group, with the
+      # callback https://piecemeal.risk-bee.ts.net/api/piecemeal/v1/auth/oidc/callback.
+      - PIECEMEAL_OIDC_ISSUER=https://auth.hogwarts.zone
+      - PIECEMEAL_OIDC_CLIENT_ID=273c8824-bb8b-4c3c-a370-1389ef1bf24e
+      - PIECEMEAL_OIDC_CLIENT_SECRET=${PIECEMEAL_OIDC_CLIENT_SECRET:-}
+      - PIECEMEAL_OIDC_NAME=Pocket ID
+      - PIECEMEAL_OIDC_ALLOWED_GROUPS=admin
+      - PIECEMEAL_OIDC_ADMIN_GROUPS=admin
     volumes:
       # SSD: database and piece completion.
       - piecemeal_data:/data
