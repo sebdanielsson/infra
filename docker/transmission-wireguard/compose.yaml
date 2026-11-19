@@ -15,6 +15,11 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Stockholm
+      # killswitch.sh lets traffic out only through the tunnel and to these
+      # networks, the ones wg0.conf's PostUp routes outside it: wgnet, where
+      # Radarr, Sonarr and DockTail reach piecemeal from, the LAN and the
+      # tailnet.
+      - KILLSWITCH_ALLOWED_NETWORKS=172.100.0.0/24 192.168.1.0/24 100.0.0.0/8
     ports:
       # piecemeal's qBittorrent API for Radarr and Sonarr, which reach it at
       # 172.17.0.1:9092. Bound to the docker bridge only: people use the
@@ -24,8 +29,12 @@ services:
       - /lib/modules:/lib/modules
       # Rendered into the workspace by pre-deploy.sh before every deploy
       - ./wg0.conf:/config/wg_confs/wg0.conf
+      # Runs before the tunnel comes up; see the script.
+      - ./killswitch.sh:/custom-cont-init.d/killswitch.sh:ro
     healthcheck:
-      test: ["CMD-SHELL", "wg show | grep -q handshake"]
+      # Healthy only with the kill switch in place, so piecemeal doesn't
+      # start without it.
+      test: ["CMD-SHELL", "wg show | grep -q handshake && nft list table inet killswitch > /dev/null"]
       interval: 30s
       timeout: 10s
       retries: 5
