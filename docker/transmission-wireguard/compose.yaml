@@ -57,7 +57,7 @@ services:
   # anacrolix/torrent with a qBittorrent-compatible API for Radarr and
   # Sonarr, a web UI, and NAT-PMP port forwarding through the VPN.
   piecemeal:
-    image: ghcr.io/sebdanielsson/piecemeal:1.2.0
+    image: ghcr.io/sebdanielsson/piecemeal:1.3.0
     container_name: piecemeal
     network_mode: "service:wireguard"
     depends_on:
@@ -85,6 +85,10 @@ services:
       - PIECEMEAL_NATPMP_GATEWAY=10.2.0.1
       # The tunnel only carries IPv4 (AllowedIPs = 0.0.0.0/0).
       - PIECEMEAL_DISABLE_IPV6=true
+      # The kill switch inside piecemeal, under killswitch.sh's firewall:
+      # every BitTorrent connection and name lookup is bound to the
+      # tunnel, so it fails rather than leave another way when wg0 goes.
+      - PIECEMEAL_BIND_INTERFACE=wg0
       # The local admin, for when Pocket ID is down. The password is
       # PIECEMEAL_ADMIN_PASSWORD in .env.sops, next to its hash.
       - PIECEMEAL_ADMIN_PASSWORD_HASH=${PIECEMEAL_ADMIN_PASSWORD_HASH:-}
