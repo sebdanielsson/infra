@@ -6,7 +6,7 @@ collections:
 
   - name: community.docker
     type: galaxy
-    version: 5.4.0
+    version: 5.4.1
 
   - name: ansible.posix
     type: galaxy
