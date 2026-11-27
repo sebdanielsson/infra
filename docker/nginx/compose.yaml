@@ -2,7 +2,7 @@
 services:
   nginx:
     container_name: nginx
-    image: nginx:1.31.8-alpine
+    image: nginx:1.31.10-alpine
     networks:
       - nginx
     ports:
